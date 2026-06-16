@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TRACE · Visual Intelligence · Identify Anything</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#D4AE52;--gold-lt:#E8D080;--gold-dim:#7A6230;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;}
+html,body{height:100%;overflow:hidden;background:#050403;}
+body{font-family:'Montserrat',sans-serif;font-weight:300;color:#F0E8D2;display:flex;justify-content:center;}
+
+.shell{
+  width:100%;max-width:430px;height:100vh;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  background:#050403;
+}
+
+/* ── INTRO LAYER — absolute, covers everything, fades out ── */
+.intro-layer{
+  position:absolute;inset:0;z-index:10;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:#050403;
+  pointer-events:none;
+  transition:opacity 0.7s ease;
+}
+.intro-layer.hidden{opacity:0;pointer-events:none;}
+
+#intro-canvas{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+}
+
+.intro-tagline{
+  position:relative;z-index:2;
+  margin-top:min(72px,20vw);
+  font-size:9px;font-weight:600;
+  letter-spacing:0.42em;text-transform:uppercase;
+  color:var(--gold);opacity:0;
+  transition:opacity 0.7s ease;
+}
+.intro-tagline.show{opacity:0.75;}
+
+/* ── CONTENT LAYER — below intro, revealed when intro fades ── */
+.content-layer{
+  position:relative;z-index:1;
+  flex:1;display:flex;flex-direction:column;
+  justify-content:center;
+  padding:0 0 20px;
+  background:#050403;
+}
+
+.choose-label{
+  text-align:center;font-size:8px;letter-spacing:0.32em;
+  text-transform:uppercase;color:rgba(212,174,82,0.65);
+  margin-bottom:18px;opacity:0;
+  transition:opacity 0.5s ease;
+}
+.choose-label.show{opacity:1;}
+
+.tier-cards{display:flex;flex-direction:column;gap:8px;padding:0 18px;}
+
+.tier{
+  background:var(--tier-bg, rgba(14,12,8,0.95));
+  border:1px solid rgba(212,174,82,0.22);
+  padding:16px 18px;cursor:pointer;
+  opacity:0;transform:translateY(18px);
+  transition:opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1), border-color 0.18s, background 0.18s;
+  display:flex;align-items:center;gap:14px;
+}
+.tier.show{opacity:1;transform:translateY(0);}
+.tier:active{border-color:rgba(212,174,82,0.5);}
+
+.tier-icon{
+  width:46px;height:46px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:18px;
+}
+.tier-icon.pro{background:rgba(42,74,138,0.32);border:1.5px solid rgba(138,173,234,0.50);}
+.tier-icon.col{background:rgba(212,174,82,0.25);border:1.5px solid rgba(212,174,82,0.60);}
+.tier-icon.dis{background:rgba(58,138,90,0.25);border:1.5px solid rgba(112,184,144,0.55);}
+
+.tier-body{flex:1;min-width:0;}
+.tier-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:300;color:#F5EDD8;
+  margin-bottom:4px;line-height:1.15;letter-spacing:0.01em;
+}
+.tier-tagline{font-size:10px;color:#C8B888;margin-bottom:5px;line-height:1.55;letter-spacing:0.02em;}
+.tier-price{font-family:'Courier Prime',monospace;font-size:12px;color:var(--gold);margin-top:3px;}
+
+.tier-badge{
+  font-size:8px;letter-spacing:0.1em;padding:3px 8px;
+  border-radius:1px;text-transform:uppercase;font-weight:700;
+  flex-shrink:0;
+}
+.badge-pro{background:rgba(42,74,138,0.2);color:#8AADEA;border:1px solid rgba(42,74,138,0.35);}
+.badge-col{background:rgba(212,174,82,0.12);color:var(--gold);border:1px solid rgba(212,174,82,0.28);}
+.badge-free{background:rgba(58,138,90,0.15);color:#70B890;border:1px solid rgba(58,138,90,0.3);}
+
+.footer{
+  text-align:center;margin-top:16px;
+  font-size:9px;letter-spacing:0.08em;
+  color:#B8AA80;opacity:0;
+  transition:opacity 0.5s ease;
+  padding:0 18px;line-height:1.65;
+}
+.footer.show{opacity:1;}
+
+.grain{
+  position:fixed;inset:0;pointer-events:none;z-index:20;
+  opacity:0.28;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ══ INTRO LAYER — logo, fades out completely before cards show ══ -->
+  <div class="intro-layer" id="intro-layer">
+    <canvas id="intro-canvas"></canvas>
+    <div class="intro-tagline" id="intro-tagline">Art Intelligence</div>
+  </div>
+
+  <!-- ══ CONTENT LAYER — always underneath, revealed after intro exits ══ -->
+  <div class="content-layer">
+    <div style="text-align:center;font-size:24px;color:#EAE0B0;margin-bottom:14px;letter-spacing:0.01em;font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;opacity:0;transition:opacity 0.5s ease 0.1s;line-height:1.2;" id="scope-label">Identify anything.<br>Know everything.</div>
+    <div class="choose-label" id="clabel">Choose Your Experience</div>
+    <div class="tier-cards">
+
+      <div class="tier" id="t1" onclick="go('professional')">
+        <div class="tier-icon pro">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8AADEA" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+        </div>
+        <div class="tier-body">
+          <div class="tier-name">TRACE Professional</div>
+          <div class="tier-tagline">Museums · Auction Houses · Dealers · Appraisers · Institutions</div>
+          <div class="tier-price">€299 / month · Institutional</div>
+        </div>
+        <span class="tier-badge badge-pro">PRO</span>
+      </div>
+
+      <div class="tier" id="t2" onclick="go('collector')">
+        <div class="tier-icon col">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AE52" stroke-width="1.5" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div class="tier-body">
+          <div class="tier-name">TRACE Collector</div>
+          <div class="tier-tagline">Collectors · Art Advisors · Enthusiasts · Researchers</div>
+          <div class="tier-price">€49 / month · Personal</div>
+        </div>
+        <span class="tier-badge badge-col">COLLECTOR</span>
+      </div>
+
+      <div class="tier" id="t3" onclick="go('discover')">
+        <div class="tier-icon dis">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#70B890" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        </div>
+        <div class="tier-body">
+          <div class="tier-name">TRACE Discover</div>
+          <div class="tier-tagline">Art · Animals · Landmarks · People · Objects · Anything</div>
+          <div class="tier-price">Free · Premium €4.99/mo</div>
+        </div>
+        <span class="tier-badge badge-free">FREE</span>
+      </div>
+
+    </div>
+    <div class="footer" id="foot">
+      Same AI engine · Self-improving · Data never sold · GDPR compliant
+    </div>
+  </div>
+
+</div>
+<div class="grain"></div>
+
+<script>
+// ══════════════════════════════════════
+// LAUNCHER SEQUENCE
+//
+// 0.0s  Black screen
+// 0.3s  TRACE letters fade in (gold canvas)
+// 1.5s  "Art Intelligence" appears below
+// 2.2s  Hold — impression settles
+// 2.8s  Logo fades out (0.7s transition)
+// 3.5s  Canvas stops, intro-layer hidden
+// 3.5s  Cards animate in
+// ══════════════════════════════════════
+
+const canvas = document.getElementById('intro-canvas');
+const ctx    = canvas.getContext('2d');
+let W, H, animId, done = false, startTs = null;
+
+function resize(){
+  W = canvas.width  = canvas.offsetWidth  || 390;
+  H = canvas.height = canvas.offsetHeight || 844;
+}
+
+function drawTrace(alpha, glowAmount){
+  // Offscreen canvas — render letters then apply gold gradient via source-in
+  const ofc = document.createElement('canvas');
+  ofc.width = W; ofc.height = H;
+  const o = ofc.getContext('2d');
+
+  const fSize = Math.round(W * 0.185);
+  o.font = `300 ${fSize}px 'Cormorant Garamond','Playfair Display',Georgia,serif`;
+  o.letterSpacing = `${Math.round(W * 0.030)}px`;
+  o.textAlign = 'center';
+  o.textBaseline = 'middle';
+  o.fillStyle = '#ffffff';
+  o.fillText('TRACE', W * 0.5, H * 0.5);
+
+  // Gold diagonal gradient clipped to letters
+  o.globalCompositeOperation = 'source-in';
+  const grad = o.createLinearGradient(W*0.05, H*0.38, W*0.95, H*0.62);
+  grad.addColorStop(0,    `rgba(255,248,190,${alpha})`);
+  grad.addColorStop(0.06, `rgba(252,235,155,${alpha})`);
+  grad.addColorStop(0.18, `rgba(242,212,115,${alpha})`);
+  grad.addColorStop(0.35, `rgba(226,188,78,${alpha})`);
+  grad.addColorStop(0.52, `rgba(208,168,58,${alpha})`);
+  grad.addColorStop(0.70, `rgba(185,145,40,${alpha})`);
+  grad.addColorStop(0.85, `rgba(160,122,28,${alpha})`);
+  grad.addColorStop(1,    `rgba(130,96,16,${alpha})`);
+  o.fillStyle = grad;
+  o.fillRect(0, 0, W, H);
+
+  // Blit to main canvas with optional glow
+  ctx.save();
+  if(glowAmount > 0){
+    ctx.shadowColor = `rgba(255,200,80,${glowAmount * 0.85})`;
+    ctx.shadowBlur  = Math.round(36 * glowAmount);
+  }
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(ofc, 0, 0);
+  if(glowAmount > 0){
+    ctx.shadowBlur = Math.round(16 * glowAmount);
+    ctx.drawImage(ofc, 0, 0); // second pass for glow depth
+  }
+  ctx.restore();
+}
+
+function frame(ts){
+  if(done) return;
+  if(!startTs) startTs = ts;
+  const e = ts - startTs;
+
+  resize();
+  ctx.clearRect(0, 0, W, H);
+
+  // Background — always black during intro
+  ctx.fillStyle = '#050403';
+  ctx.fillRect(0, 0, W, H);
+
+  // Soft central glow builds with the letters
+  if(e > 300){
+    const ga = Math.min(0.08, (e-300)/1500 * 0.08);
+    const gg = ctx.createRadialGradient(W*.5, H*.5, 0, W*.5, H*.5, W*.55);
+    gg.addColorStop(0, `rgba(212,174,82,${ga})`);
+    gg.addColorStop(1, 'rgba(5,4,3,0)');
+    ctx.fillStyle = gg;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // TRACE letters: fade in 0.3s→1.5s, hold 1.5s→2.8s, fade out 2.8s→3.5s
+  const FADE_IN_START  = 300;
+  const FADE_IN_END    = 1500;
+  const HOLD_END       = 2800;
+  const FADE_OUT_END   = 3500;
+
+  let alpha = 0;
+  if(e >= FADE_IN_START && e < FADE_IN_END){
+    alpha = (e - FADE_IN_START) / (FADE_IN_END - FADE_IN_START);
+  } else if(e >= FADE_IN_END && e < HOLD_END){
+    alpha = 1;
+  } else if(e >= HOLD_END && e < FADE_OUT_END){
+    alpha = 1 - (e - HOLD_END) / (FADE_OUT_END - HOLD_END);
+  }
+
+  if(alpha > 0){
+    const glow = Math.min(0.55, alpha * 0.55);
+    drawTrace(alpha, glow);
+  }
+
+  // Tagline: show at 1.5s, hide when logo starts fading out
+  if(e > 1500 && e < HOLD_END){
+    document.getElementById('intro-tagline').classList.add('show');
+  } else if(e >= HOLD_END){
+    document.getElementById('intro-tagline').classList.remove('show');
+  }
+
+  // When fade-out complete: stop canvas, hide intro, show cards
+  if(e >= FADE_OUT_END){
+    done = true;
+
+    // Clear canvas to pure black so nothing bleeds through
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#050403';
+    ctx.fillRect(0,0,W,H);
+
+    // Hide intro layer completely
+    const introLayer = document.getElementById('intro-layer');
+    introLayer.style.transition = 'none';
+    introLayer.style.opacity = '0';
+    introLayer.style.pointerEvents = 'none';
+    // Remove from layout after transition
+    setTimeout(()=>{ introLayer.style.display='none'; }, 50);
+
+    // Reveal cards
+    showCards();
+    return;
+  }
+
+  animId = requestAnimationFrame(frame);
+}
+
+function showCards(){
+  // Choose label
+  setTimeout(()=>{ document.getElementById('scope-label').style.opacity='1'; document.getElementById('clabel').classList.add('show'); }, 0);
+
+  // Cards stagger
+  setTimeout(()=>{
+    const t1 = document.getElementById('t1');
+    t1.style.transitionDelay = '0s';
+    t1.classList.add('show');
+  }, 120);
+  setTimeout(()=>{
+    const t2 = document.getElementById('t2');
+    t2.style.transitionDelay = '0s';
+    t2.classList.add('show');
+  }, 260);
+  setTimeout(()=>{
+    const t3 = document.getElementById('t3');
+    t3.style.transitionDelay = '0s';
+    t3.classList.add('show');
+  }, 400);
+
+  // Footer
+  setTimeout(()=> document.getElementById('foot').classList.add('show'), 700);
+}
+
+// Start
+resize();
+window.addEventListener('resize', resize);
+requestAnimationFrame(frame);
+
+// Navigation
+function go(app){
+  const urls = {
+    professional: 'trace.html',  // opens mother app (source modules)
+    collector:    'trace.html',
+    discover:     'trace.html'
+  };
+  // Pass tier as URL hash so mother app can read it
+  window.location.href = urls[app] + '#' + app;
+}
+</script>
+</body>
+</html>

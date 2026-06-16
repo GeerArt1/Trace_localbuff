@@ -1,0 +1,110 @@
+/* ═══════════════════════════════════════════════
+   TIER 1-3 VISION ROADMAP ADDITIONS
+   Gap Severity · Multi-Spectral · Research Agent
+   Forensic Analysis · CIDOC-CRM · Enhanced Chat
+═══════════════════════════════════════════════ */
+
+/* ── GAP SEVERITY ── */
+.severity-badge{display:inline-block;font-size:7px;font-weight:700;letter-spacing:.08em;padding:2px 6px;border-radius:1px;text-transform:uppercase;margin-left:6px;vertical-align:middle;}
+.severity-minor{background:rgba(232,160,32,.15);color:#E8A020;border:1px solid rgba(232,160,32,.3);}
+.severity-moderate{background:rgba(220,140,40,.18);color:#DC8C28;border:1px solid rgba(220,140,40,.35);}
+.severity-critical{background:rgba(196,72,72,.15);color:var(--red-lt);border:1px solid rgba(196,72,72,.3);}
+
+/* ── MULTI-SPECTRAL MODE ── */
+.ms-screen{display:flex;flex-direction:column;height:100%;overflow:hidden;background:var(--bg);}
+.ms-layers{display:flex;flex-direction:column;gap:8px;padding:12px 14px;overflow-y:auto;flex:1;}
+.ms-layer{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;position:relative;}
+.ms-layer-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;}
+.ms-layer-name{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mid);font-weight:500;}
+.ms-layer-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ms-layer-vis{width:100%;height:180px;object-fit:cover;display:block;background:var(--surface2);}
+.ms-blend-controls{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid var(--border);background:var(--surface2);}
+.ms-blend-label{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);white-space:nowrap;}
+.ms-blend-slider{-webkit-appearance:none;appearance:none;flex:1;height:3px;background:var(--surface3);border-radius:2px;outline:none;cursor:pointer;}
+.ms-blend-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);cursor:pointer;}
+.ms-blend-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);cursor:pointer;}
+.ms-composite-view{position:relative;width:100%;aspect-ratio:4/3;background:var(--surface);overflow:hidden;border:1px solid var(--border);margin:0 14px 14px;}
+.ms-composite-canvas{width:100%;height:100%;object-fit:cover;opacity:0.85;}
+.ms-band-toggle{display:flex;gap:6px;padding:8px 14px;flex-wrap:wrap;}
+.ms-band-btn{padding:5px 10px;border:1px solid var(--border);background:var(--surface);border-radius:3px;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;transition:all .18s;}
+.ms-band-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(212,174,82,.08);}
+
+/* ── RESEARCH AGENT ── */
+.ra-screen{display:flex;flex-direction:column;height:100%;overflow:hidden;background:var(--bg);}
+.ra-messages{flex:1;overflow-y:auto;padding:16px;}
+.ra-msg{margin-bottom:14px;max-width:92%;animation:chatFadeIn .3s ease;}
+.ra-msg.ai{margin-right:auto;}
+.ra-msg.system{margin:0 auto;max-width:100%;}
+.ra-msg-bubble{padding:12px 16px;border-radius:10px;font-size:12px;line-height:1.75;}
+.ra-msg.ai .ra-msg-bubble{background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text-mid);}
+.ra-msg.system .ra-msg-bubble{background:rgba(212,174,82,.06);border:1px solid rgba(212,174,82,.15);text-align:center;color:var(--text-dim);font-size:11px;}
+.ra-msg-label{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-ghost);margin-bottom:3px;}
+.ra-msg-label .ra-agent{color:var(--gold);font-weight:600;}
+.ra-hypothesis{margin:8px 0;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:4px;}
+.ra-hyp-title{font-size:11px;font-weight:600;color:var(--gold);margin-bottom:4px;}
+.ra-hyp-body{font-size:11px;color:var(--text-mid);line-height:1.65;}
+.ra-hyp-sources{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;}
+.ra-hyp-src{font-size:8px;letter-spacing:.06em;padding:2px 6px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:2px;}
+.ra-step{display:flex;align-items:flex-start;gap:10px;margin:8px 0;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;}
+.ra-step-num{font-family:'Courier Prime',monospace;font-size:10px;color:var(--gold);font-weight:700;flex-shrink:0;min-width:18px;}
+.ra-step-text{font-size:11px;color:var(--text-mid);line-height:1.6;}
+.ra-step-status{font-size:8px;letter-spacing:.06em;text-transform:uppercase;margin-top:4px;}
+.ra-step-status.pending{color:var(--text-ghost);}
+.ra-step-status.ready{color:var(--green-lt);}
+
+/* ── FORENSIC ANALYSIS ── */
+.fa-panel{background:var(--surface);border:1px solid var(--border);margin:0 14px 14px;overflow:hidden;}
+.fa-panel-head{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--surface2);}
+.fa-panel-title{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+.fa-body{padding:12px 14px;}
+.fa-metric{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);}
+.fa-metric:last-child{border-bottom:none;}
+.fa-metric-label{font-size:10px;color:var(--text-dim);}
+.fa-metric-value{font-family:'Courier Prime',monospace;font-size:11px;color:var(--text-mid);font-weight:600;}
+.fa-metric-bar{height:2px;background:var(--surface3);border-radius:1px;margin-top:4px;}
+.fa-metric-fill{height:100%;border-radius:1px;}
+.fa-pigment-row{display:flex;align-items:center;gap:8px;padding:6px 0;}
+.fa-pigment-swatch{width:16px;height:16px;border-radius:3px;border:1px solid var(--border);flex-shrink:0;}
+.fa-pigment-name{font-size:10px;color:var(--text-mid);flex:1;}
+.fa-pigment-era{font-family:'Courier Prime',monospace;font-size:9px;color:var(--text-dim);}
+
+/* ── CIDOC-CRM EXPORT ── */
+.cidoc-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(100,140,220,.1);border:1px solid rgba(100,140,220,.25);border-radius:2px;font-size:7px;letter-spacing:.08em;text-transform:uppercase;color:#8AADEA;font-weight:600;}
+
+/* ── ENHANCED CHAT (STREAMING) ── */
+.chat-msg-bubble.streaming{border-bottom-left-radius:12px;}
+.chat-stream-cursor{display:inline-block;width:2px;height:13px;background:var(--gold);margin-left:2px;animation:blink .8s step-end infinite;vertical-align:middle;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── ACCESSIBILITY: Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scan-line { animation: none !important; opacity: 0 !important; }
+  .chat-typing-dot { animation: none !important; }
+  .grain { display: none !important; }
+}
+
+/* ── DATABASE QUERY (GETTY/INTERPOL) ── */
+#db-query-results{display:none;margin:0 14px 14px;border:1px solid var(--border);overflow:hidden;}
+.db-loading{padding:20px;text-align:center;font-size:11px;color:var(--text-dim);}
+.db-loading::after{content:'';display:inline-block;width:14px;height:14px;border:1px solid var(--border);border-top:1.5px solid var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-left:8px;vertical-align:middle;}
+
+/* ── VALUATION PANEL ── */
+#valuation-results{display:none;margin:0 14px 14px;}
+
+/* ── DIGITAL FINGERPRINT ── */
+#fingerprint-results{display:none;margin:0 14px 14px;}
+
+/* ── EXPORT PANEL ── */
+.export-full{border-top:1px solid var(--border);background:var(--surface);padding:14px;}
+.export-full-title{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;}
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.export-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .18s;}
+.export-btn:active{border-color:var(--gold);background:rgba(212,174,82,.06);}
+.export-btn-icon{font-size:20px;}
+.export-btn-label{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-mid);text-align:center;}
+.export-btn-sub{font-size:8px;color:var(--text-ghost);text-align:center;}

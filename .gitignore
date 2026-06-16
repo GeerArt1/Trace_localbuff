@@ -1,0 +1,15 @@
+node_modules/
+venv/
+.subscriptions.json
+.subscriptions.json.bak
+.timelines.json
+*.sqlite
+*.sqlite.bak
+.env
+.env.*
+server.log
+trace_events.log
+trace_optimize.log
+lib/
+.DS_Store
+*.log

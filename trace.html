@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-root>
+<head>
+<meta charset="UTF-8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TRACE">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#050403">
+  <meta name="application-name" content="TRACE">
+  <meta name="msapplication-TileColor" content="#050403">
+  <meta name="description" content="TRACE — AI Art Intelligence. Provenance, authentication and investigation for artworks.">
+  <meta property="og:title" content="TRACE Art Intelligence">
+  <meta property="og:description" content="Identify, investigate and build provenance for any artwork.">
+  <meta property="og:type" content="website">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<!-- JSDoc types for editor autocompletion (no runtime effect) -->
+<script src="src/types.js"></script>
+<title data-i18n="app_name">TRACE · Art Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" sizes="192x192" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23050403'/%3E%3Ctext x='96' y='116' text-anchor='middle' font-family='Georgia,serif' font-size='72' font-weight='300' fill='%23D4AE52'%3ET%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" sizes="512x512" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23050403'/%3E%3Ctext x='256' y='310' text-anchor='middle' font-family='Georgia,serif' font-size='200' font-weight='300' fill='%23D4AE52'%3ET%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="trace.css">
+<script src="lib/d3.v7.min.js"></script>
+</head>
+<body>
+
+<!-- ══ AUTH SCREEN (shown before main app when no session) ══ -->
+<div class="auth-screen" id="auth-screen" style="display:none;position:fixed;inset:0;z-index:999;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;">
+  <div style="font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:var(--gold);letter-spacing:.05em;margin-bottom:4px;">TRACE</div>
+  <div style="font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--text-dim);margin-bottom:40px;">Art Intelligence</div>
+
+  <!-- Login form -->
+  <div id="auth-login" style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:28px;width:320px;max-width:90vw;">
+    <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;">Sign In</div>
+    <input id="auth-email" type="email" placeholder="Email" autocomplete="email"
+      style="width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:12px 14px;font-family:var(--font-ui);font-size:14px;border-radius:3px;outline:none;margin-bottom:10px;">
+    <input id="auth-pass" type="password" placeholder="Password" autocomplete="current-password"
+      style="width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:12px 14px;font-family:var(--font-ui);font-size:14px;border-radius:3px;outline:none;margin-bottom:14px;">
+    <button id="auth-login-btn" style="width:100%;background:var(--gold);color:#060402;border:none;padding:12px;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;border-radius:3px;">Sign In</button>
+    <div id="auth-error" style="font-size:11px;color:var(--red);margin-top:10px;text-align:center;min-height:16px;"></div>
+    <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--text-dim);">
+      No account? <a id="auth-show-register" style="color:var(--gold-dim);cursor:pointer;">Create one</a>
+    </div>
+  </div>
+
+  <!-- Register form (hidden by default) -->
+  <div id="auth-register" style="display:none;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:28px;width:320px;max-width:90vw;">
+    <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;">Create Account</div>
+    <input id="reg-name" type="text" placeholder="Your name" autocomplete="name"
+      style="width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:12px 14px;font-family:var(--font-ui);font-size:14px;border-radius:3px;outline:none;margin-bottom:10px;">
+    <input id="reg-email" type="email" placeholder="Email" autocomplete="email"
+      style="width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:12px 14px;font-family:var(--font-ui);font-size:14px;border-radius:3px;outline:none;margin-bottom:10px;">
+    <input id="reg-pass" type="password" placeholder="Password (min 8 characters)" autocomplete="new-password"
+      style="width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:12px 14px;font-family:var(--font-ui);font-size:14px;border-radius:3px;outline:none;margin-bottom:14px;">
+    <button id="auth-register-btn" style="width:100%;background:var(--gold);color:#060402;border:none;padding:12px;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;border-radius:3px;">Create Account</button>
+    <div id="reg-error" style="font-size:11px;color:var(--red);margin-top:10px;text-align:center;min-height:16px;"></div>
+    <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--text-dim);">
+      Already have an account? <a id="auth-show-login" style="color:var(--gold-dim);cursor:pointer;">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<script src="src/auth.js"></script>
+
+<div class="app" id="app">
+
+  <div class="statusbar" id="statusbar">
+    <span class="st-time" id="st-time">09:46</span>
+    <div class="st-badges">
+      <span class="badge badge-tier" id="tier-badge">COLLECTOR</span>
+      <span class="badge badge-live">LIVE</span>
+    </div>
+  </div>
+
+  <div class="screen-viewport">
+
+    <!-- ══ INTRO ══ -->
+    <div class="screen active" id="s-intro">
+      <canvas id="intro-canvas"></canvas>
+      <div class="cin-logo" id="cin-logo">
+        <div style="height:min(240px,50vh)"></div>
+        <div class="cin-sub" id="cin-tagline">Art Intelligence</div>
+      </div>
+      <div class="cin-content" id="cin-content">
+        <div class="cin-slide" id="cs1" style="flex-shrink:0;">
+          <div class="cin-eye" id="cin-eye1">—</div>
+          <div class="cin-h" id="cin-h1">—</div>
+          <div class="cin-b" id="cin-b1">—</div>
+        </div>
+        <div class="cin-slide" id="cs2" style="flex-grow:1;display:flex;flex-direction:column;justify-content:center;">
+          <div class="cin-h" style="font-size:23px;margin-bottom:10px;" id="cin-h2">—</div>
+          <div class="cin-b" id="cin-b2">—</div>
+        </div>
+        <div class="cin-stats" id="cin-stats">
+          <div class="cstat"><div class="cstat-n">12M</div><div class="cstat-l">Archive Records</div></div>
+          <div class="cstat"><div class="cstat-n">57K</div><div class="cstat-l">Stolen Works</div></div>
+          <div class="cstat"><div class="cstat-n">500yr</div><div class="cstat-l">Coverage</div></div>
+        </div>
+        <div class="cin-actions" id="cin-actions">
+          <button class="btn-gold" id="intro-begin-btn">BEGIN INVESTIGATION</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ HOME ══ -->
+    <div class="screen" id="s-home">
+      <div class="scroll">
+        <div style="padding:20px 20px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(212,174,82,.05) 0%,transparent 100%);">
+          <div class="page-eye" id="home-greeting" data-i18n="home_greeting">Welcome</div>
+          <div class="page-title" id="home-title" data-i18n="home_title">What is this artwork?</div>
+          <div id="home-scan-cta" style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;padding:15px;background:var(--surface);border:1px solid var(--border-mid);cursor:pointer;">
+            <div>
+              <div style="font-size:12px;letter-spacing:.08em;color:var(--text);font-weight:500;" id="scan-cta-label" data-i18n="scan_cta">Photograph any artwork</div>
+              <div style="font-size:9px;color:var(--text-dim);margin-top:2px;">UPLOAD · PHOTOGRAPH · SIGNATURE · DETAIL</div>
+            </div>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M3 9V6a1 1 0 011-1h3M3 15v3a1 1 0 001 1h3M21 9V6a1 1 0 00-1-1h-3M21 15v3a1 1 0 01-1 1h-3"/></svg>
+          </div>
+        </div>
+
+        <!-- Active cases (Collector + Professional) -->
+        <div id="home-cases-section">
+          <div class="sec-head"><div class="sec-label">Active Investigations</div><div class="sec-link" id="home-all-cases-link">All ›</div></div>
+          <div class="case-card c-inv" id="home-sample-case">
+            <div class="card-inner">
+              <div class="card-title">Portrait of a Lady</div>
+              <div class="card-attr">attr. circle of Frans Hals, c.1640</div>
+              <div class="card-foot"><div class="cbar"><div class="cfill" style="width:62%"></div></div><div class="pill pill-inv">Investigating</div></div>
+            </div>
+            <div class="tl-strip">
+              <div class="tl-dot"><div class="tl-dot-mark"></div><div class="tl-dot-year">1640</div><div class="tl-dot-ev">Painted</div></div>
+              <div class="tl-dot"><div class="tl-dot-mark" style="border-color:var(--gold-dim)"></div><div class="tl-dot-year">1712</div><div class="tl-dot-ev">Amsterdam</div></div>
+              <div class="tl-dot"><div class="tl-dot-mark gap"></div><div class="tl-dot-year gap">1943</div><div class="tl-dot-ev gap">⚠ GAP</div></div>
+              <div class="tl-dot"><div class="tl-dot-mark"></div><div class="tl-dot-year">2024</div><div class="tl-dot-ev">Present</div></div>
+            </div>
+          </div>
+          <div class="case-card c-conf" data-status="confirmed" data-type="artwork" onclick="nav('cases')">
+            <div class="card-inner">
+              <div class="card-title">Landscape with Ruins</div>
+              <div class="card-attr">Flemish School, c.1720</div>
+              <div class="card-foot"><div class="cbar"><div class="cfill" style="width:91%"></div></div><div class="pill pill-conf">Confirmed</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Discover-only featured -->
+        <div id="home-discover-section" style="display:none;">
+          <div class="sec-head"><div class="sec-label">Did You Know?</div></div>
+          <div style="margin:0 14px 10px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);padding:14px;">
+            <div style="font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">Art Fact of the Day</div>
+            <div style="font-size:13px;line-height:1.7;color:var(--text-mid);">The Mona Lisa was stolen from the Louvre in 1911 and missing for two years. The museum didn't notice for 28 hours.</div>
+          </div>
+        </div>
+
+      </div>
+    
+    </div><!-- end s-home -->
+
+    <!-- ══ SCAN ══ -->
+    <div class="screen" id="s-scan" role="main" aria-label="Scan artwork">
+      <div class="mode-tabs" id="scan-tabs">
+        <button class="mtab active" id="scan-tab-front">Front</button>
+        <button class="mtab" id="scan-tab-back">Back / Label</button>
+        <button class="mtab" id="scan-tab-sig">Signature</button>
+        <button class="mtab" id="scan-tab-detail">Detail</button>
+      </div>
+      <!-- Scan zone + buttons: fixed, outside scroll -->
+      <div class="scan-zone" id="main-zone">
+          <div class="scan-line"></div>
+          <div class="scan-empty" id="main-empty">
+            <div style="width:72px;height:72px;border-radius:50%;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(212,174,82,0.08) 0%,transparent 70%);margin-bottom:16px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M3 9V6a1 1 0 011-1h3M3 15v3a1 1 0 001 1h3M21 9V6a1 1 0 00-1-1h-3M21 15v3a1 1 0 01-1 1h-3"/></svg>
+            </div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--text);margin-bottom:8px;" id="scan-zone-hint">Upload or Photograph</div>
+            <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.10em;text-transform:uppercase;">Select a source below</div>
+          </div>
+          <img id="main-preview" alt="">
+      </div>
+      <input type="file" id="main-file"         accept="image/*"            style="display:none">
+      <input type="file" id="main-file-cam"    accept="image/*" capture="environment" style="display:none">
+      <div class="scan-btns">
+        <button class="btn-go" id="btn-go" tabindex="0" disabled style="flex:1;" aria-label="Analyse artwork">◈ Analyse</button>
+      </div>
+      <!-- Scan progress bar with percentage -->
+      <div class="scan-progress" id="scan-progress">
+        <div class="scan-progress-bar"><div class="scan-progress-fill" id="scan-progress-fill" style="width:0%"></div></div>
+        <span class="scan-progress-pct" id="scan-progress-pct">0%</span>
+      </div>
+      <!-- Source picker — shown before result, hidden after -->
+      <div class="scan-btns" id="source-picker">
+        <button class="btn-up" id="btn-upload" style="border-right:1px solid var(--border);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:5px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Upload
+        </button>
+        <button class="btn-up" id="btn-photograph">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:5px;"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Photograph
+        </button>
+      </div>
+      <!-- Loading box: fills black zone during analysis -->
+      <div class="loading-box" id="main-loading">
+        <div class="loader"></div>
+        <div class="loader-msg">Consulting AI art intelligence<br><span class="loader-step" id="main-step">Initializing…</span></div>
+      </div>
+      <!-- Single scroll: result text + timeline + button all inside -->
+      <!-- scroll-snap ensures timeline never goes above Analyse bar -->
+      <div class="scroll" id="scan-scroll" style="display:none;flex:1;min-height:0;overscroll-behavior-y:none;scroll-snap-type:y proximity;">
+        <div class="err-box" id="main-err"></div>
+        <!-- Quick actions: copy, share, favorite -->
+      <div class="quick-actions" id="quick-actions" style="display:none;">
+        <button class="qa-btn" id="qa-copy" title="Copy to clipboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+        <button class="qa-btn" id="qa-share" title="Share">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+        <button class="qa-btn bookmark-btn" id="bookmark-btn" title="Bookmark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          Save
+        </button>
+        <button class="qa-btn" id="qa-zoom" title="Zoom">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          Zoom
+        </button>
+        <button class="qa-btn" id="compare-btn" title="Compare" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v18M3 12h18"/><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+          Compare
+        </button>
+      </div>
+      <div class="result-panel" id="main-result">
+          <div class="rp-head"><span class="rp-label" id="rp-label">◈ Analysis Complete</span><span class="rp-id" id="result-id">TRC-000000</span></div>
+          <div class="rp-body" id="result-body">
+            <!-- Skeleton loader shown during analysis -->
+            <div id="result-skeleton" class="skeleton-wrap" style="display:none;padding:8px 0;">
+              <div class="skeleton-item skeleton-title"></div>
+              <div class="skeleton-item skeleton-line"></div>
+              <div class="skeleton-item skeleton-line"></div>
+              <div class="skeleton-item skeleton-line"></div>
+              <div class="skeleton-item skeleton-line" style="width:50%"></div>
+              <div style="height:16px"></div>
+              <div class="skeleton-item skeleton-line"></div>
+              <div class="skeleton-item skeleton-line"></div>
+              <div class="skeleton-item skeleton-line"></div>
+              <div style="height:16px"></div>
+              <div class="skeleton-item skeleton-card"></div>
+              <div class="skeleton-item skeleton-card"></div>
+            </div>
+          </div>
+        </div>
+        <div class="export-row" id="export-row">
+          <button class="btn-exp" id="btn-export-pdf">📄 PDF</button>
+          <button class="btn-exp" id="btn-export-case">📁 Case</button>
+          <button class="btn-exp" id="btn-export-cidoc">📡 Getty</button>
+        </div>
+        <!-- Ownership Timeline: last item in scroll -->
+        <div id="result-tl-wrap" style="display:none;border-top:1px solid var(--border);background:var(--surface);scroll-snap-align:end;">
+          <div style="padding:11px 14px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);">◈ Ownership Timeline</span>
+            <span style="font-size:9px;color:var(--text-dim);cursor:pointer;letter-spacing:.1em;" id="tl-expand-link">EXPAND ›</span>
+          </div>
+          <div style="padding:14px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;" class="tl-track-scroll">
+            <div style="display:flex;align-items:flex-start;position:relative;min-width:max-content;gap:0;" id="result-tl-track"></div>
+          </div>
+        </div>
+        <!-- Database Query (GETTY/INTERPOL) -->
+        <button id="db-query-btn" style="display:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Cross-Reference Getty · INTERPOL · ALR
+        </button>
+        <div id="db-query-results"></div>
+        <div id="valuation-results"></div>
+        <div id="fingerprint-results"></div>
+        <button class="btn-add" id="btn-add" tabindex="0" onclick="addCase()">+ Add to Investigations</button>
+      </div>
+    </div>
+
+    <!-- ══ CASES ══ -->
+    <div class="screen" id="s-cases" role="main" aria-label="My Cases">
+      <div class="page-head">
+        <div class="page-eye" data-i18n="cases_eye">Investigation Files</div>
+        <div class="page-title" id="cases-title" data-i18n="cases_title">My Cases</div>
+      </div>
+      <div style="display:flex;border-bottom:1px solid var(--border);flex-shrink:0;">
+        <button class="mtab active" onclick="setFilter(this)">All</button>
+        <button class="mtab" onclick="setFilter(this)">Active</button>
+        <button class="mtab" onclick="setFilter(this)">Confirmed</button>
+        <button class="mtab" onclick="setFilter(this)">Alerts</button>
+        <button class="mtab" id="filter-people" onclick="setFilter(this)">People</button>
+      </div>
+      <div class="scroll">
+        <div id="cases-list" style="padding:8px 0;">
+          <div class="case-card" data-status="active" data-type="artwork" onclick="openCaseTimeline('Portrait of a Lady','attr. circle of Frans Hals, c.1640','artwork')">
+            <div class="card-inner"><div class="card-title">Portrait of a Lady</div><div class="card-attr">attr. circle of Frans Hals, c.1640</div><div class="card-foot"><div class="cbar"><div class="cfill" style="width:62%"></div></div><div class="pill pill-inv">Investigating</div></div></div>
+            <div class="tl-strip"><div class="tl-dot"><div class="tl-dot-mark"></div><div class="tl-dot-year">1640</div><div class="tl-dot-ev">Painted</div></div><div class="tl-dot"><div class="tl-dot-mark" style="border-color:var(--gold-dim)"></div><div class="tl-dot-year">1712</div><div class="tl-dot-ev">Amsterdam</div></div><div class="tl-dot"><div class="tl-dot-mark gap"></div><div class="tl-dot-year gap">1943</div><div class="tl-dot-ev gap">⚠ GAP</div></div><div class="tl-dot"><div class="tl-dot-mark"></div><div class="tl-dot-year">2024</div><div class="tl-dot-ev">Present</div></div></div>
+          </div>
+          <div class="case-card c-conf" data-status="confirmed" data-type="artwork" onclick="nav('cases')">
+            <div class="card-inner"><div class="card-title">Landscape with Ruins</div><div class="card-attr">Flemish School, c.1720</div><div class="card-foot"><div class="cbar"><div class="cfill" style="width:91%"></div></div><div class="pill pill-conf">Confirmed</div></div></div>
+          </div>
+        </div>
+        <!-- Discover locked state -->
+        <div id="cases-locked" style="display:none;" class="locked">
+          <div class="locked-icon">📁</div>
+          <div class="locked-title">Case Management</div>
+          <div class="locked-body">Save and track your investigations across artworks. Available in Collector and Professional tiers.</div>
+          <button class="locked-btn" onclick="showUpgrade()">UPGRADE TO COLLECTOR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TIMELINE ══ -->
+    <div class="screen" id="s-timeline" role="main" aria-label="Provenance Timeline">
+      <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;">
+        <div>
+        <div class="page-eye" data-i18n="tl_eye">Provenance Timeline</div>
+        <div class="page-title" id="tl-page-title" data-i18n="tl_title">Timeline</div>
+        </div>
+        <button onclick="nav('cases')" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;padding:4px 8px;">‹</button>
+      </div>
+      <!-- Subject info -->
+      <div style="padding:12px 20px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(212,174,82,.04) 0%,transparent 100%);flex-shrink:0;">
+        <!-- Search bar for saved timelines -->
+        <div class="search-bar" id="tl-search-bar" style="position:relative;">
+          <input class="search-input" id="tl-search-input" data-i18n-placeholder="tl_search_placeholder" placeholder="&#x1F50D; Search saved timelines..." oninput="searchTimelines(this.value)">
+          <div class="search-results" id="tl-search-results"></div>
+        </div>
+        <div class="tl-sname" id="tl-sname">—</div>
+        <div class="tl-ssub" id="tl-ssub" style="font-size:11px;color:var(--text-mid);font-style:italic;margin-top:2px;">—</div>
+        <span class="tl-stype" id="tl-stype" style="display:inline-block;margin-top:6px;font-size:8px;letter-spacing:.15em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--border-mid);color:var(--gold);">ARTWORK</span>
+      </div>
+      <!-- Horizontal strip: sticky above the scroll area -->
+      <div id="tl-h-strip-container" style="display:none;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;overflow-x:auto;scrollbar-width:none;"></div>
+      <!-- Vertical timeline: spine + body in sync -->
+      <div class="tl-screen" id="tl-screen" style="display:none;">
+        <div class="tl-grid" id="tl-grid"></div>
+      </div>
+      <!-- Saved Timelines list (shown when no active timeline) -->
+      <div id="tl-saved-list" style="display:none;flex-direction:column;flex:1;min-height:0;overflow-y:auto;">
+        <div style="padding:14px 20px 8px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;">
+          <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);">Saved Investigations</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">Your saved provenance timelines persist across sessions</div>
+        </div>
+        <div id="tl-saved-items" style="padding:8px 0;"></div>
+        <div id="tl-saved-empty" style="display:none;padding:40px 20px;text-align:center;color:var(--text-dim);font-size:13px;line-height:1.8;">
+          <div style="font-size:28px;opacity:.35;margin-bottom:14px;">◈</div>
+          No saved timelines yet.<br>Scan an artwork and it will appear here automatically.
+        </div>
+      </div>
+      <!-- Locked state -->
+      <div id="tl-locked" style="display:none;" class="locked">
+        <div class="locked-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><line x1="7" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="17" y2="12"/><line x1="5" y1="7" x2="5" y2="10"/><line x1="12" y1="7" x2="12" y2="10"/><line x1="19" y1="7" x2="19" y2="10"/><line x1="5" y1="14" x2="5" y2="17"/><line x1="12" y1="14" x2="12" y2="17"/><line x1="19" y1="14" x2="19" y2="17"/></svg>
+        </div>
+        <div class="locked-title">Provenance Timeline</div>
+        <div class="locked-body">Full ownership chain, exhibition history, and life events timeline. Available in Collector and Professional tiers.</div>
+        <button class="locked-btn" onclick="showUpgrade()">UPGRADE TO COLLECTOR</button>
+      </div>
+    </div>
+
+    <!-- ══ LEARN (Discover only) ══ -->
+    <div class="screen" id="s-learn">
+      <div class="page-head">
+        <div class="page-eye" data-i18n="did_you_know">Art Education</div>
+        <div class="page-title" data-i18n="home_title">Learn Art History</div>
+      </div>
+      <div class="scroll">
+        <div class="sec-head" style="padding-top:12px;"><div class="sec-label">Beginner's Guide</div></div>
+        <div class="learn-card" onclick="toast('Loading lesson…')"><div class="learn-num">Lesson 01</div><div class="learn-title">How to Read a Painting</div><div class="learn-body">Composition, light, symbolism — what artists chose deliberately and why.</div><div class="learn-arrow">Start ›</div></div>
+        <div class="learn-card" onclick="toast('Loading lesson…')"><div class="learn-num">Lesson 02</div><div class="learn-title">Periods of Art History</div><div class="learn-body">5,000 years of human creativity from Egypt to Contemporary Art.</div><div class="learn-arrow">Start ›</div></div>
+        <div class="learn-card" onclick="toast('Loading lesson…')"><div class="learn-num">Lesson 03</div><div class="learn-title">What is Provenance?</div><div class="learn-body">Why ownership history matters, how stolen art gets recovered.</div><div class="learn-arrow">Start ›</div></div>
+        <div class="learn-card" onclick="toast('Loading lesson…')"><div class="learn-num">Lesson 04</div><div class="learn-title">Famous Art Forgeries</div><div class="learn-body">Van Meegeren fooled the Nazis. How AI catches what humans miss.</div><div class="learn-arrow">Start ›</div></div>
+        <div class="learn-card" onclick="toast('Loading lesson…')"><div class="learn-num">Lesson 05</div><div class="learn-title">Hidden Symbols in Art</div><div class="learn-body">The skull, the lily, the hourglass — every Old Master object had meaning.</div><div class="learn-arrow">Start ›</div></div>
+      </div>
+    </div>
+
+    <!-- ══ CHAT ══ -->
+    <div class="screen" id="s-chat" role="main" aria-label="AI Chat">
+      <div class="page-head">
+        <div class="page-eye">AI Chat</div>
+        <div class="page-title">Ask TRACE</div>
+      </div>
+      <div class="chat-context" id="chat-context" style="display:none;">
+        <img class="chat-ctx-img" id="chat-ctx-img" src="" alt="">
+        <div class="chat-ctx-text">
+          <div class="chat-ctx-title" id="chat-ctx-title"></div>
+          <div class="chat-ctx-sub" id="chat-ctx-sub"></div>
+        </div>
+        <button class="chat-ctx-close" onclick="closeChat()" aria-label="Close chat">✕</button>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-msg ai">
+          <div class="chat-msg-label">TRACE</div>
+          <div class="chat-msg-bubble">Ask me anything about the artwork you just scanned. I can discuss style, provenance, period details, or suggest next investigation steps.</div>
+        </div>
+      </div>
+      <div class="chat-input-wrap">
+        <div class="chat-suggestions" id="chat-suggestions" style="padding:10px 16px 6px;">
+          <div class="chat-sug" onclick="sendChat('Is this signature authentic?')">Is this signature authentic?</div>
+          <div class="chat-sug" onclick="sendChat('What period does this style suggest?')">What period does this style suggest?</div>
+          <div class="chat-sug" onclick="sendChat('Are there similar works I should compare?')">Similar works to compare?</div>
+        </div>
+        <div class="chat-input-bar" style="border-top:none;">
+          <input type="text" class="chat-input" id="chat-input" data-i18n-placeholder="chat_input_placeholder" placeholder="Ask about this artwork…" onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" id="chat-send" onclick="sendChat()" aria-label="Send message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#060402" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="chat-spacer" style="flex:1;min-height:0;"></div>
+    </div>
+
+    <!-- ══ RESEARCH AGENT ══ -->
+    <div class="screen" id="s-research" role="main" aria-label="AI Research Agent">
+      <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="page-eye">AI Research Agent</div>
+          <div class="page-title">Provenance Research</div>
+        </div>
+        <span class="cidoc-badge">CIDOC-CRM</span>
+      </div>
+      <div class="ra-screen" id="ra-screen">
+        <div class="ra-messages" id="ra-messages">
+          <div class="ra-msg system">
+            <div class="ra-msg-bubble">TRACE Research Agent autonomously investigates provenance chains, searches auction databases, museum collections, and generates investigation hypotheses.</div>
+          </div>
+          <div class="ra-msg ai">
+            <div class="ra-msg-label"><span class="ra-agent">TRACE</span> RESEARCH AGENT</div>
+            <div class="ra-msg-bubble">Ready to investigate. Start an analysis first, then open the Research Agent to generate autonomous investigation hypotheses.</div>
+          </div>
+        </div>
+        <div class="chat-input-bar">
+          <input type="text" class="chat-input" id="ra-input" data-i18n-placeholder="research_placeholder" placeholder="Enter artwork to research…" onkeydown="if(event.key==='Enter')runResearch()">
+          <button class="chat-send" id="ra-send" onclick="runResearch()" aria-label="Start research">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#060402" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MULTI-SPECTRAL ANALYSIS ══ -->
+    <div class="screen" id="s-spectral" role="main" aria-label="Multi-Spectral Analysis">
+      <div class="page-head">
+        <div class="page-eye">Multi-Spectral Analysis</div>
+        <div class="page-title">Spectral Imaging</div>
+      </div>
+      <div class="scroll" id="spectral-scroll">
+        <div style="padding:14px;">
+          <div style="font-size:11px;color:var(--text-mid);line-height:1.7;margin-bottom:12px;">Import UV, IR, and X-Ray images to compare spectral bands side-by-side with layer blending.</div>
+          <div class="ms-band-toggle" id="ms-band-buttons">
+            <button class="ms-band-btn active" onclick="MSSpectral.importBand('Visible')">Visible</button>
+            <button class="ms-band-btn" onclick="MSSpectral.importBand('UV')">UV</button>
+            <button class="ms-band-btn" onclick="MSSpectral.importBand('IR')">IR</button>
+            <button class="ms-band-btn" onclick="MSSpectral.importBand('X-Ray')">X-Ray</button>
+          </div>
+        </div>
+        <div class="ms-layers" id="ms-layers-container">
+          <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:12px;">Import spectral images using the buttons above.</div>
+        </div>
+      </div>
+    </div>
+
+    
+    <!-- ══ SACRED GEOMETRY ══ -->
+    <div class="screen" id="s-geometry" role="main" aria-label="Sacred Geometry">
+      <div class="page-head">
+        <div class="page-eye">Composition Analysis</div>
+        <div class="page-title">Sacred Geometry</div>
+      </div>
+      <div class="scroll" id="sg-scroll">
+        <div style="padding:12px 14px 8px;flex-shrink:0;">
+          <div style="font-size:10px;line-height:1.6;color:var(--text-dim);">Upload an artwork to overlay golden ratio, rule of thirds, dynamic symmetry, and radial harmony grids.</div>
+        </div>
+        <button class="sg-upload-btn" id="sg-upload-btn" onclick="sgLoadImage()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Upload artwork for composition analysis
+        </button>
+        <div class="sg-canvas-wrap" id="sg-canvas-wrap" style="display:none;">
+          <canvas id="sg-canvas"></canvas>
+        </div>
+        <input type="file" id="sg-file-input" accept="image/*" style="display:none" onchange="sgOnFile(event)">
+        <div class="sg-controls" id="sg-controls" style="display:none;">
+          <button class="sg-btn" onclick="sgToggle('golden')" id="sg-btn-golden">Golden Ratio φ</button>
+          <button class="sg-btn" onclick="sgToggle('thirds')" id="sg-btn-thirds">Rule of Thirds</button>
+          <button class="sg-btn" onclick="sgToggle('spiral')" id="sg-btn-spiral">Golden Spiral</button>
+          <button class="sg-btn" onclick="sgToggle('symmetry')" id="sg-btn-symmetry">Dynamic Symmetry</button>
+          <button class="sg-btn" onclick="sgToggle('radial')" id="sg-btn-radial">Radial</button>
+          <button class="sg-btn" onclick="sgClear()" id="sg-btn-clear" style="margin-left:auto;border-color:var(--border-strong);">Clear</button>
+          <button class="sg-ai-btn" id="sg-ai-btn" onclick="sgAnalyzeWithAI()" style="margin-left:4px;">✦ AI Analyze</button>
+        </div>
+        <div class="sg-analysis" id="sg-analysis">
+          <div class="sg-analysis-title">◈ Composition Analysis</div>
+          <div class="sg-analysis-body" id="sg-analysis-body">Toggle overlays above to analyse the compositional structure. The golden ratio (φ≈1.618) appears throughout classical and Renaissance art.</div>
+        </div>
+        <div class="sg-info">
+          <strong>Sacred Geometry</strong> — The golden ratio (φ = 1.618…), rule of thirds, dynamic symmetry rectangles (√2, √3, √4, √5), and radial harmony are compositional frameworks used by artists from antiquity through the Renaissance and beyond. Toggle overlays to reveal underlying structure.
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ KNOWLEDGE GRAPH ══ -->
+    <div class="screen" id="s-knowledge" role="main" aria-label="Provenance Knowledge Graph">
+      <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="page-eye">Provenance Network</div>
+          <div class="page-title">Knowledge Graph</div>
+        </div>
+        <button onclick="nav('timeline')" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;padding:4px 8px;">‹</button>
+      </div>
+      <div class="scroll" style="display:flex;flex-direction:column;gap:0;padding:0;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+          <div style="font-size:11px;color:var(--text-mid);line-height:1.6;">Visual ownership chain showing artists, exhibitions, auctions, and provenance events as an interactive network graph.</div>
+        </div>
+        <div id="kg-container" style="flex:1;min-height:300px;padding:10px;">
+          <div style="padding:40px 20px;text-align:center;color:var(--text-dim);font-size:12px;line-height:1.8;">
+            <div style="font-size:36px;opacity:.2;margin-bottom:10px;">◈</div>
+            No provenance data loaded.<br>
+            Run an analysis first, then open the Knowledge Graph to see the ownership network.
+          </div>
+        </div>
+        <div id="kg-legend" style="display:flex;gap:16px;padding:10px 16px;border-top:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;">
+          <span style="font-size:8px;color:var(--text-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#D4AE52;"></span> Artwork</span>
+          <span style="font-size:8px;color:var(--text-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8AADEA;"></span> Artist</span>
+          <span style="font-size:8px;color:var(--text-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#5AAA78;"></span> Owner</span>
+          <span style="font-size:8px;color:var(--text-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8B5CF6;"></span> Exhibition</span>
+          <span style="font-size:8px;color:var(--text-dim);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#EF4444;"></span> Auction</span>
+        </div>
+        <button id="kg-build-btn" onclick="window.KNOWLEDGE.loadFromServer(window._lastResult ? window._lastResult.title : '', window._lastResult ? window._lastResult.artist : '', window._lastResult ? window._lastResult.timeline : [])" style="width:100%;background:var(--surface);border:none;border-top:1px solid var(--border);padding:12px;font-family:Montserrat,sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);cursor:pointer;">◈ Build from Current Analysis</button>
+      </div>
+    </div>
+
+    <!-- ══ IIIF VIEWER (Professional tier) ══ -->
+    <div class="screen" id="s-viewer" role="main" aria-label="Deep Zoom Viewer">
+      <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="page-eye">Deep Zoom Viewer</div>
+          <div class="page-title">IIIF Artwork Viewer</div>
+        </div>
+        <button onclick="nav('scan')" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;padding:4px 8px;">‹</button>
+      </div>
+      <div class="scroll" style="display:flex;flex-direction:column;gap:0;padding:0;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+          <div style="font-size:11px;color:var(--text-mid);line-height:1.6;">Deep-zoom viewer for high-resolution artwork inspection. Supports IIIF-compatible images and local uploads.</div>
+        </div>
+        <div id="viewer-empty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;color:var(--text-dim);gap:12px;">
+          <div style="font-size:36px;opacity:.3;">◈</div>
+          <div style="font-size:14px;">No image loaded</div>
+          <div style="font-size:11px;line-height:1.6;">Scan an artwork first, then open the Zoom viewer to inspect it in detail.<br>IIIF support: paste a IIIF Image API URL below.</div>
+          <div style="display:flex;gap:8px;width:100%;max-width:400px;margin-top:4px;">
+            <input id="iiif-url-input" placeholder="IIIF Image URL (info.json)..." 
+              style="flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 14px;font-size:16px;border-radius:2px;outline:none;font-family:var(--font-mono);">
+            <button onclick="loadIIIFImage()" style="background:var(--gold);color:#060402;border:none;padding:10px 16px;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;border-radius:2px;">Load</button>
+          </div>
+          <div style="font-size:10px;color:var(--text-ghost);margin-top:4px;">Or upload a high-res image for deep-zoom</div>
+          <button onclick="loadLocalImage()" style="background:none;border:1px solid var(--border);color:var(--text-mid);padding:10px 20px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;">↑ Upload Image</button>
+          <input type="file" id="viewer-file-input" accept="image/*" style="display:none" onchange="viewerLoadLocal(event)">
+        </div>
+        <div id="openseadragon-viewer" style="width:100%;flex:1;min-height:400px;display:none;background:var(--bg2);"></div>
+        <div id="viewer-controls" style="display:none;padding:10px 14px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;text-align:center;">
+          <button onclick="resetViewer()" style="background:none;border:1px solid var(--border);color:var(--text-mid);padding:6px 14px;font-size:8px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;">Reset View</button>
+          <span style="font-size:9px;color:var(--text-dim);margin:0 12px;">Scroll to zoom · Drag to pan</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PROFILE ══ -->
+    <!-- ══ PROFILE ══ -->
+    <div class="screen" id="s-profile">
+      <div class="scroll">
+        <div class="pro-hero">
+          <div class="pro-inst" id="prof-inst">Collector</div>
+          <div class="pro-name" id="prof-name">Geert</div>
+          <div class="pro-plan" id="prof-plan">TRACE Collector · Pro</div>
+        </div>
+        <div class="pro-stats" id="prof-stats">
+          <div class="ps"><div class="ps-n" id="ps-cases">2</div><div class="ps-l">Cases</div></div>
+          <div class="ps"><div class="ps-n">14</div><div class="ps-l">Scans</div></div>
+          <div class="ps"><div class="ps-n">1</div><div class="ps-l">Confirmed</div></div>
+          <div class="ps"><div class="ps-n">∞</div><div class="ps-l">Credits</div></div>
+        </div>
+        <!-- Upgrade box (Discover only) -->
+        <div class="upgrade-box" id="upgrade-box" style="display:none;">
+          <div class="upg-title">Upgrade to Collector</div>
+          <div class="upg-body">Full provenance timeline · Case management · AI analysis · Unlimited scans</div>
+          <div class="upg-price">€49<span style="font-size:11px;color:var(--text-dim);"> / month</span></div>
+          <button class="upg-btn" onclick="toast('Upgrade — connect to Stripe in production')">UPGRADE NOW</button>
+        </div>
+        <div class="p-sec">Account</div>
+        <div class="p-row" onclick="toast('Subscription details')"><div class="p-row-l" data-i18n="profile_plan">Plan</div><div class="p-row-r" id="plan-row">Collector · €49/mo</div></div>
+        <div class="p-row" onclick="toast('Database connections')"><div class="p-row-l" data-i18n="profile_databases">Databases</div><div class="p-row-r" id="db-row">Getty · INTERPOL</div></div>
+        <div class="p-row" id="api-row" onclick="toast('API documentation')"><div class="p-row-l" data-i18n="profile_api">API Access</div><div class="p-row-r">Active</div></div>
+        <!-- Getty CSV Import (professional tier) -->
+        <div id="getty-csv-section" style="display:none;border-top:1px solid var(--border);">
+          <div class="p-sec" data-i18n="profile_getty_csv">Import Getty CSV</div>
+          <div style="padding:0 20px 12px;">
+            <div style="font-size:10px;color:var(--text-dim);line-height:1.6;margin-bottom:10px;" data-i18n="profile_getty_csv_sub">Upload a Getty Provenance Index CSV file to expand the local database for cross-referencing.</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="file" id="csv-file-input" accept=".csv" style="display:none" onchange="window.handleGettyCSV(event)">
+              <button onclick="document.getElementById('csv-file-input').click()" style="background:var(--surface2);border:1px solid var(--border-mid);color:var(--text-mid);padding:8px 14px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Choose CSV</button>
+              <span id="csv-status" style="font-size:9px;color:var(--text-dim);"></span>
+            </div>
+            <div id="csv-preview" style="margin-top:8px;max-height:120px;overflow-y:auto;display:none;"></div>
+          </div>
+        </div>
+        <div id="collections-section"></div>
+        <div class="p-sec" data-i18n="profile_settings">Settings</div>
+        <div class="p-row" onclick="toast('Alert preferences')"><div class="p-row-l" data-i18n="profile_alert_prefs">Alert Preferences</div><div class="p-row-r" data-i18n="on">On</div></div>
+        <div class="p-row" onclick="toast('Export options')"><div class="p-row-l" data-i18n="profile_export_format">Export Format</div><div class="p-row-r" id="export-row-val">PDF / CSV</div></div>
+        <div class="p-row" onclick="toast('Switch tier · Demo')"><div class="p-row-l" data-i18n="profile_switch_tier">Switch Tier (Demo)</div><div class="p-row-r">›</div></div>
+        <!-- Language selector -->
+        <div class="p-row" id="lang-selector-row" onclick="toggleLangPicker()">
+          <div class="p-row-l" data-i18n="profile_language">Language</div>
+          <div class="p-row-r" id="lang-current">English</div>
+        </div>
+        <div id="lang-picker" style="display:none;padding:6px 20px 14px;border-bottom:1px solid var(--border);">
+          <div style="font-size:9px;color:var(--text-dim);margin-bottom:8px;letter-spacing:.1em;text-transform:uppercase;" data-i18n="language_select">Select Language</div>
+          <div id="lang-options" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+        <!-- Logout -->
+        <div class="p-row" onclick="authLogout()" style="cursor:pointer;">
+          <div class="p-row-l" style="color:var(--red);">Sign Out</div>
+          <div class="p-row-r" style="color:var(--red);">↪</div>
+        </div>
+        <div style="margin:14px;display:flex;gap:8px;">
+          <button style="flex:1;background:none;border:1px solid var(--border-mid);color:var(--text-dim);padding:10px;font-family:'Montserrat',sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;" onclick="setTier('discover')">DISCOVER</button>
+          <button style="flex:1;background:none;border:1px solid var(--border-mid);color:var(--gold);padding:10px;font-family:'Montserrat',sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;" onclick="setTier('collector')">COLLECTOR</button>
+          <button style="flex:1;background:none;border:1px solid var(--border-mid);color:var(--accent);padding:10px;font-family:'Montserrat',sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;" onclick="setTier('professional')">PRO</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end viewport -->
+
+  <!-- BOTTOM NAV — rebuilt by JS per tier -->
+  <nav class="bottom-nav" id="bottom-nav" style="display:none;"></nav>
+
+</div><!-- end app -->
+
+<div class="toast" id="main-toast"></div>
+<div class="offline-banner" id="offline-banner" data-i18n="no_connection">⚠ No internet connection — working offline</div>
+<div class="ambient-particles" id="ambient-particles"></div>
+<div class="grain"></div>
+<!-- Camera overlay - full-screen capture -->
+<div class="camera-overlay" id="camera-overlay">
+  <div class="camera-header">
+    <div class="camera-header-left">
+      <button class="camera-close-btn" onclick="window.TRACE_CAMERA.close()">X</button>
+      <span class="camera-tab-label" id="camera-tab-label">Front</span>
+      <span class="camera-shot-count" id="camera-shot-count">0 captured</span>
+    </div>
+    <div class="camera-toolbar">
+      <button class="camera-tool-btn" id="camera-torch-btn" onclick="window.TRACE_CAMERA.toggleTorch()" style="display:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></button>
+      <button class="camera-tool-btn" id="camera-grid-btn" onclick="window.TRACE_CAMERA.toggleGrid()">Grid</button>
+    </div>
+  </div>
+  <div class="camera-viewfinder" id="camera-viewfinder">
+    <video id="camera-video" autoplay playsinline muted></video>
+    <div class="camera-grid-overlay" id="camera-grid">
+      <div class="camera-grid-line-h"></div>
+      <div class="camera-grid-line-h"></div>
+      <div class="camera-grid-line-v"></div>
+      <div class="camera-grid-line-v"></div>
+    </div>
+    <div class="camera-flash" id="camera-flash"></div>
+  </div>
+  <div class="camera-preview" id="camera-preview">
+    <img class="camera-preview-img" id="camera-preview-img" src="" alt="Capture preview">
+  </div>
+  <div class="camera-preview-actions" id="camera-preview-actions">
+    <button class="camera-preview-btn retake" onclick="window.TRACE_CAMERA.retake()">Retake</button>
+    <button class="camera-preview-btn accept" onclick="window.TRACE_CAMERA.accept()">Use Photo</button>
+  </div>
+  <div class="camera-footer">
+    <button class="camera-roll-btn" onclick="window.TRACE_CAMERA.showRoll()">Roll</button>
+    <button class="camera-capture-btn" onclick="window.TRACE_CAMERA.capture()"><div class="camera-capture-inner"></div></button>
+    <button class="camera-roll-btn" onclick="window.TRACE_CAMERA.compare()">COMP</button>
+  </div>
+  <div class="camera-roll" id="camera-roll">
+    <div class="camera-roll-header">
+      <span class="camera-roll-title">Camera Roll</span>
+      <button class="camera-close-btn-big" onclick="window.TRACE_CAMERA.closeRoll()">Back</button>
+    </div>
+    <div class="camera-roll-grid" id="camera-roll-grid"></div>
+  </div>
+</div>
+
+<!-- Comparison overlay -->
+<div class="compare-overlay" id="compare-overlay">
+  <div class="compare-header">
+    <div class="compare-header-left">
+      <span class="compare-title">Comparative Analysis</span>
+      <div class="compare-labels">
+        <span class="compare-label-a" id="compare-label-a">Image A</span>
+        <span style="color:var(--text-ghost);">vs</span>
+        <span class="compare-label-b" id="compare-label-b">Image B</span>
+      </div>
+    </div>
+    <div class="compare-toolbar">
+      <button class="compare-mode-btn active" id="cmp-mode-side" onclick="window.TRACE_COMPARE.setMode('side')">Side</button>
+      <button class="compare-mode-btn" id="cmp-mode-overlay" onclick="window.TRACE_COMPARE.setMode('overlay')">Overlay</button>
+      <button class="compare-mode-btn" id="cmp-mode-split" onclick="window.TRACE_COMPARE.setMode('split')">Split</button>
+      <button class="compare-close-btn" onclick="window.TRACE_COMPARE.close()" style="margin-left:8px;">Close</button>
+    </div>
+  </div>
+  <div class="compare-container" id="compare-container">
+    <canvas id="compare-canvas"></canvas>
+  </div>
+  <div class="compare-controls">
+    <div class="compare-opacity-control" id="compare-opacity-control">
+      <span class="compare-opacity-label">Opacity</span>
+      <input type="range" class="compare-opacity-slider" min="0" max="1" step="0.01" value="0.5" oninput="window.TRACE_COMPARE.setOpacity(parseFloat(this.value))">
+      <span class="compare-opacity-val" id="compare-opacity-val">50%</span>
+    </div>
+    <button class="compare-ctrl-btn" onclick="window.TRACE_COMPARE.zoomIn()">Zoom +</button>
+    <button class="compare-ctrl-btn" onclick="window.TRACE_COMPARE.zoomOut()">Zoom -</button>
+    <button class="compare-ctrl-btn" onclick="window.TRACE_COMPARE.resetView()">Reset</button>
+  </div>
+</div>
+
+
+<!-- Load source modules in dependency order -->
+<script src="src/registry.js"></script>
+<script src="src/utils.js"></script>
+<script src="src/dom.js"></script>
+<script src="src/watchdog.js"></script>
+<script src="src/i18n.js"></script>
+<script src="src/tiers.js"></script>
+<script src="src/nav.js"></script>
+<script src="src/persistence.js"></script>
+<script src="src/scan.js"></script>
+<script src="src/chat.js"></script>
+<script src="src/cases.js"></script>
+<script src="src/results.js"></script>
+<script src="src/timeline.js"></script>
+<script src="src/vision.js"></script>
+<script src="src/geometry.js"></script>
+<script src="src/viewer.js"></script>
+<script src="src/export.js"></script>
+<script src="src/knowledge.js"></script>
+<script src="src/idb.js"></script>
+<script src="src/sync.js"></script>
+<script src="src/upload.js"></script>
+<script src="src/csv_import.js"></script>
+<script src="src/intro.js"></script>
+<script src="src/offline.js"></script>
+<script src="src/camera.js"></script>
+<script src="src/compare.js"></script>
+<script src="src/sse.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>

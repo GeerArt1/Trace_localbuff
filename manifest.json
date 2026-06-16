@@ -1,0 +1,64 @@
+{
+  "name": "TRACE — Art Intelligence",
+  "short_name": "TRACE",
+  "description": "AI-powered art identification, provenance investigation, and stolen art cross-referencing.",
+  "start_url": "/trace.html",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "portrait",
+  "background_color": "#050403",
+  "theme_color": "#050403",
+  "categories": ["art", "education", "utilities"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23050403'/%3E%3Ctext x='96' y='116' text-anchor='middle' font-family='Georgia,serif' font-size='72' font-weight='300' fill='%23D4AE52'%3ET%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23050403'/%3E%3Ctext x='256' y='310' text-anchor='middle' font-family='Georgia,serif' font-size='200' font-weight='300' fill='%23D4AE52'%3ET%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844'%3E%3Crect width='390' height='844' fill='%23050403'/%3E%3Ctext x='195' y='400' text-anchor='middle' font-family='Georgia,serif' font-size='48' fill='%23D4AE52'%3ETRACE%3C/text%3E%3C/svg%3E",
+      "sizes": "390x844",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "TRACE home screen"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Scan Artwork",
+      "short_name": "Scan",
+      "description": "Identify any artwork with AI",
+      "url": "/trace.html#scan"
+    },
+    {
+      "name": "My Cases",
+      "short_name": "Cases",
+      "description": "View saved investigations",
+      "url": "/trace.html#cases"
+    },
+    {
+      "name": "Timeline",
+      "short_name": "Timeline",
+      "description": "Provenance history",
+      "url": "/trace.html#timeline"
+    }
+  ],
+  "serviceworker": {
+    "src": "/trace_sw.js",
+    "scope": "/",
+    "update_via_cache": "none"
+  }
+}

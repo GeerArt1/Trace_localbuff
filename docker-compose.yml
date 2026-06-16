@@ -1,0 +1,60 @@
+# ══════════════════════════════════════════════
+# TRACE — Docker Compose (Production Stack)
+# ══════════════════════════════════════════════
+# Start:  docker compose up -d
+# Stop:   docker compose down
+# Logs:   docker compose logs -f
+# ══════════════════════════════════════════════
+
+services:
+  trace:
+    build: .
+    container_name: trace-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - ALLOWED_ORIGIN=${ALLOWED_ORIGIN:-http://localhost:3000}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - ADMIN_SECRET=${ADMIN_SECRET:-}
+      - OPS_API_KEY=${OPS_API_KEY:-}
+      - AUTH_SECRET=${AUTH_SECRET:-}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///app/trace_db.sqlite}
+      - TRACE_DB_PATH=${TRACE_DB_PATH:-/data/trace_db.sqlite}
+    volumes:
+      - trace_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ── Optional: PostgreSQL (enable by setting DATABASE_URL) ──
+  # To use PostgreSQL, set:
+  #   DATABASE_URL=postgresql://trace:trace@postgres:5432/trace
+  # Then uncomment the postgres service below.
+  #
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: trace-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: trace
+  #     POSTGRES_PASSWORD: ${PG_PASSWORD:-trace}
+  #     POSTGRES_DB: trace
+  #   volumes:
+  #     - trace_pgdata:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U trace"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+volumes:
+  trace_data:
+  # trace_pgdata:

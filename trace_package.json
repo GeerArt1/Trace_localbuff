@@ -1,0 +1,12 @@
+{
+  "name": "trace-api-proxy",
+  "version": "1.0.0",
+  "description": "TRACE Art Intelligence — API Key Proxy Server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

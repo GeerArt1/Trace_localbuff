@@ -1,0 +1,433 @@
+{
+  "patterns": [
+    {
+      "error_pattern": "EADDRINUSE",
+      "severity": "moderate",
+      "description": "Port 3000 already in use by another process",
+      "auto_fix_command": "lsof -ti:3000 | xargs kill -9",
+      "auto_fix_script": "kill_port_3000",
+      "requires_sudo": false,
+      "success_indicator": "Server starts on port 3000"
+    },
+    {
+      "error_pattern": "API key not configured",
+      "severity": "critical",
+      "description": "ANTHROPIC_API_KEY environment variable is not set",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_env_key",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "API key found in environment"
+    },
+    {
+      "error_pattern": "ETIMEDOUT",
+      "severity": "moderate",
+      "description": "Upstream API connection timed out",
+      "auto_fix_command": "",
+      "auto_fix_script": "retry_connection",
+      "requires_sudo": false,
+      "success_indicator": "Connection succeeds on retry"
+    },
+    {
+      "error_pattern": "ECONNREFUSED",
+      "severity": "high",
+      "description": "Upstream server refused connection",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_upstream_health",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "Upstream server is reachable"
+    },
+    {
+      "error_pattern": "QuotaExceededError",
+      "severity": "low",
+      "description": "localStorage quota exceeded in browser",
+      "auto_fix_command": "",
+      "auto_fix_script": "prune_local_storage",
+      "requires_sudo": false,
+      "success_indicator": "Storage space freed"
+    },
+    {
+      "error_pattern": "Unexpected token",
+      "severity": "high",
+      "description": "JSON parse error \u2014 likely API response format changed",
+      "auto_fix_command": "",
+      "auto_fix_script": "validate_api_response",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "API response parses correctly"
+    },
+    {
+      "error_pattern": "Subscription DB corrupted",
+      "severity": "critical",
+      "description": "subscriptions.json is corrupted or unparseable",
+      "auto_fix_command": "",
+      "auto_fix_script": "restore_subscription_backup",
+      "requires_sudo": false,
+      "success_indicator": "Subscriptions restored from backup"
+    },
+    {
+      "error_pattern": "Timeline DB corrupted",
+      "severity": "moderate",
+      "description": "timelines.json is corrupted or unparseable",
+      "auto_fix_command": "",
+      "auto_fix_script": "restore_timeline_backup",
+      "requires_sudo": false,
+      "success_indicator": "Timelines restored from backup"
+    },
+    {
+      "error_pattern": "Cannot find module",
+      "severity": "high",
+      "description": "A required dependency module is missing",
+      "auto_fix_command": "npm install 2>&1",
+      "auto_fix_script": "install_dependencies",
+      "requires_sudo": false,
+      "success_indicator": "All dependencies installed"
+    },
+    {
+      "error_pattern": "heap out of memory",
+      "severity": "critical",
+      "description": "Node.js process ran out of memory",
+      "auto_fix_command": "",
+      "auto_fix_script": "restart_with_more_memory",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "Process restarted successfully"
+    },
+    {
+      "error_pattern": "Stripe",
+      "severity": "high",
+      "description": "Stripe API error occurred",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_stripe_connectivity",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "Stripe API responds"
+    },
+    {
+      "error_pattern": "rate limit exceeded",
+      "severity": "low",
+      "description": "Rate limit reached for an IP address",
+      "auto_fix_command": "",
+      "auto_fix_script": "clear_rate_limit_cache",
+      "requires_sudo": false,
+      "success_indicator": "Rate limit cache cleared"
+    },
+    {
+      "error_pattern": "429 Too Many Requests",
+      "severity": "moderate",
+      "description": "Rate limit hit on API calls (30 req/min)",
+      "auto_fix_command": "",
+      "auto_fix_script": "wait_and_retry",
+      "requires_sudo": false,
+      "success_indicator": "Request succeeds after backoff"
+    },
+    {
+      "error_pattern": "ENOTFOUND api.anthropic.com",
+      "severity": "high",
+      "description": "DNS resolution failed for Anthropic API",
+      "auto_fix_command": "",
+      "auto_fix_script": "dns_check",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "API host resolves"
+    },
+    {
+      "error_pattern": "CORS header",
+      "severity": "high",
+      "description": "CORS policy blocked a request",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_cors_config",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "CORS headers present on response"
+    },
+    {
+      "error_pattern": "Subscription verification failed",
+      "severity": "moderate",
+      "description": "License key or token not verified",
+      "auto_fix_command": "",
+      "auto_fix_script": "regenerate_license",
+      "requires_sudo": false,
+      "success_indicator": "New license key verifies successfully"
+    },
+    {
+      "error_pattern": "Stripe webhook",
+      "severity": "high",
+      "description": "Stripe webhook signature verification failed",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_stripe_webhook",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "Webhook signature verified"
+    },
+    {
+      "error_pattern": "ENOSPC",
+      "severity": "critical",
+      "description": "No space left on device",
+      "auto_fix_command": "df -h 2>&1",
+      "auto_fix_script": "check_disk_space",
+      "action": "alert_admin",
+      "requires_sudo": true,
+      "success_indicator": "Available disk space > 1GB"
+    },
+    {
+      "error_pattern": "SQLError: SQLITE_BUSY",
+      "severity": "moderate",
+      "description": "SQLite database is locked by another connection",
+      "auto_fix_command": "",
+      "auto_fix_script": "wait_and_retry",
+      "requires_sudo": false,
+      "success_indicator": "Database write succeeds on retry"
+    },
+    {
+      "error_pattern": "Invalid image format",
+      "severity": "low",
+      "description": "Uploaded image could not be decoded",
+      "auto_fix_command": "",
+      "auto_fix_script": "report_invalid_format",
+      "requires_sudo": false,
+      "success_indicator": "Image decoded successfully"
+    },
+    {
+      "error_pattern": "checkSubscription failed",
+      "severity": "moderate",
+      "description": "Subscription check API call failed",
+      "auto_fix_command": "",
+      "auto_fix_script": "retry_subscription_check",
+      "requires_sudo": false,
+      "success_indicator": "Subscription check succeeds"
+    },
+    {
+      "error_pattern": "Service Worker",
+      "severity": "low",
+      "description": "Service worker registration or update failed",
+      "auto_fix_command": "",
+      "auto_fix_script": "unregister_service_worker",
+      "requires_sudo": false,
+      "success_indicator": "Service worker registered successfully"
+    },
+    {
+      "error_pattern": "ENOMEM",
+      "severity": "critical",
+      "description": "System out of memory",
+      "auto_fix_command": "",
+      "auto_fix_script": "restart_with_more_memory",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "Process restarted with adequate memory"
+    },
+    {
+      "error_pattern": "ERR_SSL",
+      "severity": "high",
+      "description": "SSL/TLS handshake failed",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_ssl_cert",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "SSL handshake succeeds"
+    },
+    {
+      "error_pattern": "ERR_HTTP_HEADERS_SENT",
+      "severity": "high",
+      "description": "Headers already sent",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_route_handlers",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "Route handler sends response only once"
+    },
+    {
+      "error_pattern": "payload too large",
+      "severity": "moderate",
+      "description": "Request body exceeded 10MB limit",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_request_size",
+      "requires_sudo": false,
+      "success_indicator": "Request size is under limit"
+    },
+    {
+      "error_pattern": "Invalid tier",
+      "severity": "low",
+      "description": "Invalid subscription tier value",
+      "auto_fix_command": "",
+      "auto_fix_script": "validate_tier_config",
+      "requires_sudo": false,
+      "success_indicator": "Tier value validated"
+    },
+    {
+      "error_pattern": "429 Too Many Requests",
+      "severity": "moderate",
+      "description": "Rate limit hit on API calls (30 req/min)",
+      "auto_fix_command": "",
+      "auto_fix_script": "wait_and_retry",
+      "requires_sudo": false,
+      "success_indicator": "Request succeeds after backoff"
+    },
+    {
+      "error_pattern": "ENOTFOUND api.anthropic.com",
+      "severity": "high",
+      "description": "DNS resolution failed for Anthropic API",
+      "auto_fix_command": "",
+      "auto_fix_script": "dns_check",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "API host resolves"
+    },
+    {
+      "error_pattern": "CORS header",
+      "severity": "high",
+      "description": "CORS policy blocked a request",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_cors_config",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "CORS headers present on response"
+    },
+    {
+      "error_pattern": "Subscription verification failed",
+      "severity": "moderate",
+      "description": "License key or token not verified",
+      "auto_fix_command": "",
+      "auto_fix_script": "regenerate_license",
+      "requires_sudo": false,
+      "success_indicator": "New license key verifies successfully"
+    },
+    {
+      "error_pattern": "Stripe webhook",
+      "severity": "high",
+      "description": "Stripe webhook signature verification failed",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_stripe_webhook",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "Webhook signature verified"
+    },
+    {
+      "error_pattern": "ENOSPC",
+      "severity": "critical",
+      "description": "No space left on device",
+      "auto_fix_command": "df -h 2>&1",
+      "auto_fix_script": "check_disk_space",
+      "action": "alert_admin",
+      "requires_sudo": true,
+      "success_indicator": "Available disk space > 1GB"
+    },
+    {
+      "error_pattern": "SQLError: SQLITE_BUSY",
+      "severity": "moderate",
+      "description": "SQLite database is locked by another connection",
+      "auto_fix_command": "",
+      "auto_fix_script": "wait_and_retry",
+      "requires_sudo": false,
+      "success_indicator": "Database write succeeds on retry"
+    },
+    {
+      "error_pattern": "Invalid image format",
+      "severity": "low",
+      "description": "Uploaded image could not be decoded",
+      "auto_fix_command": "",
+      "auto_fix_script": "report_invalid_format",
+      "requires_sudo": false,
+      "success_indicator": "Image decoded successfully"
+    },
+    {
+      "error_pattern": "checkSubscription failed",
+      "severity": "moderate",
+      "description": "Subscription check API call failed",
+      "auto_fix_command": "",
+      "auto_fix_script": "retry_subscription_check",
+      "requires_sudo": false,
+      "success_indicator": "Subscription check succeeds"
+    },
+    {
+      "error_pattern": "Service Worker",
+      "severity": "low",
+      "description": "Service worker registration or update failed",
+      "auto_fix_command": "",
+      "auto_fix_script": "unregister_service_worker",
+      "requires_sudo": false,
+      "success_indicator": "Service worker registered successfully"
+    },
+    {
+      "error_pattern": "ENOMEM",
+      "severity": "critical",
+      "description": "System out of memory",
+      "auto_fix_command": "",
+      "auto_fix_script": "restart_with_more_memory",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "Process restarted with adequate memory"
+    },
+    {
+      "error_pattern": "ERR_SSL",
+      "severity": "high",
+      "description": "SSL/TLS handshake failed",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_ssl_cert",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "SSL handshake succeeds"
+    },
+    {
+      "error_pattern": "ERR_HTTP_HEADERS_SENT",
+      "severity": "high",
+      "description": "Headers already sent",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_route_handlers",
+      "action": "alert_admin",
+      "requires_sudo": false,
+      "success_indicator": "Route handler sends response only once"
+    },
+    {
+      "error_pattern": "payload too large",
+      "severity": "moderate",
+      "description": "Request body exceeded 10MB limit",
+      "auto_fix_command": "",
+      "auto_fix_script": "check_request_size",
+      "requires_sudo": false,
+      "success_indicator": "Request size is under limit"
+    },
+    {
+      "error_pattern": "Invalid tier",
+      "severity": "low",
+      "description": "Invalid subscription tier value",
+      "auto_fix_command": "",
+      "auto_fix_script": "validate_tier_config",
+      "requires_sudo": false,
+      "success_indicator": "Tier value validated"
+    }
+  ],
+  "scripts": {
+    "kill_port_3000": "lsof -ti:3000 2>/dev/null | xargs kill -9 2>/dev/null; sleep 1; echo 'Port 3000 freed'",
+    "check_env_key": "if [ -z \"$ANTHROPIC_API_KEY\" ]; then echo 'CRITICAL: ANTHROPIC_API_KEY not set'; else echo 'OK: API key configured ('${#ANTHROPIC_API_KEY}' chars)'; fi",
+    "retry_connection": "sleep 2; echo 'Connection retry attempted'",
+    "check_upstream_health": "curl -s -o /dev/null -w '%{http_code}' https://api.anthropic.com/v1/messages --max-time 5 2>/dev/null || echo 'Upstream unreachable'",
+    "prune_local_storage": "echo 'User must clear browser cache manually. Recommendation sent.'",
+    "validate_api_response": "echo 'API validation requires manual inspection of latest response'",
+    "restore_subscription_backup": "cp .subscriptions.json.bak .subscriptions.json 2>/dev/null && echo 'Backup restored' || echo 'No backup found'",
+    "restore_timeline_backup": "cp .timelines.json.bak .timelines.json 2>/dev/null && echo 'Backup restored' || echo 'No backup found'",
+    "install_dependencies": "npm install 2>&1",
+    "restart_with_more_memory": "echo 'Increase NODE_OPTIONS=--max-old-space-size=1024 and restart'",
+    "check_stripe_connectivity": "curl -s -o /dev/null -w '%{http_code}' https://api.stripe.com --max-time 5 || echo 'Stripe unreachable'",
+    "clear_rate_limit_cache": "echo 'Rate limit cache cleared on next server restart'",
+    "wait_and_retry": "sleep 3; echo 'Retry attempted after 3s delay'",
+    "dns_check": "nslookup api.anthropic.com 2>&1 | head -10 || echo 'DNS failed'",
+    "check_cors_config": "echo 'ALLOWED_ORIGIN='${ALLOWED_ORIGIN:-not set}",
+    "regenerate_license": "echo 'Use admin panel to regenerate license key'",
+    "check_stripe_webhook": "echo 'Verify webhook secret matches Stripe Dashboard'",
+    "check_disk_space": "df -h / 2>&1 | tail -1",
+    "report_invalid_format": "echo 'Supported formats: JPEG, PNG, WebP'",
+    "retry_subscription_check": "curl -s /api/verify-subscription --max-time 5 2>/dev/null || echo 'Subscription API unreachable'",
+    "unregister_service_worker": "echo 'Use: navigator.serviceWorker.getRegistrations().then(r => r.forEach(r => r.unregister()))'",
+    "check_ssl_cert": "echo 'openssl s_client -connect api.anthropic.com:443 -servername api.anthropic.com 2>&1 | openssl x509 -noout -dates'",
+    "check_route_handlers": "echo 'Check for missing return statements in route handlers'",
+    "check_request_size": "echo 'Max request body size: 10MB'"
+  },
+  "metadata": {
+    "version": "2.0.0",
+    "last_updated": "2026-06-14",
+    "managed_by": "TRACE AI Agent",
+    "pattern_count": 42
+  }
+}

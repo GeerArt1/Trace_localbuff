@@ -1,0 +1,28 @@
+{
+  "name": "trace-api",
+  "version": "2.1.0",
+  "description": "TRACE Art Intelligence API Proxy — SQLite backend",
+  "main": "trace_server.js",
+  "scripts": {
+    "start": "node trace_cluster.js",
+    "start:standalone": "node trace_server.js",
+    "start:watch": "node trace_cluster.js --watch",
+    "start:graceful": "node trace_cluster.js --graceful",
+    "start:prod": "WORKERS=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2) node trace_cluster.js --graceful",
+    "test": "node tests/test_all.js",
+    "test:db": "TRACE_DB_PATH=trace_db_test.sqlite node tests/test_db.js",
+    "test:server": "node tests/test_server_core.js",
+    "test:watch": "node -e \"setInterval(function(){require('child_process').spawn('node',['tests/test_all.js'],{stdio:'inherit',env:process.env})},10000).unref();console.log('Watching — tests re-run every 10s')\""
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.10.0",
+    "dotenv": "^17.4.2",
+    "pg": "^8.21.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}
