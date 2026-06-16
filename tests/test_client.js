@@ -553,6 +553,22 @@ test('Provenance button tier-gated in _visionShowResultHook', function() {
   assert.ok(visionSource.indexOf('professional') >= 0, 'Shown for Professional tier');
 });
 
+test('AAMD flaggedYears render shows correct HTML structure', function() {
+  var renderSection = visionSource.slice(
+    visionSource.indexOf('render(data)'),
+    visionSource.indexOf('window.runProvenanceCheck')
+  );
+  // Check the AAMD flagged years callout structure
+  assert.ok(renderSection.indexOf('aamdData.flagged && aamdData.flaggedYears') >= 0, 'Should check flaggedYears array');
+  assert.ok(renderSection.indexOf('Nazi-Era Ownership Gaps') >= 0, 'Should have Nazi-era header');
+  assert.ok(renderSection.indexOf('1933') >= 0, 'Should reference 1933-1945 period start');
+  assert.ok(renderSection.indexOf('1945') >= 0, 'Should reference 1933-1945 period end');
+  assert.ok(renderSection.indexOf('Washington Conference Principles') >= 0, 'Should cite Washington Principles');
+  // Check the html += uses .map for flaggedYears
+  assert.ok(renderSection.indexOf('flaggedYears.map') >= 0, 'Should map over flaggedYears array');
+  assert.ok(renderSection.indexOf('Provenance gap') >= 0, 'Should show gap text with plural handling');
+});
+
 test('KG summary card renders cross-reference status', function() {
   var kgSource = fs.readFileSync(path.resolve(__dirname, '..', 'src', 'knowledge.js'), 'utf-8');
   assert.ok(kgSource.indexOf('kg-provenance-summary') >= 0, 'Should reference summary element');

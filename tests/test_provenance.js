@@ -184,6 +184,57 @@ test('SPARQL returns valid JSON-LD format', function(done) {
   req.end();
 });
 
+// ── GPI SPARQL Structure ──
+console.log('\n── GPI SPARQL — Getty Provenance Index ──\n');
+
+test('GPI SPARQL function exists in source', function() {
+  assert(source.indexOf('searchGettyProvenanceIndex') >= 0, 'GPI function should exist');
+  assert(source.indexOf('data.getty.edu/provenance/sparql') >= 0, 'GPI endpoint should be configured');
+  assert(source.indexOf('http://www.cidoc-crm.org/cidoc-crm/') >= 0, 'GPI uses CIDOC-CRM ontology');
+  assert(source.indexOf('FILTER(CONTAINS(LCASE(') >= 0, 'GPI uses case-insensitive partial matching');
+});
+
+test('GPI SPARQL falls back to mock data on error', function() {
+  // The catch handler in searchGettyProvenanceIndex should call searchGettyProvenanceMock
+  assert(source.indexOf('searchGettyProvenanceMock') >= 0, 'Mock fallback function should exist');
+  assert(source.indexOf('GPI SPARQL error') >= 0, 'Error logging should be present');
+});
+
+test('Cross-reference handler uses Promise.all for ULAN + GPI', function() {
+  var xrefSection = source.slice(source.indexOf('// ── Cross-Reference Handler'), source.indexOf('// ── Getty ULAN Search Handler'));
+  assert(xrefSection.indexOf('gpiPromise') >= 0, 'Should have gpiPromise variable');
+  assert(xrefSection.indexOf('Promise.all([ulanPromise, gpiPromise])') >= 0, 'Should use Promise.all for parallel queries');
+  assert(xrefSection.indexOf('gettyProvenance: { real: !gpiMock }') >= 0, 'Should track GPI mock status in apis');
+});
+
+// ── GPI SPARQL Endpoint (public) ──
+test('GPI SPARQL endpoint is reachable', function(done) {
+  var query = 'PREFIX la: <https://linked.art/ns/terms/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?artwork ?title WHERE { ?artwork rdfs:label ?title } LIMIT 3';
+  var encoded = encodeURIComponent(query);
+  var opts = {
+    hostname: 'data.getty.edu',
+    path: '/provenance/sparql?query=' + encoded + '&format=json',
+    method: 'GET',
+    headers: { 'Accept': 'application/sparql-results+json' }
+  };
+  var req = https.request(opts, function(res) {
+    var data = '';
+    res.on('data', function(chunk) { data += chunk; });
+    res.on('end', function() {
+      try {
+        assertEqual(res.statusCode, 200, 'GPI SPARQL should return 200');
+        var parsed = JSON.parse(data);
+        assert(parsed.results !== undefined, 'Response should have results');
+        assert(Array.isArray(parsed.results.bindings), 'Bindings should be array');
+        assert(parsed.results.bindings.length > 0, 'Should find at least one artwork');
+        done();
+      } catch(e) { done(e); }
+    });
+  });
+  req.on('error', function(e) { done(new Error('GPI SPARQL connection: ' + e.message)); });
+  req.end();
+});
+
 // ── Module structure validation ──
 console.log('\n── Module Validation ──\n');
 

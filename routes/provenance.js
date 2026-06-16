@@ -5,7 +5,7 @@ const https = require('https');
 const { sendJSON, log, logError } = require('./helpers');
 
 // ── SPARQL query timeout (ms) ──
-const SPARQL_TIMEOUT = 8000;
+const SPARQL_TIMEOUT = 15000;
 
 module.exports = function(ctx) {
   const { db, checkRateLimitWithHeaders } = ctx;
@@ -187,7 +187,9 @@ module.exports = function(ctx) {
 
   // ── Getty Provenance Index (GPI) Search via SPARQL (public endpoint) ──
   // Endpoint: https://data.getty.edu/provenance/sparql
-  // Uses Linked Art model (https://linked.art/ns/terms/)
+  // Uses CIDOC-CRM ontology (http://www.cidoc-crm.org/cidoc-crm/)
+  // Model: E8_Acquisition events link to artworks via P24_transferred_title_of,
+  //        seller via P23_transferred_title_from, buyer via P22_transferred_title_to.
   // Falls back to mock data on error or timeout.
   function searchGettyProvenanceIndex(artist, title) {
     var a = (artist || '').trim();
@@ -199,29 +201,36 @@ module.exports = function(ctx) {
     var safeArtist = sanitizeSparqlString(a);
     var safeTitle = sanitizeSparqlString(t);
 
-    // Build SPARQL query using Linked Art model
+    // Build SPARQL query using CIDOC-CRM model
     var sparql = [];
-    sparql.push('PREFIX la: <https://linked.art/ns/terms/>');
+    sparql.push('PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>');
     sparql.push('PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>');
-    sparql.push('SELECT ?artwork ?title ?provenanceEvent ?description WHERE {');
+    sparql.push('SELECT DISTINCT ?artwork ?title ?acquisition ?acqLabel ?sellerName ?buyerName WHERE {');
+    sparql.push('  ?acquisition a crm:E8_Acquisition .');
+    sparql.push('  ?acquisition crm:P24_transferred_title_of ?artwork .');
+
+    if (safeTitle) {
+      // Search by artwork title
+      sparql.push('  ?artwork rdfs:label ?title .');
+      sparql.push('  FILTER(CONTAINS(LCASE(?title), "' + safeTitle.toLowerCase() + '"))');
+    } else {
+      sparql.push('  OPTIONAL { ?artwork rdfs:label ?title . }');
+    }
 
     if (safeArtist) {
-      sparql.push('  ?artist rdfs:label ?label .');
-      sparql.push('  FILTER(CONTAINS(LCASE(?label), "' + safeArtist.toLowerCase() + '"))');
-      sparql.push('  ?artwork la:created_by/la:used_best_practice ?artist .');
-    }
-    if (safeTitle) {
-      sparql.push('  ?artwork rdfs:label "' + safeTitle + '" .');
-    }
-    if (!safeTitle) {
-      sparql.push('  ?artwork rdfs:label ?title .');
+      // Search by seller or buyer name in acquisition label
+      sparql.push('  ?acquisition rdfs:label ?acqLabel .');
+      sparql.push('  FILTER(CONTAINS(LCASE(?acqLabel), "' + safeArtist.toLowerCase() + '"))');
+    } else {
+      sparql.push('  OPTIONAL { ?acquisition rdfs:label ?acqLabel . }');
     }
 
-    sparql.push('  OPTIONAL { ?artwork la:provenance ?provenanceEvent .');
-    sparql.push('    ?provenanceEvent rdfs:label ?description .');
-    sparql.push('  }');
+    sparql.push('  OPTIONAL { ?acquisition crm:P23_transferred_title_from ?seller . }');
+    sparql.push('  OPTIONAL { ?seller rdfs:label ?sellerName . }');
+    sparql.push('  OPTIONAL { ?acquisition crm:P22_transferred_title_to ?buyer . }');
+    sparql.push('  OPTIONAL { ?buyer rdfs:label ?buyerName . }');
     sparql.push('}');
-    sparql.push('LIMIT 20');
+    sparql.push('LIMIT 30');
 
     var gpiEndpoint = 'https://data.getty.edu/provenance/sparql';
 
@@ -232,24 +241,29 @@ module.exports = function(ctx) {
         return mockFallback;
       }
 
-      // Deduplicate by artwork
+      // Deduplicate by artwork URI
       var seen = {};
       var results = [];
       bindings.forEach(function(b) {
-        var artworkId = (b.artwork && b.artwork.value) || b.title;
-        if (seen[artworkId]) return;
+        var artworkId = (b.artwork && b.artwork.value) || '';
+        if (!artworkId || seen[artworkId]) return;
         seen[artworkId] = true;
+
+        var sellerLabel = (b.sellerName && b.sellerName.value) || (b.seller && b.seller.value) || '';
+        var buyerLabel = (b.buyerName && b.buyerName.value) || (b.buyer && b.buyer.value) || '';
+        var acqLabel = (b.acqLabel && b.acqLabel.value) || '';
+        var artworkTitle = (b.title && b.title.value) || t || 'Unknown';
 
         results.push({
           source: 'Getty Provenance Index',
           type: 'artwork',
-          title: (b.title && b.title.value) || t || 'Unknown',
-          artist: a || 'Unknown',
+          title: artworkTitle,
+          artist: a || sellerLabel || 'Unknown',
           year: null,
           medium: null,
-          currentLocation: null,
-          provenance: (b.description && b.description.value) || '',
-          ref: (b.provenanceEvent && b.provenanceEvent.value) || '',
+          currentLocation: buyerLabel || null,
+          provenance: acqLabel,
+          ref: artworkId,
           confidence: 'high',
           isMock: false
         });
