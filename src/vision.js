@@ -479,6 +479,193 @@ window.runDBQuery = function() {
   window.DatabaseQuery.search(r.title, r.artist, r.period);
 };
 
+// ── PROVENANCE CROSS-REFERENCE CHECK (uses structured API results) ────
+window.ProvenanceCheck = {
+  results: null,
+
+  async search(title, artist, events, tier) {
+    var apiBase = window.TRACE_API_PROXY || '';
+    if (!apiBase) {
+      window.toast('Server API not available — start the TRACE server');
+      return Promise.resolve(null);
+    }
+    var wrap = document.getElementById('provenance-results');
+    if (wrap) {
+      wrap.style.display = 'block';
+      wrap.innerHTML = '<div class="db-loading">Querying Getty ULAN \u00b7 GPI \u00b7 INTERPOL \u00b7 ALR \u00b7 AAMD</div>';
+    }
+    try {
+      var res = await fetch(apiBase + '/api/provenance/cross-reference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          artworkTitle: title || '',
+          artist: artist || '',
+          period: '',
+          timeline: events || [],
+          tier: tier || window.TIER || 'collector'
+        })
+      });
+      var data = await res.json();
+      this.results = data;
+      this.render(data);
+      return data;
+    } catch (e) {
+      if (wrap) {
+        wrap.innerHTML = '<div style="padding:14px;color:var(--red-lt);font-size:11px;">Error: ' + window.esc(e.message) + '</div>';
+      }
+      return null;
+    }
+  },
+
+  render(data) {
+    var wrap = document.getElementById('provenance-results');
+    if (!wrap) return;
+
+    if (!data || !data.databases) {
+      wrap.innerHTML = '<div style="padding:14px;color:var(--text-dim);font-size:11px;">No provenance data returned.</div>';
+      return;
+    }
+
+    var dbs = data.databases;
+    var apis = data.apis || {};
+    var checkedAt = data.checkedAt || new Date().toISOString();
+    var ts = new Date(checkedAt);
+    var timeStr = ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    var dateStr = ts.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+
+    // Database badge helper
+    function badge(key, label) {
+      var info = apis[key] || {};
+      var isReal = info.real;
+      var color = isReal ? 'var(--green-lt)' : 'var(--gold-dim)';
+      var text = isReal ? 'LIVE' : 'SIMULATED';
+      return '<span style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid ' + color + ';color:' + color + ';border-radius:2px;">' +
+        '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + color + ';margin-right:4px;vertical-align:middle;"></span>' +
+        window.esc(label) + ' ' + text + '</span>';
+    }
+
+    // Build HTML
+    var html = '';
+
+    // API Badges header
+    html += '<div class="provenance-panel" style="margin-top:8px;background:var(--surface);border:1px solid var(--border);">' +
+      '<div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;">Provenance Check</span>' +
+      '<span style="font-size:8px;color:var(--text-ghost);font-family:var(--font-mono);">' + dateStr + ' ' + timeStr + '</span></div>' +
+      '<div style="padding:8px 14px;display:flex;gap:5px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--bg2);">' +
+      badge('gettyUlan', 'Getty ULAN') + badge('gettyProvenance', 'GPI') + badge('interpol', 'INTERPOL') + badge('alr', 'ALR') + badge('aamd', 'AAMD') + badge('unesco', 'UNESCO') +
+      '</div>';
+
+    // Summary bar
+    var alerts = (data.summary && data.summary.alerts) || 0;
+    var total = (data.summary && data.summary.totalChecks) || 5;
+    html += '<div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">' +
+      '<div><span style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;">Status</span>' +
+      '<div style="font-size:13px;font-weight:600;margin-top:2px;color:' + (alerts > 0 ? 'var(--red-lt)' : 'var(--green-lt)') + ';">' +
+      (alerts > 0 ? '\u26a0 ' + alerts + ' Alert' + (alerts > 1 ? 's' : '') : '\u2713 Clear') + '</div></div>' +
+      '<div style="text-align:right;"><span style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;">Real APIs</span>' +
+      '<div style="font-size:13px;font-weight:600;margin-top:2px;color:var(--text-mid);">' + Object.keys(apis).filter(function(k) { return apis[k].real; }).length + '/' + Object.keys(apis).length + '</div></div></div>';
+
+    // Getty ULAN Artist Results
+    var ulanArtists = dbs.getty && dbs.getty.artist ? dbs.getty.artist : [];
+    html += '<div style="border-bottom:1px solid var(--border);">' +
+      '<div style="padding:8px 14px;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="var n=this.nextElementSibling;n.style.display=n.style.display===\'none\'?\'block\':\'none\'">' +
+      'Getty ULAN Artist' +
+      '<span style="font-size:9px;color:var(--text-ghost);">' + ulanArtists.length + ' result' + (ulanArtists.length !== 1 ? 's' : '') + ' \u25be</span></div>' +
+      '<div style="padding:6px 14px 10px;display:' + (ulanArtists.length > 0 ? 'block' : 'none') + ';">';
+
+    if (ulanArtists.length === 0) {
+      html += '<div style="font-size:10px;color:var(--text-dim);padding:4px 0;">No ULAN artist matches.</div>';
+    } else {
+      ulanArtists.slice(0, 5).forEach(function(a) {
+        var lifespan = [a.birth, a.death].filter(Boolean).join('\u2013');
+        var mockTag = a.isMock ? '<span style="font-size:7px;color:var(--gold-dim);margin-left:4px;">(sim)</span>' : '<span style="font-size:7px;color:var(--green-lt);margin-left:4px;">(live)</span>';
+        html += '<div style="padding:6px 8px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border2);">' +
+          '<div style="font-size:11px;color:var(--text);font-weight:500;">' + window.esc(a.name || '') + mockTag + '</div>' +
+          '<div style="font-size:8px;color:var(--text-dim);margin-top:2px;">' + (a.role || 'artist') + (lifespan ? ' \u00b7 ' + window.esc(lifespan) : '') + (a.nationality ? ' \u00b7 ' + window.esc(a.nationality) : '') + '</div></div>';
+      });
+      if (ulanArtists.length > 5) {
+        html += '<div style="font-size:8px;color:var(--text-ghost);padding:4px 8px;">+' + (ulanArtists.length - 5) + ' more results</div>';
+      }
+    }
+    html += '</div></div>';
+
+    // Getty Provenance Index Results
+    var gpiWorks = dbs.getty && dbs.getty.provenance ? dbs.getty.provenance : [];
+    html += '<div style="border-bottom:1px solid var(--border);">' +
+      '<div style="padding:8px 14px;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="var n=this.nextElementSibling;n.style.display=n.style.display===\'none\'?\'block\':\'none\'">' +
+      'Getty Provenance Index' +
+      '<span style="font-size:9px;color:var(--text-ghost);">' + gpiWorks.length + ' result' + (gpiWorks.length !== 1 ? 's' : '') + ' \u25be</span></div>' +
+      '<div style="padding:6px 14px 10px;display:' + (gpiWorks.length > 0 ? 'block' : 'none') + ';">';
+
+    if (gpiWorks.length === 0) {
+      html += '<div style="font-size:10px;color:var(--text-dim);padding:4px 0;">No provenance records found.</div>';
+    } else {
+      gpiWorks.slice(0, 5).forEach(function(w) {
+        var mockTag = w.isMock ? '<span style="font-size:7px;color:var(--gold-dim);margin-left:4px;">(sim)</span>' : '<span style="font-size:7px;color:var(--green-lt);margin-left:4px;">(live)</span>';
+        html += '<div style="padding:6px 8px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border2);">' +
+          '<div style="font-size:11px;color:var(--text);font-weight:500;">' + window.esc(w.title || '') + mockTag + '</div>' +
+          '<div style="font-size:9px;color:var(--text-dim);margin-top:2px;">' + window.esc(w.artist || '') + (w.year ? ', ' + w.year : '') + '</div>' +
+          (w.currentLocation ? '<div style="font-size:8px;color:var(--text-ghost);margin-top:2px;">' + window.esc(w.currentLocation) + '</div>' : '') +
+          (w.ref ? '<div style="font-size:7px;color:var(--text-ghost);margin-top:2px;font-family:var(--font-mono);">Ref: ' + window.esc(w.ref) + '</div>' : '') +
+          '</div>';
+      });
+      if (gpiWorks.length > 5) {
+        html += '<div style="font-size:8px;color:var(--text-ghost);padding:4px 8px;">+' + (gpiWorks.length - 5) + ' more results</div>';
+      }
+    }
+    html += '</div></div>';
+
+    // Database Checks: INTERPOL, ALR, AAMD, UNESCO
+    var dbChecks = [
+      { key: 'interpol', label: 'INTERPOL Stolen Works', data: dbs.interpol, color: function(d) { return d && d.matched ? 'var(--red-lt)' : 'var(--green-lt)'; }, status: function(d) { return d && d.matched ? 'MATCH' : 'CLEAR'; } },
+      { key: 'alr', label: 'Art Loss Register', data: dbs.alr, color: function(d) { return d && d.matched ? 'var(--gold)' : 'var(--green-lt)'; }, status: function(d) { return d && d.matched ? 'FLAGGED' : 'CLEAR'; } },
+      { key: 'aamd', label: 'AAMD Nazi-Era Project', data: dbs.aamd, color: function(d) { return d && d.flagged ? '#E8A020' : 'var(--green-lt)'; }, status: function(d) { return d && d.flagged ? 'FLAG' : 'CLEAR'; } },
+      { key: 'unesco', label: 'UNESCO 1970 Convention', data: dbs.unesco, color: function(d) { return d && d.flagged ? 'var(--red-lt)' : 'var(--green-lt)'; }, status: function(d) { return d && d.flagged ? 'FLAGGED' : 'CLEAR'; } }
+    ];
+
+    html += '<div style="padding:10px 14px;">';
+    dbChecks.forEach(function(c) {
+      var d = c.data || {};
+      var clr = c.color(d);
+      var st = c.status(d);
+      var ref = d.reference && d.reference !== '\u2014' ? d.reference : null;
+      var det = d.detail || '';
+      var mockTag = d && d.isMock ? '<span style="font-size:7px;color:var(--gold-dim);margin-left:6px;">(simulated)</span>' : '';
+      html += '<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border2);">' +
+        '<div style="width:8px;height:8px;border-radius:50%;background:' + clr + ';margin-top:3px;flex-shrink:0;"></div>' +
+        '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:9px;color:var(--text);font-weight:500;">' + window.esc(c.label) + mockTag + '</div>' +
+        '<div style="font-size:10px;color:' + clr + ';font-weight:600;font-family:var(--font-mono);margin-top:1px;">' + st + '</div>' +
+        (det ? '<div style="font-size:9px;color:var(--text-dim);margin-top:2px;line-height:1.4;">' + window.esc(det) + '</div>' : '') +
+        (ref ? '<div style="font-size:7px;color:var(--text-ghost);margin-top:2px;font-family:var(--font-mono);">Ref: ' + window.esc(ref) + '</div>' : '') +
+        '</div></div>';
+    });
+    html += '</div>';
+
+    // Footer with checked timestamp
+    html += '<div style="padding:6px 14px;border-top:1px solid var(--border);background:var(--bg2);font-size:7px;color:var(--text-ghost);display:flex;justify-content:space-between;">' +
+      '<span>Checked: ' + dateStr + ' ' + timeStr + '</span>' +
+      '<span>' + (data.realApisEnabled ? 'Live API mode' : 'Simulated mode') + '</span></div>';
+
+    html += '</div>';
+
+    wrap.innerHTML = html;
+    wrap.style.display = 'block';
+  }
+};
+
+window.runProvenanceCheck = function() {
+  var r = window._lastResult;
+  if (!r) { window.toast('No analysis to cross-reference'); return; }
+  var btn = document.getElementById('provenance-btn');
+  if (btn) btn.style.opacity = '0.5';
+  window.ProvenanceCheck.search(r.title, r.artist, r.timeline, window.TIER).then(function() {
+    if (btn) btn.style.opacity = '1';
+  });
+};
+
 // ── MULTI-SPECTRAL ANALYSIS ────────────────
 window.MSSpectral = {
   bands: [],
@@ -605,6 +792,10 @@ window._visionShowResultHook = function(r) {
   // DATABASE QUERY BUTTON (Professional)
   var dbBtn = document.getElementById('db-query-btn');
   if (dbBtn) dbBtn.style.display = (window.TIER === 'professional') ? 'flex' : 'none';
+
+  // PROVENANCE CHECK BUTTON (Collector + Professional)
+  var provBtn = document.getElementById('provenance-btn');
+  if (provBtn) provBtn.style.display = (window.TIER === 'collector' || window.TIER === 'professional') ? 'flex' : 'none';
 
   // VALUATION (Collector + Professional)
   if (window.TIER === 'collector' || window.TIER === 'professional') {

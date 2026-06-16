@@ -336,6 +336,16 @@ module.exports = function(ctx) {
       { title: 'Still Life with Flowers', artist: 'Jan Davidsz de Heem (attr.)', year: '2020', ref: 'SWD-55923', detail: 'Comparable still life stolen from museum, Antwerp 2020' },
       { title: 'Madonna and Child', artist: 'Follower of Botticelli', year: '2012', ref: 'SWD-28477', detail: 'Church theft, Florence 2012 — similar iconography' },
       { title: 'Portrait of a Gentleman', artist: 'Sir Joshua Reynolds (circle of)', year: '2019', ref: 'SWD-61034', detail: 'Stolen from London townhouse, 2019' },
+      { title: 'The Concert', artist: 'Johannes Vermeer', year: '1990', ref: 'SWD-90145', detail: 'Infamous Isabella Stewart Gardner Museum heist, Boston 1990 — still missing' },
+      { title: 'Banks of the Seine at Argenteuil', artist: 'Claude Monet', year: '2007', ref: 'SWD-07912', detail: 'Stolen from private collector, Zurich 2007 — recovered empty frame' },
+      { title: 'Poppy Field at Giverny', artist: 'Claude Monet', year: '2022', ref: 'SWD-22881', detail: 'Taken from exhibition loan, Munich 2022 — transport vehicle intercepted' },
+      { title: 'Bronze Figurine of a Horse', artist: 'Ancient Greek (attr. to Myron)', year: '2011', ref: 'SWD-11568', detail: 'Looted from archaeological site, Magna Graecia region 2011' },
+      { title: 'Ivory Crucifix', artist: 'Unknown Spanish, late 16th C.', year: '2017', ref: 'SWD-17423', detail: 'Stolen from cathedral treasury, Seville 2017' },
+      { title: 'Portrait of a Young Man', artist: 'Hans Holbein the Younger (attributed)', year: '2014', ref: 'SWD-14590', detail: 'Missing from royal collection inventory, London 2014' },
+      { title: 'Seascape at Sunset', artist: 'J.M.W. Turner (circle of)', year: '2021', ref: 'SWD-21840', detail: 'Stolen during auction house transport, New York 2021' },
+      { title: 'Calligraphic Panel', artist: 'Ottoman School, 18th C.', year: '2016', ref: 'SWD-16723', detail: 'Illicit excavation and export, Turkey 2016 — UNESCO notification issued' },
+      { title: 'Terra Cotta Votive Head', artist: 'Nok Culture, Nigeria', year: '2019', ref: 'SWD-19109', detail: 'Smuggled through international art market, recovered 2024 in London' },
+      { title: 'Silk Embroidered Screen', artist: 'Chinese, Ming Dynasty', year: '2013', ref: 'SWD-13355', detail: 'Reported stolen from museum store, Beijing 2013' },
     ];
     var match = mockMatches[Math.floor(Math.random() * mockMatches.length)];
     return {
