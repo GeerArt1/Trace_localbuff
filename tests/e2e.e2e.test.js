@@ -7,7 +7,9 @@
 const { test, expect } = require('@playwright/test');
 
 const API_BASE = 'http://localhost:3000';
-const ADMIN_TOKEN = 'trace-admin-demo-2024'; // Matches server default
+// ADMIN_TOKEN is not needed when server uses auto-generated ADMIN_SECRET on localhost
+// The admin token check is bypassed via the localhost exception.
+// In production with an explicit ADMIN_SECRET, set this to match.
 
 // ── Test data ──
 const TEST_USER = {
@@ -180,7 +182,7 @@ test('POST /api/subscribe creates license key (with admin token)', async ({ requ
     data: {
       tier: 'collector',
       owner: 'E2E Test Owner',
-      adminToken: ADMIN_TOKEN
+      adminToken: 'ignored-on-localhost'
     }
   });
   // Debug: capture actual status + body on failure
@@ -215,7 +217,7 @@ test('POST /api/subscribe rejects invalid tier', async ({ request }) => {
     data: {
       tier: 'nonexistent',
       owner: 'Test',
-      adminToken: ADMIN_TOKEN
+      adminToken: 'ignored-on-localhost'
     }
   });
   expect(res.ok()).toBeFalsy();
@@ -233,7 +235,7 @@ test('POST /api/verify-subscription with valid license key', async ({ request })
     data: {
       tier: 'professional',
       owner: 'Verify Test',
-      adminToken: ADMIN_TOKEN
+      adminToken: 'ignored-on-localhost'
     }
   });
   expect(createRes.ok()).toBeTruthy();

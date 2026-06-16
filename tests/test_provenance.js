@@ -208,6 +208,10 @@ test('Cross-reference handler uses Promise.all for ULAN + GPI', function() {
 });
 
 // ── GPI SPARQL Endpoint (public) ──
+// Note: This reachability test uses a simple query with the old Linked Art prefix (la:).
+// The la: prefix is unused in the query body (only rdfs: is used) — it just validates
+// that the GPI endpoint is responsive. The actual production query in
+// searchGettyProvenanceIndex uses the CIDOC-CRM ontology (crm: prefix).
 test('GPI SPARQL endpoint is reachable', function(done) {
   var query = 'PREFIX la: <https://linked.art/ns/terms/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?artwork ?title WHERE { ?artwork rdfs:label ?title } LIMIT 3';
   var encoded = encodeURIComponent(query);
@@ -233,6 +237,31 @@ test('GPI SPARQL endpoint is reachable', function(done) {
   });
   req.on('error', function(e) { done(new Error('GPI SPARQL connection: ' + e.message)); });
   req.end();
+});
+
+// ── GPI Combined Filter behavior ──
+test('GPI SPARQL handles artist + title together (AND semantics)', function() {
+  var gpiSection = source.slice(source.indexOf('function searchGettyProvenanceIndex'), source.indexOf('function searchGettyProvenanceMock'));
+  // When both artist and title are provided, both FILTER clauses should be active
+  assert(gpiSection.indexOf('if (safeTitle)') >= 0, 'Should handle title filter');
+  assert(gpiSection.indexOf('if (safeArtist)') >= 0, 'Should handle artist filter');
+  // Verify the AND semantics: when both present, BOTH FILTERs are in the query
+  var bothFiltersActive = gpiSection.indexOf('FILTER(CONTAINS(LCASE(?title)') >= 0 &&
+    gpiSection.indexOf('FILTER(CONTAINS(LCASE(?acqLabel)') >= 0;
+  assert(bothFiltersActive, 'Both FILTERs should be present in query');
+  // Verify early return when both are empty
+  assert(gpiSection.indexOf("if (!a && !t) return Promise.resolve(mockFallback)") >= 0, 'Should short-circuit on empty inputs');
+});
+
+test('Cross-reference handler has fallback for Promise.all rejection', function() {
+  var xrefSection = source.slice(source.indexOf('function handleCrossReference'), source.indexOf('function handleGettySearch'));
+  // Promise.all should have a .catch handler
+  assert(xrefSection.indexOf('.catch(') >= 0, 'Promise.all should have catch handler');
+  assert(xrefSection.indexOf('logError(err,') >= 0, 'Catch should log error');
+  // Fallback should return empty arrays for SPARQL results
+  assert(xrefSection.indexOf('artist: [], provenance: []') >= 0, 'Fallback should return empty arrays');
+  // Fallback should still include sync results (INTERPOL, ALR, etc.)
+  assert(xrefSection.indexOf('interpol: interpolResult') >= 0, 'Fallback should include remaining sync results');
 });
 
 // ── Module structure validation ──
