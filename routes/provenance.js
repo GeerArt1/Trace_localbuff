@@ -5,7 +5,7 @@ const https = require('https');
 const { sendJSON, log, logError } = require('./helpers');
 
 // ── SPARQL query timeout (ms) ──
-const SPARQL_TIMEOUT = 15000;
+const SPARQL_TIMEOUT = 20000;
 
 module.exports = function(ctx) {
   const { db, checkRateLimitWithHeaders } = ctx;

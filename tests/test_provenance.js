@@ -22,9 +22,9 @@ function test(name, fn) {
     totalAsync++;
     var timeout = setTimeout(function() {
       testsFailed++;
-      console.log('  ✗ ' + name + ' (timeout — 10s)');
+      console.log('  ✗ ' + name + ' (timeout — 20s)');
       maybeFinish();
-    }, 10000);
+    }, 20000);
     fn(function(err) {
       clearTimeout(timeout);
       if (err) {

@@ -105,12 +105,13 @@ scripts/                ← Utility scripts
 6. Handle visibility in `setTier()` function
 
 ### Testing:
-- Start server: `ADMIN_SECRET=e2e-test-strong-secret-2024 node trace_server.js`
+- Start server (manual): `ADMIN_SECRET=e2e-test-strong-secret-2024 node trace_server.js`
+- Start server (E2E tests): Playwright manages its own server via `playwright.config.js` without setting `ADMIN_SECRET` (auto-generated, localhost bypasses admin token check)
 - Health check: `curl http://localhost:3000/health`
 - Provenance cross-reference: `curl -X POST http://localhost:3000/api/provenance/cross-reference -H "Content-Type: application/json" -d '{"artist":"Rembrandt","artworkTitle":"The Night Watch","tier":"professional"}'`
 - Getty ULAN search: `curl -X POST http://localhost:3000/api/provenance/getty-search -H "Content-Type: application/json" -d '{"query":"Vermeer"}'`
 - Knowledge graph: `curl -X POST http://localhost:3000/api/provenance/knowledge-graph -H "Content-Type: application/json" -d '{"title":"Sunflowers","artist":"Van Gogh","timeline":[{"year":"1888","event":"Painted","category":"creation"}]}'`
-- Subscription API: `curl -X POST http://localhost:3000/api/subscribe -H "Content-Type: application/json" -d '{"tier":"professional","owner":"Test","adminToken":"your-secret-here"}'`
+- Subscription API: `curl -X POST http://localhost:3000/api/subscribe -H "Content-Type: application/json" -d '{"tier":"professional","owner":"Test","adminToken":"your-secret-here"}'` (or without `adminToken` on localhost with auto-generated secret)
 - Debug: `curl http://localhost:3000/api/debug`
 - File listing: `curl http://localhost:3000/api/files`
 - Run unit tests: `node tests/test_server_core.js`
