@@ -15,7 +15,10 @@ module.exports = function(ctx) {
   const INTERPOL_API_KEY = process.env.INTERPOL_API_KEY || '';
   const ALR_API_KEY = process.env.ALR_API_KEY || '';
 
-  // Getty ULAN is always available via public SPARQL. GPI has no public API yet.
+  // Getty ULAN is always available via public SPARQL (vocab.getty.edu).
+  // Getty Provenance Index (GPI) also has a public SPARQL endpoint at data.getty.edu.
+  // See https://data.getty.edu/provenance/docs/ for query documentation.
+  // Future: implement GPI SPARQL integration alongside the current mock data.
   const REAL_APIS_ENABLED = !!(INTERPOL_API_KEY || ALR_API_KEY);
 
   // ── SPARQL helper: query the Getty Vocabularies endpoint ──
@@ -143,6 +146,16 @@ module.exports = function(ctx) {
       { id: '500019693', name: 'Diego Velázquez', birth: 1599, death: 1660, nationality: 'Spanish', role: 'painter', ulan: 'http://vocab.getty.edu/ulan/500019693' },
       { id: '500018206', name: 'Caravaggio', birth: 1571, death: 1610, nationality: 'Italian', role: 'painter', ulan: 'http://vocab.getty.edu/ulan/500018206' },
       { id: '500115764', name: 'J.M.W. Turner', birth: 1775, death: 1851, nationality: 'British', role: 'painter', ulan: 'http://vocab.getty.edu/ulan/500115764' },
+      { id: '500043851', name: 'Henri Matisse', birth: 1869, death: 1954, nationality: 'French', role: 'painter,sculptor,printmaker', ulan: 'http://vocab.getty.edu/ulan/500043851' },
+      { id: '500027732', name: 'Frida Kahlo', birth: 1907, death: 1954, nationality: 'Mexican', role: 'painter', ulan: 'http://vocab.getty.edu/ulan/500027732' },
+      { id: '500031531', name: 'Gustav Klimt', birth: 1862, death: 1918, nationality: 'Austrian', role: 'painter', ulan: 'http://vocab.getty.edu/ulan/500031531' },
+      { id: '500032427', name: 'Edvard Munch', birth: 1863, death: 1944, nationality: 'Norwegian', role: 'painter,printmaker', ulan: 'http://vocab.getty.edu/ulan/500032427' },
+      { id: '500060426', name: 'Katsushika Hokusai', birth: 1760, death: 1849, nationality: 'Japanese', role: 'printmaker,painter', ulan: 'http://vocab.getty.edu/ulan/500060426' },
+      { id: '500012367', name: 'Mary Cassatt', birth: 1844, death: 1926, nationality: 'American', role: 'painter,printmaker', ulan: 'http://vocab.getty.edu/ulan/500012367' },
+      { id: '500015965', name: 'Sandro Botticelli', birth: 1445, death: 1510, nationality: 'Italian', role: 'painter', ulan: 'http://vocab.getty.edu/ulan/500015965' },
+      { id: '500010090', name: 'Jan van Eyck', birth: 1390, death: 1441, nationality: 'Flemish', role: 'painter', ulan: 'http://vocab.getty.edu/ulan/500010090' },
+      { id: '500010793', name: 'Pierre-Auguste Renoir', birth: 1841, death: 1919, nationality: 'French', role: 'painter,sculptor', ulan: 'http://vocab.getty.edu/ulan/500010793' },
+      { id: '500010090', name: 'Édouard Manet', birth: 1832, death: 1883, nationality: 'French', role: 'painter,printmaker', ulan: 'http://vocab.getty.edu/ulan/500010090' },
     ];
     mockArtists.forEach(function(a) {
       var nameLower = a.name.toLowerCase();
@@ -167,7 +180,7 @@ module.exports = function(ctx) {
     return results;
   }
 
-  // ── Getty Provenance Index (GPI) Search — simulated until public API available ──
+  // ── Getty Provenance Index (GPI) Search — mock data (public SPARQL at data.getty.edu) ──
   function searchGettyProvenance(title, artist) {
     var t = (title || '').toLowerCase();
     var a = (artist || '').toLowerCase();
@@ -183,7 +196,22 @@ module.exports = function(ctx) {
       { title: 'The Persistence of Memory', artist: 'Salvador Dalí', year: 1931, medium: 'Oil on canvas', provenance: 'MoMA, New York', ref: 'GPI-US-01931' },
       { title: 'Starry Night', artist: 'Vincent van Gogh', year: 1889, medium: 'Oil on canvas', provenance: 'MoMA, New York', ref: 'GPI-US-01889' },
       { title: "Les Demoiselles d'Avignon", artist: 'Pablo Picasso', year: 1907, medium: 'Oil on canvas', provenance: 'MoMA, New York', ref: 'GPI-US-01907' },
-    ];
+      { title: 'The Kiss', artist: 'Gustav Klimt', year: 1908, medium: 'Oil and gold on canvas', provenance: 'Österreichische Galerie Belvedere, Vienna', ref: 'GPI-AT-01908' },
+      { title: 'The Scream', artist: 'Edvard Munch', year: 1893, medium: 'Oil, tempera, pastel on cardboard', provenance: 'National Museum, Oslo', ref: 'GPI-NO-01893' },
+      { title: 'The Birth of Venus', artist: 'Sandro Botticelli', year: 1486, medium: 'Tempera on canvas', provenance: 'Uffizi Gallery, Florence', ref: 'GPI-IT-01486' },
+      { title: 'Impression, Sunrise', artist: 'Claude Monet', year: 1872, medium: 'Oil on canvas', provenance: 'Musée Marmottan Monet, Paris', ref: 'GPI-FR-01872' },
+      { title: 'Dance at Le moulin de la Galette', artist: 'Pierre-Auguste Renoir', year: 1876, medium: 'Oil on canvas', provenance: 'Musée d\'Orsay, Paris', ref: 'GPI-FR-01876' },
+      { title: 'Olympia', artist: 'Édouard Manet', year: 1863, medium: 'Oil on canvas', provenance: 'Musée d\'Orsay, Paris', ref: 'GPI-FR-01863' },
+      { title: 'The Great Wave off Kanagawa', artist: 'Katsushika Hokusai', year: 1831, medium: 'Woodblock print', provenance: 'Metropolitan Museum of Art, New York', ref: 'GPI-JP-01831' },
+      { title: 'The Two Fridas', artist: 'Frida Kahlo', year: 1939, medium: 'Oil on canvas', provenance: 'Museo de Arte Moderno, Mexico City', ref: 'GPI-MX-01939' },
+      { title: 'The Arnolfini Portrait', artist: 'Jan van Eyck', year: 1434, medium: 'Oil on oak panel', provenance: 'National Gallery, London', ref: 'GPI-UK-01434' },
+      { title: 'The Dance', artist: 'Henri Matisse', year: 1910, medium: 'Oil on canvas', provenance: 'State Hermitage Museum, St. Petersburg', ref: 'GPI-RU-01910' },
+      { title: 'The Thinker', artist: 'Auguste Rodin', year: 1904, medium: 'Bronze sculpture', provenance: 'Musée Rodin, Paris', ref: 'GPI-FR-01904' },
+      { title: 'American Gothic', artist: 'Grant Wood', year: 1930, medium: 'Oil on beaverboard', provenance: 'Art Institute of Chicago', ref: 'GPI-US-01930' },
+      { title: 'The Garden of Earthly Delights', artist: 'Hieronymus Bosch', year: 1515, medium: 'Oil on oak panels', provenance: 'Museo del Prado, Madrid', ref: 'GPI-ES-01515' },
+      { title: "Whistler's Mother", artist: 'James McNeill Whistler', year: 1871, medium: 'Oil on canvas', provenance: 'Musée d\'Orsay, Paris', ref: 'GPI-FR-01871' },
+      { title: 'Composition II in Red, Blue and Yellow', artist: 'Piet Mondrian', year: 1930, medium: 'Oil on canvas', provenance: 'Kunsthaus Zürich', ref: 'GPI-CH-01930' },
+  ];
     knownWorks.forEach(function(w) {
       var titleMatch = !t || w.title.toLowerCase().indexOf(t) >= 0;
       var artistMatch = !a || w.artist.toLowerCase().indexOf(a) >= 0;
