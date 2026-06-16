@@ -621,7 +621,7 @@ window.ProvenanceCheck = {
     var dbChecks = [
       { key: 'interpol', label: 'INTERPOL Stolen Works', data: dbs.interpol, color: function(d) { return d && d.matched ? 'var(--red-lt)' : 'var(--green-lt)'; }, status: function(d) { return d && d.matched ? 'MATCH' : 'CLEAR'; } },
       { key: 'alr', label: 'Art Loss Register', data: dbs.alr, color: function(d) { return d && d.matched ? 'var(--gold)' : 'var(--green-lt)'; }, status: function(d) { return d && d.matched ? 'FLAGGED' : 'CLEAR'; } },
-      { key: 'aamd', label: 'AAMD Nazi-Era Project', data: dbs.aamd, color: function(d) { return d && d.flagged ? '#E8A020' : 'var(--green-lt)'; }, status: function(d) { return d && d.flagged ? 'FLAG' : 'CLEAR'; } },
+      { key: 'aamd', label: 'AAMD Nazi-Era Project', data: dbs.aamd, color: function(d) { return d && d.flagged ? '#E8A020' : 'var(--green-lt)'; }, status: function(d) { return d && d.flagged ? 'NAZI-ERA FLAG' : 'CLEAR'; } },
       { key: 'unesco', label: 'UNESCO 1970 Convention', data: dbs.unesco, color: function(d) { return d && d.flagged ? 'var(--red-lt)' : 'var(--green-lt)'; }, status: function(d) { return d && d.flagged ? 'FLAGGED' : 'CLEAR'; } }
     ];
 
@@ -642,6 +642,17 @@ window.ProvenanceCheck = {
         (ref ? '<div style="font-size:7px;color:var(--text-ghost);margin-top:2px;font-family:var(--font-mono);">Ref: ' + window.esc(ref) + '</div>' : '') +
         '</div></div>';
     });
+
+    // AAMD flagged years — show timeline callout when Nazi-era gaps found
+    var aamdData = dbs.aamd || {};
+    if (aamdData.flagged && aamdData.flaggedYears && aamdData.flaggedYears.length > 0) {
+      html += '<div style="margin:0 14px 10px;padding:8px 10px;background:rgba(232,160,32,0.08);border:1px solid rgba(232,160,32,0.25);border-radius:2px;">' +
+        '<div style="font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:#E8A020;margin-bottom:3px;">Nazi-Era Ownership Gaps</div>' +
+        '<div style="font-size:9px;color:var(--text-dim);line-height:1.5;">Provenance gap' + (aamdData.flaggedYears.length > 1 ? 's' : '') + ' during 1933–1945 period: ' +
+        aamdData.flaggedYears.map(function(y) { return '<span style="font-family:var(--font-mono);color:#E8A020;font-weight:600;">' + y + '</span>'; }).join(', ') +
+        '. Further research recommended under Washington Conference Principles.</div></div>';
+    }
+
     html += '</div>';
 
     // Footer with checked timestamp

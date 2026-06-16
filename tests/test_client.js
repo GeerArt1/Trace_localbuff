@@ -6,6 +6,7 @@
 // ══════════════════════════════════════════════
 
 var assert = require('assert');
+var path = require('path');
 
 // ── Mock browser environment ──
 if (!global.window) global.window = {};
@@ -464,6 +465,99 @@ test('dedup logic by reference works', function() {
   assert.strictEqual(added, 1);
   assert.strictEqual(merged.length, 2);
   assert.strictEqual(merged[1].reference, 'GPI-002');
+});
+
+// ══════════════════════════════════════════════
+// PROVENANCECHECK TESTS (client-side)
+// ══════════════════════════════════════════════
+
+console.log('\n\u2500\u2500 ProvenanceCheck \u2014 vision.js \u2500\u2500');
+
+var fs = require('fs');
+var visionSource = fs.readFileSync(path.resolve(__dirname, '..', 'src', 'vision.js'), 'utf-8');
+
+test('ProvenanceCheck.render() exists and is a function', function() {
+  var provSource = visionSource.slice(visionSource.indexOf('window.ProvenanceCheck'));
+  assert.ok(provSource.indexOf('render(data)') >= 0, 'Should have render method');
+  assert.ok(provSource.indexOf('search(') >= 0, 'Should have search method');
+});
+
+test('ProvenanceCheck.render() escapes HTML with window.esc()', function() {
+  var renderSection = visionSource.slice(
+    visionSource.indexOf('render(data)'),
+    visionSource.indexOf('window.runProvenanceCheck')
+  );
+  // Count window.esc() calls in render - should be used for all user-provided values
+  var escCount = (renderSection.match(/window\.esc\(/g) || []).length;
+  assert.ok(escCount >= 10, 'render() should use window.esc() extensively (' + escCount + ' calls)');
+});
+
+test('ProvenanceCheck.render() handles null/empty gracefully', function() {
+  var renderSection = visionSource.slice(
+    visionSource.indexOf('render(data)'),
+    visionSource.indexOf('window.runProvenanceCheck')
+  );
+  assert.ok(renderSection.indexOf('!data || !data.databases') >= 0, 'Should guard against null data');
+  assert.ok(renderSection.indexOf('No provenance data returned') >= 0, 'Should show empty message');
+});
+
+test('ProvenanceCheck.render() generates database badges for all 6 sources', function() {
+  var renderSection = visionSource.slice(
+    visionSource.indexOf('render(data)'),
+    visionSource.indexOf('window.runProvenanceCheck')
+  );
+  assert.ok(renderSection.indexOf("badge('gettyUlan'") >= 0, 'Should have Getty ULAN badge');
+  assert.ok(renderSection.indexOf("badge('gettyProvenance'") >= 0, 'Should have GPI badge');
+  assert.ok(renderSection.indexOf("badge('interpol'") >= 0, 'Should have INTERPOL badge');
+  assert.ok(renderSection.indexOf("badge('alr'") >= 0, 'Should have ALR badge');
+  assert.ok(renderSection.indexOf("badge('aamd'") >= 0, 'Should have AAMD badge');
+  assert.ok(renderSection.indexOf("badge('unesco'") >= 0, 'Should have UNESCO badge');
+});
+
+test('ProvenanceCheck.render() shows AAMD flagged years when present', function() {
+  var renderSection = visionSource.slice(
+    visionSource.indexOf('render(data)'),
+    visionSource.indexOf('window.runProvenanceCheck')
+  );
+  assert.ok(renderSection.indexOf('flaggedYears') >= 0, 'Should reference flaggedYears');
+  assert.ok(renderSection.indexOf('Nazi-Era Ownership Gaps') >= 0, 'Should have Nazi-era section header');
+  assert.ok(renderSection.indexOf('Washington Conference Principles') >= 0, 'Should mention Washington Principles');
+});
+
+test('ProvenanceCheck.render() shows summary alerts bar', function() {
+  var renderSection = visionSource.slice(
+    visionSource.indexOf('render(data)'),
+    visionSource.indexOf('window.runProvenanceCheck')
+  );
+  assert.ok(renderSection.indexOf('data.summary && data.summary.alerts') >= 0, 'Should read alerts from summary');
+  assert.ok(renderSection.indexOf('Real APIs') >= 0, 'Should show real API count');
+});
+
+test('ProvenanceCheck.search() is async and uses fetch', function() {
+  var provSource = visionSource.slice(visionSource.indexOf('window.ProvenanceCheck'), visionSource.indexOf('window.runProvenanceCheck'));
+  assert.ok(provSource.indexOf('async search') >= 0, 'search() should be async');
+  assert.ok(provSource.indexOf('fetch(') >= 0, 'Should use fetch()');
+  assert.ok(provSource.indexOf('/api/provenance/cross-reference') >= 0, 'Should target correct endpoint');
+});
+
+test('runProvenanceCheck() uses _lastResult and toggles button opacity', function() {
+  assert.ok(visionSource.indexOf('window.runProvenanceCheck =') >= 0, 'Function should exist on window');
+  assert.ok(visionSource.indexOf('window._lastResult') >= 0, 'Should reference _lastResult');
+  assert.ok(visionSource.indexOf('provenance-btn') >= 0, 'Should reference provenance-btn');
+  assert.ok(visionSource.indexOf('opacity') >= 0, 'Should handle button opacity');
+});
+
+test('Provenance button tier-gated in _visionShowResultHook', function() {
+  assert.ok(visionSource.indexOf('provenance-btn') >= 0, 'Hook should reference provenance-btn');
+  assert.ok(visionSource.indexOf('collector') >= 0, 'Shown for Collector tier');
+  assert.ok(visionSource.indexOf('professional') >= 0, 'Shown for Professional tier');
+});
+
+test('KG summary card renders cross-reference status', function() {
+  var kgSource = fs.readFileSync(path.resolve(__dirname, '..', 'src', 'knowledge.js'), 'utf-8');
+  assert.ok(kgSource.indexOf('kg-provenance-summary') >= 0, 'Should reference summary element');
+  assert.ok(kgSource.indexOf('Cross-Reference Status') >= 0, 'Should show status label');
+  assert.ok(kgSource.indexOf('liveCount') >= 0, 'Should show live API count');
 });
 
 // ══════════════════════════════════════════════

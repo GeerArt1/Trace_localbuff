@@ -650,6 +650,42 @@
             });
           }
 
+          // Render provenance summary card below the graph
+          var summaryEl = document.getElementById('kg-provenance-summary');
+          if (summaryEl && xrefData.databases) {
+            var dbs = xrefData.databases;
+            var alerts = (xrefData.summary && xrefData.summary.alerts) || 0;
+            var totalChecks = (xrefData.summary && xrefData.summary.totalChecks) || 5;
+            var apis = xrefData.apis || {};
+            var liveCount = Object.keys(apis).filter(function(k) { return apis[k].real; }).length;
+            var totalApis = Object.keys(apis).length;
+
+            var summaryHtml = '<div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">' +
+              '<div><span style="font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-ghost);">Cross-Reference Status</span>' +
+              '<div style="font-size:11px;font-weight:600;margin-top:2px;color:' + (alerts > 0 ? 'var(--red-lt)' : 'var(--green-lt)') + ';">' +
+              (alerts > 0 ? '\u26a0 ' + alerts + ' Alert' + (alerts > 1 ? 's' : '') : '\u2713 Clear') + ' \u00b7 ' + liveCount + '/' + totalApis + ' live</div></div>';
+
+            // Add database status dots
+            var dbTypes = [
+              { key: 'interpol', label: 'INTERPOL', data: dbs.interpol, color: function(d) { return d && d.matched ? 'var(--red-lt)' : 'var(--green-lt)'; } },
+              { key: 'alr', label: 'ALR', data: dbs.alr, color: function(d) { return d && d.matched ? 'var(--gold)' : 'var(--green-lt)'; } },
+              { key: 'aamd', label: 'AAMD', data: dbs.aamd, color: function(d) { return d && d.flagged ? '#E8A020' : 'var(--green-lt)'; } },
+              { key: 'unesco', label: 'UNESCO', data: dbs.unesco, color: function(d) { return d && d.flagged ? 'var(--red-lt)' : 'var(--green-lt)'; } }
+            ];
+            summaryHtml += '<div style="display:flex;gap:8px;">';
+            dbTypes.forEach(function(t) {
+              var d = t.data || {};
+              var clr = t.color(d);
+              summaryHtml += '<span style="font-size:7px;display:flex;align-items:center;gap:3px;color:var(--text-ghost);">' +
+                '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + clr + ';"></span>' +
+                t.label + '</span>';
+            });
+            summaryHtml += '</div></div>';
+
+            summaryEl.innerHTML = summaryHtml;
+            summaryEl.style.display = 'block';
+          }
+
           // Add API status badges if appropriate (max once per session)
           if (xrefData.apis && !window._kgApiStatusWarned && typeof window.toast === 'function') {
             var liveCount = 0;
