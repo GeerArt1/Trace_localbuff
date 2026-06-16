@@ -13,7 +13,7 @@ module.exports = defineConfig({
     baseURL: 'http://localhost:3000',
   },
   webServer: {
-    command: 'ADMIN_SECRET=trace-admin-demo-2024 node trace_server.js',
+    command: 'ADMIN_SECRET=e2e-test-strong-secret-2024 node trace_server.js',
     port: 3000,
     timeout: 15000,
     reuseExistingServer: false,
