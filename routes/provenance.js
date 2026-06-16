@@ -158,6 +158,9 @@ module.exports = function(ctx) {
       { id: '500010090', name: 'Jan van Eyck', birth: 1390, death: 1441, nationality: 'Flemish', role: 'painter', ulan: 'http://vocab.getty.edu/ulan/500010090' },
       { id: '500010793', name: 'Pierre-Auguste Renoir', birth: 1841, death: 1919, nationality: 'French', role: 'painter,sculptor', ulan: 'http://vocab.getty.edu/ulan/500010793' },
       { id: '500010090', name: 'Édouard Manet', birth: 1832, death: 1883, nationality: 'French', role: 'painter,printmaker', ulan: 'http://vocab.getty.edu/ulan/500010090' },
+      { id: '500016619', name: 'Auguste Rodin', birth: 1840, death: 1917, nationality: 'French', role: 'sculptor,drawer', ulan: 'http://vocab.getty.edu/ulan/500016619' },
+      { id: '500031908', name: 'Grant Wood', birth: 1891, death: 1942, nationality: 'American', role: 'painter', ulan: 'http://vocab.getty.edu/ulan/500031908' },
+      { id: '500000759', name: 'Hieronymus Bosch', birth: 1450, death: 1516, nationality: 'Dutch', role: 'painter,drawer', ulan: 'http://vocab.getty.edu/ulan/500000759' },
     ];
     mockArtists.forEach(function(a) {
       var nameLower = a.name.toLowerCase();
