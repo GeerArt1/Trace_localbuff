@@ -79,9 +79,7 @@ const CSRF_PROTECTED_PATHS = [
   '/api/subscribe',
   '/api/timeline/save',
   '/api/timeline/delete',
-  '/api/provenance/cross-reference',
-  '/api/provenance/getty-search',
-  '/api/provenance/knowledge-graph',
+  // Provenance endpoints are read-only (query external DBs, return results) — no CSRF needed
   '/api/agent/report',
   '/api/agent/auto-fix',
   '/api/interpol-check'
