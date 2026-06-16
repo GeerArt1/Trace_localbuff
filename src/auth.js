@@ -11,14 +11,14 @@ var TRACE_AUTH = (function() {
   var CSRF_KEY = 'trace_csrf_token';
 
   function getToken() { try { return sessionStorage.getItem(TOKEN_KEY); } catch(e) { return null; } }
-  function setToken(t) { try { sessionStorage.setItem(TOKEN_KEY, t); } catch(e) {} }
+  function setToken(t) { try { sessionStorage.setItem(TOKEN_KEY, t); } catch(e) { /* sessionStorage may be unavailable */ } }
   function getStoredUser() { try { return JSON.parse(sessionStorage.getItem(USER_KEY) || 'null'); } catch(e) { return null; } }
-  function setStoredUser(u) { try { sessionStorage.setItem(USER_KEY, JSON.stringify(u)); } catch(e) {} }
-  function clearAuth() { try { sessionStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(USER_KEY); sessionStorage.removeItem(CSRF_KEY); } catch(e) {} }
+  function setStoredUser(u) { try { sessionStorage.setItem(USER_KEY, JSON.stringify(u)); } catch(e) { /* sessionStorage may be unavailable */ } }
+  function clearAuth() { try { sessionStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(USER_KEY); sessionStorage.removeItem(CSRF_KEY); } catch(e) { /* sessionStorage may be unavailable */ } }
 
   // CSRF token management
   function getCsrfToken() { try { return sessionStorage.getItem(CSRF_KEY); } catch(e) { return null; } }
-  function setCsrfToken(t) { try { if (t) sessionStorage.setItem(CSRF_KEY, t); } catch(e) {} }
+  function setCsrfToken(t) { try { if (t) sessionStorage.setItem(CSRF_KEY, t); } catch(e) { /* sessionStorage may be unavailable */ } }
 
   function apiPost(path, data, cb) {
     var xhr = new XMLHttpRequest();

@@ -417,17 +417,26 @@ window.DatabaseQuery = {
 
     // API status badges — show which databases are live vs mock
     var apis = result.apis || {};
-    var apiBadges = Object.keys(apis).length ?
-      '<div style="padding:6px 14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface2);">' +
-      Object.keys(apis).map(function(key) {
-        var isReal = apis[key] && apis[key].real;
-        var label = key.replace(/([A-Z])/g, ' $1').replace(/^./, function(s) { return s.toUpperCase(); });
-        var color = isReal ? 'var(--green-lt)' : 'var(--gold-dim)';
-        var text = isReal ? 'LIVE' : 'SIMULATED';
-        return '<span style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid ' + color + ';color:' + color + ';border-radius:2px;">' +
-          '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + color + ';margin-right:4px;vertical-align:middle;"></span>' +
-          window.esc(label) + ' ' + text + '</span>';
-      }).join('') + '</div>' : '';
+    var apiBadges = '';
+    if (Object.keys(apis).length) {
+      apiBadges = '<div style="padding:6px 14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface2);">' +
+        Object.keys(apis).map(function(key) {
+          var isReal = apis[key] && apis[key].real;
+          var label = key.replace(/([A-Z])/g, ' $1').replace(/^./, function(s) { return s.toUpperCase(); });
+          var color = isReal ? 'var(--green-lt)' : 'var(--gold-dim)';
+          var text = isReal ? 'LIVE' : 'SIMULATED';
+          return '<span style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid ' + color + ';color:' + color + ';border-radius:2px;">' +
+            '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + color + ';margin-right:4px;vertical-align:middle;"></span>' +
+            window.esc(label) + ' ' + text + '</span>';
+        }).join('') + '</div>';
+    } else {
+      // AI-generated results — always show as simulated
+      apiBadges = '<div style="padding:6px 14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface2);">' +
+        '<span style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--gold-dim);color:var(--gold-dim);border-radius:2px;">' +
+        '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold-dim);margin-right:4px;vertical-align:middle;"></span>' +
+        'AI-Generated (Simulated) \u00b7 Set up API proxy for live data' +
+        '</span></div>';
+    }
 
     var html = apiBadges + '<div class="db-risk-header" style="border-left:3px solid ' + (riskColors[risk] || 'var(--gold)') + ';padding:10px 14px;background:var(--surface);margin-bottom:10px;">' +
       '<div style="font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);">Risk Assessment</div>' +

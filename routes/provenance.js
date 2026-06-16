@@ -1,7 +1,7 @@
 // TRACE Provenance Routes — Getty ULAN (SPARQL), INTERPOL, ALR, AAMD, UNESCO
 // Getty ULAN uses a public SPARQL endpoint (no API key needed).
 // INTERPOL, ALR require institutional/paid access — data is simulated when unavailable.
-const http = require('http');
+const https = require('https');
 const { sendJSON, log, logError } = require('./helpers');
 
 // ── SPARQL query timeout (ms) ──
@@ -22,9 +22,12 @@ module.exports = function(ctx) {
   function sparqlQuery(sparql) {
     return new Promise(function(resolve, reject) {
       var encoded = encodeURIComponent(sparql);
-      var url = 'http://vocab.getty.edu/sparql?query=' + encoded + '&format=json';
+      var url = 'https://vocab.getty.edu/sparql?query=' + encoded + '&format=json';
 
-      var req = http.get(url, function(res) {
+      var req = https.request(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/sparql-results+json' }
+      }, function(res) {
         var data = '';
         res.on('data', function(chunk) { data += chunk; });
         res.on('end', function() {
@@ -48,6 +51,7 @@ module.exports = function(ctx) {
       req.on('error', function(e) {
         reject(e);
       });
+      req.end();
     });
   }
 

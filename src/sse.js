@@ -42,16 +42,22 @@
           if (e.type === 'info' && e.message) {
             if (typeof window.toast === 'function') window.toast(e.message);
           }
-        } catch(e2) {}
+        } catch(e2) {
+          /* Malformed SSE data — ignore */
+        }
       };
       sse.onerror = function() {
         // Reconnect handled automatically by EventSource
         sse.close();
         setTimeout(function() {
-          try { sse = new EventSource(sseUrl); } catch(e) {}
+          try { sse = new EventSource(sseUrl); } catch(e) {
+            /* EventSource may not be available in all contexts */
+          }
         }, 5000);
       };
-    } catch(e) {}
+    } catch(e) {
+      /* EventSource not available — SSE silently disabled */
+    }
     console.log('[TRACE SSE] Real-time event stream connected');
   }
 

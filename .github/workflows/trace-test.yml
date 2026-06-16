@@ -59,7 +59,7 @@ jobs:
         run: npx playwright install chromium --with-deps 2>/dev/null
 
       - name: Run E2E tests
-        run: npx playwright test tests/e2e.e2e.test.js
+        run: npx playwright test tests/e2e.e2e.test.js tests/provenance.e2e.test.js
         env:
           ADMIN_SECRET: trace-admin-demo-2024
 

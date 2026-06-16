@@ -575,7 +575,7 @@
     },
 
     /**
-     * Load from server knowledge graph API
+     * Load from server knowledge graph API, enriched with cross-reference data
      */
     loadFromServer: function(title, artist, events) {
       var self = this;
@@ -584,16 +584,92 @@
         this.load(title, artist, events);
         return;
       }
-      fetch(apiBase + '/api/provenance/knowledge-graph', {
+
+      // Fetch knowledge graph + cross-reference data in parallel
+      var kgPromise = fetch(apiBase + '/api/provenance/knowledge-graph', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: title, artist: artist, timeline: events })
-      }).then(function(r) { return r.json(); }).then(function(data) {
-        if (data && data.nodes && data.nodes.length > 0) {
-          self.graphData = data;
-          var container = document.getElementById('kg-container');
-          if (container) self._renderD3(container, data);
+      }).then(function(r) { return r.json(); });
+
+      var xrefPromise = artist ? fetch(apiBase + '/api/provenance/cross-reference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ artworkTitle: title || '', artist: artist, period: '', timeline: events, tier: window.TIER || 'collector' })
+      }).then(function(r) { return r.json(); }) : Promise.resolve(null);
+
+      Promise.all([kgPromise, xrefPromise]).then(function(results) {
+        var kgData = results[0];
+        var xrefData = results[1];
+
+        // Use knowledge graph data as base
+        if (kgData && kgData.nodes && kgData.nodes.length > 0) {
+          self.graphData = kgData;
         } else {
+          // Build from timeline if KG endpoint returned nothing
+          self.graphData = self._buildFromTimeline(title, artist, events);
+        }
+
+        // Enrich with cross-reference data: add ULAN artist nodes
+        if (xrefData && xrefData.databases && xrefData.databases.getty && xrefData.databases.getty.artist) {
+          var ulanArtists = xrefData.databases.getty.artist;
+          if (ulanArtists.length > 0) {
+            var data = self.graphData;
+            var existingIds = {};
+            if (data.nodes) { data.nodes.forEach(function(n) { existingIds[n.id] = true; }); }
+
+            // Add ULAN artist details as connected nodes
+            ulanArtists.forEach(function(ula, idx) {
+              var ulanId = 'ulan_' + (ula.id || idx);
+              if (existingIds[ulanId]) return;
+              existingIds[ulanId] = true;
+
+              var lifespan = [ula.birth, ula.death].filter(Boolean).join('-');
+              var label = ula.name + (lifespan ? ' (' + lifespan + ')' : '');
+              if (label.length > 25) label = label.slice(0, 22) + '…';
+
+              data.nodes.push({
+                id: ulanId,
+                label: label,
+                type: 'artist',
+                year: String(ula.birth || ''),
+                meta: ula.role || ula.nationality || ''
+              });
+
+              // Connect ULAN node to main artist node if it exists
+              var mainArtistId = 'artist';
+              if (existingIds[mainArtistId]) {
+                if (!data.edges) data.edges = [];
+                data.edges.push({
+                  source: mainArtistId,
+                  target: ulanId,
+                  label: 'ULAN: ' + (ula.isMock ? 'Simulated' : 'Live'),
+                  year: ''
+                });
+              }
+            });
+          }
+
+          // Add API status badges if appropriate (max once per session)
+          if (xrefData.apis && !window._kgApiStatusWarned && typeof window.toast === 'function') {
+            var liveCount = 0;
+            var totalCount = 0;
+            Object.keys(xrefData.apis).forEach(function(key) {
+              totalCount++;
+              if (xrefData.apis[key].real) liveCount++;
+            });
+            if (liveCount > 0 && liveCount < totalCount) {
+              window._kgApiStatusWarned = true;
+              window.toast('⚠ Some databases are simulated. Set API keys for live data.');
+            }
+          }
+        }
+
+        var container = document.getElementById('kg-container');
+        if (container && self.graphData && self.graphData.nodes && self.graphData.nodes.length > 0) {
+          self._renderD3(container, self.graphData);
+        } else {
+          // Fall back to client-side build
           self.load(title, artist, events);
         }
       }).catch(function() {

@@ -113,7 +113,7 @@ globalThis.localStorage = {
 globalThis.sessionStorage = globalThis.localStorage;
 globalThis.performance = { memory: { usedJSHeapSize: 50000000 }, timing: { navigationStart: Date.now() } };
 globalThis.fetch = function() { return Promise.resolve({ ok: true, status: 200, json: function() { return Promise.resolve({}); } }); };
-globalThis.console = { log: function(){}, warn: function(){}, error: function(){}, info: function(){} };
+// Keep real console for test output visibility. Module noise is acceptable.
 globalThis.location = { href: 'http://localhost', hash: '', search: '' };
 globalThis.matchMedia = function() { return { matches: false }; };
 globalThis.setTimeout = setTimeout;
@@ -422,4 +422,5 @@ if (failed > 0) {
   process.exit(1);
 } else {
   console.log('  All tests passed.');
+  process.exit(0);
 }
