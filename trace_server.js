@@ -541,6 +541,7 @@ function handleRequest(req, res) {
 
   // ── Timeline Routes ──
   if (method === 'POST' && urlPath === '/api/timeline/save') {
+    if (!checkRateLimitWithHeaders(clientIp, req)) return sendJSON(res, 429, { error: 'Rate limit' });
     return collectBody(req, res, 65536, (body) => tlRoutes.handleTimelineSave(req, res, body));
   }
 
@@ -549,19 +550,23 @@ function handleRequest(req, res) {
   }
 
   if (method === 'POST' && urlPath === '/api/timeline/delete') {
+    if (!checkRateLimitWithHeaders(clientIp, req)) return sendJSON(res, 429, { error: 'Rate limit' });
     return collectBody(req, res, 4096, (body) => tlRoutes.handleTimelineDelete(req, res, body));
   }
 
   // ── Provenance Routes ──
   if (method === 'POST' && urlPath === '/api/provenance/cross-reference') {
+    if (!checkRateLimitWithHeaders(clientIp, req)) return sendJSON(res, 429, { error: 'Rate limit' });
     return collectBody(req, res, 65536, (body) => provRoutes.handleCrossReference(req, res, body));
   }
 
   if (method === 'POST' && urlPath === '/api/provenance/getty-search') {
+    if (!checkRateLimitWithHeaders(clientIp, req)) return sendJSON(res, 429, { error: 'Rate limit' });
     return collectBody(req, res, 4096, (body) => provRoutes.handleGettySearch(req, res, body));
   }
 
   if (method === 'POST' && urlPath === '/api/provenance/knowledge-graph') {
+    if (!checkRateLimitWithHeaders(clientIp, req)) return sendJSON(res, 429, { error: 'Rate limit' });
     return collectBody(req, res, 65536, (body) => provRoutes.handleKnowledgeGraph(req, res, body));
   }
 

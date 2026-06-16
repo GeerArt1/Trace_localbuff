@@ -18,14 +18,16 @@ module.exports = function(ctx) {
   // Getty ULAN is always available via public SPARQL (vocab.getty.edu).
   // Getty Provenance Index (GPI) also has a public SPARQL endpoint at data.getty.edu.
   // See https://data.getty.edu/provenance/docs/ for query documentation.
-  // Future: implement GPI SPARQL integration alongside the current mock data.
+  // GPI SPARQL integration implemented in searchGettyProvenanceIndex — falls back to mock on error.
   const REAL_APIS_ENABLED = !!(INTERPOL_API_KEY || ALR_API_KEY);
 
-  // ── SPARQL helper: query the Getty Vocabularies endpoint ──
-  function sparqlQuery(sparql) {
+  // ── SPARQL helper: query a Getty SPARQL endpoint ──
+  // Defaults to Getty Vocabularies (ULAN). Pass a custom endpoint for GPI.
+  function sparqlQuery(sparql, endpoint) {
     return new Promise(function(resolve, reject) {
       var encoded = encodeURIComponent(sparql);
-      var url = 'https://vocab.getty.edu/sparql?query=' + encoded + '&format=json';
+      endpoint = endpoint || 'https://vocab.getty.edu/sparql';
+      var url = endpoint + '?query=' + encoded + '&format=json';
 
       var req = https.request(url, {
         method: 'GET',
@@ -180,8 +182,86 @@ module.exports = function(ctx) {
     return results;
   }
 
-  // ── Getty Provenance Index (GPI) Search — mock data (public SPARQL at data.getty.edu) ──
-  function searchGettyProvenance(title, artist) {
+  // ── Getty Provenance Index (GPI) Search via SPARQL (public endpoint) ──
+  // Endpoint: https://data.getty.edu/provenance/sparql
+  // Uses Linked Art model (https://linked.art/ns/terms/)
+  // Falls back to mock data on error or timeout.
+  function searchGettyProvenanceIndex(artist, title) {
+    var a = (artist || '').trim();
+    var t = (title || '').trim();
+    var mockFallback = searchGettyProvenanceMock(title, artist);
+
+    if (!a && !t) return Promise.resolve(mockFallback);
+
+    var safeArtist = sanitizeSparqlString(a);
+    var safeTitle = sanitizeSparqlString(t);
+
+    // Build SPARQL query using Linked Art model
+    var sparql = [];
+    sparql.push('PREFIX la: <https://linked.art/ns/terms/>');
+    sparql.push('PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>');
+    sparql.push('SELECT ?artwork ?title ?provenanceEvent ?description WHERE {');
+
+    if (safeArtist) {
+      sparql.push('  ?artist rdfs:label ?label .');
+      sparql.push('  FILTER(CONTAINS(LCASE(?label), "' + safeArtist.toLowerCase() + '"))');
+      sparql.push('  ?artwork la:created_by/la:used_best_practice ?artist .');
+    }
+    if (safeTitle) {
+      sparql.push('  ?artwork rdfs:label "' + safeTitle + '" .');
+    }
+    if (!safeTitle) {
+      sparql.push('  ?artwork rdfs:label ?title .');
+    }
+
+    sparql.push('  OPTIONAL { ?artwork la:provenance ?provenanceEvent .');
+    sparql.push('    ?provenanceEvent rdfs:label ?description .');
+    sparql.push('  }');
+    sparql.push('}');
+    sparql.push('LIMIT 20');
+
+    var gpiEndpoint = 'https://data.getty.edu/provenance/sparql';
+
+    return sparqlQuery(sparql.join('\n'), gpiEndpoint).then(function(parsed) {
+      var bindings = (parsed.results && parsed.results.bindings) || [];
+      if (bindings.length === 0) {
+        log('WARN', 'GPI SPARQL returned 0 results for "' + a + '" / "' + t + '" — using mock data');
+        return mockFallback;
+      }
+
+      // Deduplicate by artwork
+      var seen = {};
+      var results = [];
+      bindings.forEach(function(b) {
+        var artworkId = (b.artwork && b.artwork.value) || b.title;
+        if (seen[artworkId]) return;
+        seen[artworkId] = true;
+
+        results.push({
+          source: 'Getty Provenance Index',
+          type: 'artwork',
+          title: (b.title && b.title.value) || t || 'Unknown',
+          artist: a || 'Unknown',
+          year: null,
+          medium: null,
+          currentLocation: null,
+          provenance: (b.description && b.description.value) || '',
+          ref: (b.provenanceEvent && b.provenanceEvent.value) || '',
+          confidence: 'high',
+          isMock: false
+        });
+      });
+
+      log('INFO', 'GPI SPARQL: ' + results.length + ' results for "' + a + '" / "' + t + '"');
+      return results;
+    }).catch(function(err) {
+      logError(err, 'GPI SPARQL error (falling back to mock)');
+      return mockFallback;
+    });
+  }
+
+  // ── Getty Provenance Index (GPI) Mock Data ──
+  function searchGettyProvenanceMock(title, artist) {
     var t = (title || '').toLowerCase();
     var a = (artist || '').toLowerCase();
     var mockRecords = [];
@@ -357,24 +437,30 @@ module.exports = function(ctx) {
       var events = data.timeline || [];
       var tier = data.tier || 'collector';
 
-      // ULAN is now async (SPARQL) — run in parallel with synchronous mock checks
+      // ULAN and GPI are async (SPARQL) — run in parallel with synchronous mock checks
       var ulanPromise = searchGettyULAN(artist);
-      var gettyProvenanceResults = searchGettyProvenance(title, artist);
+      var gpiPromise = searchGettyProvenanceIndex(artist, title);
       var interpolResult = checkINTERPOL(title, artist);
       var alrResult = checkArtLossRegister(title, artist);
       var aamdResult = checkAAMDProvenance(events);
       var unescoResult = checkUNESCO(artist, '');
 
       var hasAlerts = interpolResult.matched || alrResult.matched || aamdResult.flagged;
-      var mockCount = [gettyProvenanceResults, interpolResult, alrResult, unescoResult].filter(function(r) {
-        if (Array.isArray(r)) return r.some(function(item) { return item.isMock; });
-        return r.isMock;
-      }).length;
-      // Also check if ULAN falls back to mock
-      ulanPromise.then(function(gettyArtistResults) {
+
+      // Wait for both SPARQL queries to resolve
+      Promise.all([ulanPromise, gpiPromise]).then(function(results) {
+        var gettyArtistResults = results[0];
+        var gettyProvenanceResults = results[1];
+
         var ulaMock = gettyArtistResults.some(function(r) { return r.isMock; });
+        var gpiMock = gettyProvenanceResults.some(function(r) { return r.isMock; });
+        var syncMockCount = [interpolResult, alrResult, unescoResult].filter(function(r) {
+          return r.isMock;
+        }).length;
+        var totalMock = (ulaMock ? 1 : 0) + (gpiMock ? 1 : 0) + syncMockCount;
+
         log('INFO', 'Cross-reference: ' + (title || 'unknown') + ' by ' + (artist || 'unknown') +
-          ' — ' + (hasAlerts ? 'ALERTS FOUND' : 'CLEAR') + ' (mock: ' + (mockCount + (ulaMock ? 1 : 0)) + '/5)');
+          ' — ' + (hasAlerts ? 'ALERTS FOUND' : 'CLEAR') + ' (mock: ' + totalMock + '/5)');
 
         sendJSON(res, 200, {
           artworkTitle: title,
@@ -386,7 +472,7 @@ module.exports = function(ctx) {
           realApisEnabled: REAL_APIS_ENABLED,
           apis: {
             gettyUlan: { real: !ulaMock },
-            gettyProvenance: { real: false },
+            gettyProvenance: { real: !gpiMock },
             interpol: { real: !!INTERPOL_API_KEY },
             alr: { real: !!ALR_API_KEY },
             aamd: { real: true },
@@ -410,6 +496,7 @@ module.exports = function(ctx) {
         });
       }).catch(function(err) {
         logError(err, 'Cross-reference handler (promise)');
+        // Fallback: use just the sync results
         sendJSON(res, 200, {
           artworkTitle: title,
           artist: artist,
@@ -427,7 +514,7 @@ module.exports = function(ctx) {
             unesco: { real: false }
           },
           databases: {
-            getty: { artist: [], provenance: gettyProvenanceResults },
+            getty: { artist: [], provenance: [] },
             interpol: interpolResult,
             alr: alrResult,
             aamd: aamdResult,
