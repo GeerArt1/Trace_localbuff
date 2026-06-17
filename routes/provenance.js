@@ -321,7 +321,8 @@ module.exports = function(ctx) {
           year: w.year,
           medium: w.medium,
           currentLocation: w.provenance,
-          provenance: w.provenance, // Note: real GPI response has acquisition label here (acqLabel distinct from currentLocation)
+          provenance: 'Collection of ' + w.provenance + ', acquired ' + w.year,
+          // Note: real GPI response has acquisition label distinct from currentLocation/buyer name
           ref: w.ref,
           confidence: (titleMatch && artistMatch) ? 'high' : 'medium',
           isMock: true
