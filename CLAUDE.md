@@ -2,7 +2,23 @@
 
 ## Project Overview
 
-TRACE is a web app (`trace.html`) served by a Node.js backend (`trace_server.js`). It uses AI (Anthropic Claude) to identify artworks, build provenance timelines, and cross-reference stolen art databases. Three subscription tiers: Discover (free), Collector (€49/mo), Professional (€299/mo).
+TRACE is a web app (`trace.html`) served by a Node.js backend (`trace_server.js`). It uses AI (Anthropic Claude or Google Gemini) to identify artworks, build provenance timelines, and cross-reference stolen art databases. Three subscription tiers: Discover (free), Collector (€49/mo), Professional (€299/mo).
+
+## Codebase Health Metrics
+
+| Metric | Value |
+|--------|-------|
+| trace.html inline onclick | **0** ✅ (all migrated to event delegation via registry) |
+| trace_hq.html inline onclick | **0** ✅ (all migrated to data-hq delegation) |
+| trace_launcher.html inline onclick | **0** ✅ (migrated to data-tier delegation) |
+| data-hq attributes (HQ delegation) | **74** |
+| src/*.js inline handlers | **0** ✅ (all migrated to delegation patterns) |
+| Unit tests | **4/4 suites, 138 tests** ✅ |
+| E2E tests | **46/46** (23 e2e + 10 provenance + 13 hq) ✅ |
+| HQ E2E tests | **tests/hq.e2e.test.js** — 13 tests (lock screen, navigation, panel content, event log, sacred geometry) ✅ |
+| Empty catch blocks | **0** ✅ (all have TRACE_WATCHDOG?.warn() logging) |
+| Deployment config | Procfile (Railway/Heroku) + Dockerfile ✅ |
+| AI providers | Claude (Anthropic) + Gemini (Google) ✅
 
 ## File Map
 
@@ -118,7 +134,7 @@ scripts/                ← Utility scripts
 - Run provenance tests: `node tests/test_provenance.js`
 - Run integration tests: `node tests/test_integration.js`
 - Run all unit tests: `node tests/test_all.js`
-- Run Playwright e2e tests: `npx playwright test tests/e2e.e2e.test.js tests/provenance.e2e.test.js`
+- Run Playwright e2e tests: `npx playwright test tests/e2e.e2e.test.js tests/provenance.e2e.test.js tests/hq.e2e.test.js`
 
 ## Common Issues & Fixes
 
@@ -143,7 +159,11 @@ To restore: `cp .subscriptions.json.bak .subscriptions.json`
 
 ## Environment Variables
 ```
-ANTHROPIC_API_KEY=sk-ant-...         # Required for AI analysis
+# Choose 'claude' (Anthropic — requires API key) or 'gemini' (Google — generous free tier)
+AI_PROVIDER=claude                   # Set to 'gemini' for Google Gemini. Default: claude
+GEMINI_API_KEY=                      # Required if AI_PROVIDER=gemini. Get free key at https://aistudio.google.com/apikey
+GEMINI_MODEL=gemini-2.5-flash        # Gemini model to use
+ANTHROPIC_API_KEY=sk-ant-...         # Required for AI analysis (Claude)
 ADMIN_SECRET=your-strong-secret-here # Min 16 chars. Weak tokens rejected at startup.
 ANALYSE_API_KEY=                     # Auto-generated if not set. Protects /analyse endpoint.
 SUBSCRIPTION_SECRET=                 # Auto-generated if not set. Signs subscription tokens.
@@ -173,9 +193,13 @@ WORKERS=1                            # Cluster worker count (cluster mode)
 - Provenance endpoints are read-only (no CSRF needed, but rate limited)
 - State-changing POST endpoints (timeline save/delete, checkout) are CSRF-protected
 - `/analyse` endpoint requires `x-api-key` matching `ANALYSE_API_KEY`
+- **routes/agent.js**: `exec()` has a safety filter blocking `;`, `$(`, and backtick shell metacharacters
+- **routes/subscriptions.js**: Localhost detection (`req.headers['host']`) handles missing/empty Host header for E2E tests
 
 ## Deployment
 - Node.js server, deployable on Railway / Render / Fly.io
 - Static files served from project root directory
+- `Procfile` included: `web: node trace_server.js` (or `node trace_cluster.js` for multi-core)
 - Subscription data persisted to `.subscriptions.json` (mount persistent volume in production)
 - For production: Set `ADMIN_SECRET` to a strong random value to disable demo key generation
+- `.env.example` documents all env vars; `restart.sh` now sources `.env` on startup

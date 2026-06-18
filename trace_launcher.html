@@ -132,7 +132,7 @@ body{font-family:'Montserrat',sans-serif;font-weight:300;color:#F0E8D2;display:f
     <div class="choose-label" id="clabel">Choose Your Experience</div>
     <div class="tier-cards">
 
-      <div class="tier" id="t1" onclick="go('professional')">
+      <div class="tier" id="t1" data-tier="professional">
         <div class="tier-icon pro">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8AADEA" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
         </div>
@@ -144,7 +144,7 @@ body{font-family:'Montserrat',sans-serif;font-weight:300;color:#F0E8D2;display:f
         <span class="tier-badge badge-pro">PRO</span>
       </div>
 
-      <div class="tier" id="t2" onclick="go('collector')">
+      <div class="tier" id="t2" data-tier="collector">
         <div class="tier-icon col">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AE52" stroke-width="1.5" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         </div>
@@ -156,7 +156,7 @@ body{font-family:'Montserrat',sans-serif;font-weight:300;color:#F0E8D2;display:f
         <span class="tier-badge badge-col">COLLECTOR</span>
       </div>
 
-      <div class="tier" id="t3" onclick="go('discover')">
+      <div class="tier" id="t3" data-tier="discover">
         <div class="tier-icon dis">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#70B890" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
         </div>
@@ -346,16 +346,19 @@ resize();
 window.addEventListener('resize', resize);
 requestAnimationFrame(frame);
 
-// Navigation
-function go(app){
-  const urls = {
-    professional: 'trace.html',  // opens mother app (source modules)
-    collector:    'trace.html',
-    discover:     'trace.html'
-  };
-  // Pass tier as URL hash so mother app can read it
-  window.location.href = urls[app] + '#' + app;
-}
+// Navigation — via event delegation on tier-cards container
+document.querySelector('.tier-cards').addEventListener('click', function(e) {
+  var tier = e.target.closest('[data-tier]');
+  if (tier) {
+    var app = tier.getAttribute('data-tier');
+    var urls = {
+      professional: 'trace.html',
+      collector:    'trace.html',
+      discover:     'trace.html'
+    };
+    window.location.href = urls[app] + '#' + app;
+  }
+});
 </script>
 </body>
 </html>

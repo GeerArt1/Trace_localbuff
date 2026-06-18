@@ -342,6 +342,152 @@ hr.divider{border-top-color:var(--border);}
 .sg-ai-btn:disabled{opacity:.4;cursor:not-allowed;}
 .sg-analysis{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px;margin-top:12px;font-size:12px;line-height:1.7;color:var(--text-mid);}
 .sg-analysis strong{color:var(--gold);}
+
+/* ── INLINE STYLE MIGRATION — utility classes for common patterns ── */
+.text-dim-sm { color:var(--text-dim);font-size:10px; }
+.text-dim { color:var(--text-dim); }
+.text-mid { color:var(--text-mid); }
+.text-dim-10 { font-size:10px;color:var(--text-mid); }
+.text-red { color:var(--red); }
+.text-green { color:var(--green); }
+.text-gold { color:var(--gold); }
+.mb-0 { margin-bottom:0; }
+.mb-6 { margin-bottom:6px; }
+.mb-12 { margin-bottom:12px; }
+.mb-16 { margin-bottom:16px; }
+.mb-20 { margin-bottom:20px; }
+.flex-gap-8 { display:flex;gap:8px; }
+.flex-min-100 { flex:1;min-width:100px; }
+.surface2-box { background:var(--surface2);padding:10px;text-align:center;border-radius:2px; }
+.empty-state-md { padding:24px;text-align:center;color:var(--text-dim);font-size:12px; }
+.empty-state-lg { padding:32px;text-align:center;color:var(--text-dim);font-size:13px; }
+.meta-uppercase { font-size:8px;color:var(--text-dim);margin-top:3px;letter-spacing:.1em;text-transform:uppercase; }
+.font-ui-14 { font-size:14px;font-family:var(--font-ui); }
+.text-dim-sm-mt4 { font-size:10px;color:var(--text-dim);margin-top:4px; }
+.p-12-20 { padding:12px 20px; }
+.text-mid { color:var(--text-mid); }
+.text-dim-10 { font-size:10px;color:var(--text-mid); }
+.p-0 { padding:0; }
+.mt-8 { margin-top:8px; }
+.mt-10 { margin-top:10px; }
+.mt-14 { margin-top:14px; }
+.mt-16 { margin-top:16px; }
+
+/* Deploy button style */
+.btn-deploy { padding:16px;font-size:10px;text-align:center; }
+.btn-deploy:hover { background:var(--gold-lt); }
+
+/* Deploy button sub-description */
+.btn-sub-desc { font-weight:400;margin-top:4px;font-size:8px;opacity:.7; }
+
+/* Icon sizes */
+.icon-20 { font-size:20px; }
+.icon-24-mb8 { font-size:24px;margin-bottom:8px; }
+.icon-20-mb6 { font-size:20px;margin-bottom:6px; }
+
+/* Section label styles */
+.section-label-mid { font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mid); }
+.section-label-dim { font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px; }
+
+/* Text variants */
+.text-dim-11 { font-size:11px;color:var(--text-dim); }
+
+.text-mono-14 { font-family:var(--font-mono);font-size:14px;color:var(--text); }
+
+/* Gold label with margin bottom */
+.gold-label-mb6 { color:var(--gold);font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px; }
+
+/* Small uppercase muted label */
+.label-xs { font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim); }
+.label-xs-mt4 { font-size:8px;color:var(--text-dim);margin-top:4px;letter-spacing:.1em;text-transform:uppercase; }
+.label-dim-mb6 { font-size:10px;color:var(--text-dim);margin-bottom:6px;letter-spacing:.12em;text-transform:uppercase; }
+
+/* Flex utilities */
+.flex-2-min200 { flex:2;min-width:200px; }
+.flex-gap-8-wrap { display:flex;gap:8px;flex-wrap:wrap; }
+.grid-2-gap8 { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
+
+/* Margin variants */
+.mb-0-cursor { margin-bottom:0;cursor:pointer; }
+.ml-4 { margin-left:4px; }
+.max-w-360-mb0 { max-width:360px;margin-bottom:0; }
+
+
+/* Small padding */
+.p-6 { padding:6px; }
+.p-8 { padding:8px; }
+.section-label-sm { font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px; }
+.badge-sm { padding:4px 10px;font-size:8px; }
+
+/* Font size utilities */
+.fs-18 { font-size:18px; }
+
+/* Gold display font for watchdog values */
+.font-display-gold { font-size:16px;font-family:var(--font-display);color:var(--gold); }
+
+/* Card body text */
+.card-body-text { font-size:12px;color:var(--text-mid);line-height:1.7; }
+
+/* Top border utility */
+.border-top-mt10 { margin-top:10px;padding-top:10px;border-top:1px solid var(--border); }
+
+/* Flex gap 10 utilities */
+.flex-gap-10 { display:flex;gap:10px; }
+.flex-gap-10-wrap { display:flex;gap:10px;flex-wrap:wrap; }
+.flex-gap-10-wrap-end { display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end; }
+
+/* Quick action button style */
+.quick-action-btn { padding:16px;border-right:1px solid var(--border);text-align:center;cursor:pointer; }
+.quick-action-btn:hover { background:var(--surface2); }
+
+/* Color utilities for database status */
+.text-amber { color:#c89820; }
+.text-blue-lt { color:#A0C8E0; }
+.text-blue-pro { color:#7AADDA; }
+
+/* Background+padding utility */
+.bg2-p10 { background:var(--bg2);padding:10px;border-radius:3px; }
+
+/* Padding horizontal */
+.px-14 { padding:0 14px; }
+
+/* Card-like container with flex items */
+.flex-between-items { padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center; }
+
+/* Small section label in uppercase */
+.section-label-8 { font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600; }
+
+/* Compact tag with border */
+.tag-badge { font-size:7px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:2px; }
+
+/* Flex row with gap and border-bottom */
+.flex-gap-bb { padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border); }
+
+/* Flex row with gap wrap and background */
+.flex-gap-wrap-bg { padding:6px 14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface2); }
+
+/* Small bordered container */
+.bordered-sm { padding:6px 8px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border2); }
+
+.p-10-14 { padding:10px 14px; }
+.p-8-14 { padding:8px 14px; }
+.h-8 { height:8px; }
+.h-16 { height:16px; }
+.ml-8 { margin-left:8px; }
+.pl-20 { padding-left:20px; }
+.text-right { text-align:right; }
+.mt-12 { margin-top:12px; }
+.mb-24 { margin-bottom:24px; }
+.mb-10 { margin-bottom:10px; }
+.gold-display-20 { font-size:20px;font-family:var(--font-display);color:var(--gold); }
+.grid-3-gap8 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px; }
+.px-18 { padding:0 18px; }
+.pt-16 { padding-top:16px; }
+
+
+/* Missing utilities */
+.text-green-lt { color:var(--green-lt); }
+.text-gold-dim { color:var(--gold-dim); }
 </style>
 </head>
 <body>
@@ -354,8 +500,8 @@ hr.divider{border-top-color:var(--border);}
     <div class="lock-label">Password</div>
     <input class="lock-input" id="lock-input" type="password"
            placeholder="••••••••" autocomplete="off"
-           onkeydown="if(event.key==='Enter')unlock()">
-    <button class="lock-btn" onclick="unlock()">Enter HQ</button>
+           data-hq-key="unlock">
+    <button class="lock-btn" data-hq="unlock">Enter HQ</button>
     <div class="lock-error" id="lock-error"></div>
   </div>
   <!-- Inline set-password form (shown when no password exists) -->
@@ -366,18 +512,18 @@ hr.divider{border-top-color:var(--border);}
       </div>
       <div class="lock-label">Choose password</div>
       <input class="lock-input" id="set-pw1" type="password" placeholder="••••••••"
-             style="margin-bottom:10px;" autocomplete="new-password">
+             class="mb-10" autocomplete="new-password">
       <div class="lock-label">Confirm password</div>
       <input class="lock-input" id="set-pw2" type="password" placeholder="••••••••"
-             onkeydown="if(event.key==='Enter')submitSetPassword()">
-      <button class="lock-btn" onclick="submitSetPassword()" style="margin-top:14px;">
+             data-hq-key="submitSetPassword">
+      <button class="lock-btn" data-hq="submitSetPassword" class="mt-14">
         Set Password &amp; Enter
       </button>
       <div id="set-pw-error" class="lock-error"></div>
     </div>
   </div>
   <div class="lock-hint" id="lock-hint-links">
-    Forgot password? <a onclick="resetPassword()">Reset (clears all data)</a>
+    Forgot password? <a data-hq="resetPassword">Reset (clears all data)</a>
   </div>
 </div>
 
@@ -387,11 +533,11 @@ hr.divider{border-top-color:var(--border);}
   <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-logo">TRACE HQ</div>
-    <button class="lock-btn-sm" onclick="document.querySelector('.sidebar').classList.toggle('open')" style="font-size:14px;display:none;" title="Menu" id="menu-toggle">☰</button><div class="topbar-right">
+    <button class="lock-btn-sm" data-hq="toggleSidebar" style="font-size:14px;display:none;" title="Menu" id="menu-toggle">☰</button><div class="topbar-right">
       <div class="live-dot" id="live-dot" title="Status"></div>
       <div class="topbar-time" id="clock"></div>
-      <button class="lock-btn-sm" o<button class="lock-btn-sm" id="mute-btn" onclick="toggleMute()" title="Toggle agent alert sounds">♫</button>
-      nclick="lockApp()">⎠ Lock</button>
+      <button class="lock-btn-sm" data-hq="lockApp">⎠ Lock</button>
+      <button class="lock-btn-sm" id="mute-btn" data-hq="toggleMute" title="Toggle agent alert sounds">♫</button>
     </div>
   </div>
 
@@ -401,67 +547,67 @@ hr.divider{border-top-color:var(--border);}
     <div class="sidebar">
       <div class="nav-section">
         <div class="nav-label">Overview</div>
-        <button class="nav-btn active" onclick="show('dashboard')">
+        <button class="nav-btn active" data-hq="show" data-hq-arg="dashboard">
           <span class="nav-icon">⬡</span> Dashboard
         </button>
       
-        <button class="nav-btn" onclick="show('analytics')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="analytics">
           <span class="nav-icon">◉</span> Analytics
         </button></div>
       <div class="nav-section">
         <div class="nav-label">App Files</div>
-        <button class="nav-btn" onclick="show('files')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="files">
           <span class="nav-icon">◈</span> All Files
         </button>
-        <button class="nav-btn" onclick="show('versions')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="versions">
           <span class="nav-icon">◎</span> Version History
         </button>
       </div>
       <div class="nav-section">
         <div class="nav-label">Operations</div>
-        <button class="nav-btn" onclick="show('status')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="status">
           <span class="nav-icon">●</span> Live Status
         </button>
-        <button class="nav-btn" onclick="show('apikey')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="apikey">
           <span class="nav-icon">⚷</span> API Key Setup
         </button>
-        <button class="nav-btn" onclick="show('checklist')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="checklist">
           <span class="nav-icon">✓</span> Launch Checklist
         </button>
-        <button class="nav-btn" onclick="show('sacredgeo')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="sacredgeo">
           <span class="nav-icon">⬡</span> Sacred Geometry
         </button>
-        <button class="nav-btn" onclick="show('eventlog')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="eventlog">
           <span class="nav-icon">■</span> Event Log
         </button>
-        <button class="nav-btn" onclick="show('flags')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="flags">
           <span class="nav-icon">⚑</span> Feature Flags
         </button>
-        <button class="nav-btn" onclick="show('aiops')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="aiops">
           <span class="nav-icon">✦</span> AI Ops
         </button>
       </div>
       <div class="nav-section">
         <div class="nav-label">Business</div>
-        <button class="nav-btn" onclick="show('revenue')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="revenue">
           <span class="nav-icon">◆</span> Revenue Model
         </button>
-        <button class="nav-btn" onclick="show('deploy')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="deploy">
           <span class="nav-icon">↻</span> Deployment
         </button>
-        <button class="nav-btn" onclick="show('usermgmt')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="usermgmt">
           <span class="nav-icon">◉</span> Users
         </button>
-        <button class="nav-btn" onclick="show('settings')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="settings">
           <span class="nav-icon">⚙</span> Settings
         </button>
       </div>
       <div class="nav-section">
         <div class="nav-label">Product</div>
-        <button class="nav-btn" onclick="show('tierdesigner')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="tierdesigner">
           <span class="nav-icon">◈</span> Tier Designer
         </button>
-        <button class="nav-btn" onclick="show('abtesting')">
+        <button class="nav-btn" data-hq="show" data-hq-arg="abtesting">
           <span class="nav-icon">↯</span> A/B Testing
         </button>
       </div>
@@ -475,21 +621,21 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">Dashboard</div>
         <div class="panel-sub">TRACE Art Intelligence · Administrator</div>
 
-        <div class="status-grid" style="margin-bottom:24px;">
+        <div class="status-grid mb-24">
           <div class="status-card">
             <div class="status-name">App Version</div>
             <div class="status-val">v30</div>
             <div class="status-indicator">
               <div class="dot dot-green"></div>
-              <span style="color:var(--text-dim);font-size:10px;">Current build</span>
+              <span class="text-dim-sm">Current build</span>
             </div>
           </div>
           <div class="status-card">
             <div class="status-name">Audit Score</div>
-            <div class="status-val" style="color:var(--gold);">9.0/10</div>
+            <div class="status-val text-gold">9.0/10</div>
             <div class="status-indicator">
               <div class="dot dot-green"></div>
-              <span style="color:var(--text-dim);font-size:10px;">Best in class</span>
+              <span class="text-dim-sm">Best in class</span>
             </div>
           </div>
           <div class="status-card">
@@ -497,56 +643,56 @@ hr.divider{border-top-color:var(--border);}
             <div class="status-val" id="dash-proxy-status">—</div>
             <div class="status-indicator" id="dash-proxy-ind">
               <div class="dot dot-grey"></div>
-              <span style="color:var(--text-dim);font-size:10px;">Not configured</span>
+              <span class="text-dim-sm">Not configured</span>
             </div>
           </div>
           <div class="status-card">
             <div class="status-name">Launch Progress</div>
             <div class="status-val" id="dash-checklist-pct">0%</div>
-            <div class="progress-bar" style="margin-top:8px;">
+            <div class="progress-bar mt-8">
               <div class="progress-fill" id="dash-progress" style="width:0%"></div>
             </div>
           </div>
         </div>
 
         <!-- Watchdog Agent Status -->
-        <div class="status-grid" style="margin-bottom:20px;">
+        <div class="status-grid mb-20">
           <div class="status-card">
             <div class="status-name">Agent Errors</div>
-            <div class="status-val" style="font-size:18px;" id="dash-wd-errors">—</div>
-            <div class="status-indicator"><div class="dot" id="dash-wd-dot"></div><span style="color:var(--text-dim);font-size:10px;" id="dash-wd-status">Checking...</span></div>
+            <div class="status-val fs-18" id="dash-wd-errors">—</div>
+            <div class="status-indicator"><div class="dot" id="dash-wd-dot"></div><span class="text-dim-sm" id="dash-wd-status">Checking...</span></div>
           </div>
           <div class="status-card">
             <div class="status-name">Last Fix</div>
-            <div class="status-val" style="font-size:14px;font-family:var(--font-ui);color:var(--green);" id="dash-wd-lastfix">—</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;" id="dash-wd-fix-ago">—</span></div>
+            <div class="status-val font-ui" style="font-size:14px;color:var(--green);" id="dash-wd-lastfix">—</div>
+            <div class="status-indicator"><span class="text-dim-sm" id="dash-wd-fix-ago">—</span></div>
           </div>
           <div class="status-card">
             <div class="status-name">Fix Rate</div>
-            <div class="status-val" style="font-size:18px;" id="dash-wd-fixrate">—</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;">Auto-fix success rate</span></div>
+            <div class="status-val fs-18" id="dash-wd-fixrate">—</div>
+            <div class="status-indicator"><span class="text-dim-sm">Auto-fix success rate</span></div>
           </div>
           <div class="status-card">
             <div class="status-name">Agent Since</div>
-            <div class="status-val" style="font-size:14px;font-family:var(--font-ui);" id="dash-wd-since">—</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;">Last event</span></div>
+            <div class="status-val font-ui-14" id="dash-wd-since">—</div>
+            <div class="status-indicator"><span class="text-dim-sm">Last event</span></div>
           </div>
         </div>
 
         <div class="card">
           <div class="card-head"><div class="card-title">Quick Actions</div></div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;">
-            <div style="padding:16px;border-right:1px solid var(--border);text-align:center;cursor:pointer;" onclick="show('files')" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
-              <div style="font-size:24px;margin-bottom:8px;">◈</div>
-              <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mid);">Download Files</div>
+            <div class="quick-action-btn" data-hq="show" data-hq-arg="files" data-hq-hover="highlight">
+              <div class="icon-24-mb8">◈</div>
+              <div class="section-label-mid">Download Files</div>
             </div>
-            <div style="padding:16px;border-right:1px solid var(--border);text-align:center;cursor:pointer;" onclick="show('status')" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
-              <div style="font-size:24px;margin-bottom:8px;">●</div>
-              <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mid);">Check Status</div>
+            <div class="quick-action-btn" data-hq="show" data-hq-arg="status" data-hq-hover="highlight">
+              <div class="icon-24-mb8">●</div>
+              <div class="section-label-mid">Check Status</div>
             </div>
-            <div style="padding:16px;text-align:center;cursor:pointer;" onclick="show('revenue')" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
-              <div style="font-size:24px;margin-bottom:8px;">◆</div>
-              <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mid);">Revenue Calc</div>
+            <div class="quick-action-btn" style="border-right:none;" data-hq="show" data-hq-arg="revenue" data-hq-hover="highlight">
+              <div class="icon-24-mb8">◆</div>
+              <div class="section-label-mid">Revenue Calc</div>
             </div>
           </div>
         </div>
@@ -558,7 +704,7 @@ hr.divider{border-top-color:var(--border);}
               style="width:100%;background:var(--bg2);border:1px solid var(--border2);
               color:var(--text);padding:12px;font-family:var(--font-ui);font-size:13px;
               line-height:1.6;border-radius:3px;resize:vertical;min-height:100px;outline:none;"
-              oninput="saveNotes(this.value)"></textarea>
+              data-hq-input="saveNotes"></textarea>
           </div>
         </div>
       </div>
@@ -568,8 +714,8 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">App Files</div>
         <div class="panel-sub">All TRACE files · Click to download</div>
         <div class="card" id="files-list"></div>
-        <div style="margin-top:16px;text-align:center;">
-          <button class="btn-dl" onclick="downloadAll()" style="padding:13px 32px;font-size:10px;">
+        <div class="mt-16 text-center">
+          <button class="btn-dl" data-hq="downloadAll" class="btn-dl" style="padding:13px 32px;font-size:10px;">
             ↓ Download All Files
           </button>
         </div>
@@ -591,12 +737,12 @@ hr.divider{border-top-color:var(--border);}
             </div>
             <div id="custom-versions"></div>
           </div>
-          <div style="padding:14px 18px;border-top:1px solid var(--border);">
+          <div class="px-18 py-14" style="border-top:1px solid var(--border);">
             <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;">Add Release Note</div>
-            <div style="display:flex;gap:10px;">
+            <div class="flex-gap-10">
               <input id="ver-tag" placeholder="v30" style="width:80px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;font-family:var(--font-mono);font-size:13px;border-radius:3px;outline:none;">
               <input id="ver-desc" placeholder="Description of changes..." style="flex:1;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;font-family:var(--font-ui);font-size:13px;border-radius:3px;outline:none;">
-              <button class="btn-dl" onclick="addVersion()">Add</button>
+              <button class="btn-dl" data-hq="addVersion">Add</button>
             </div>
           </div>
         </div>
@@ -607,13 +753,13 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">Live Status</div>
         <div class="panel-sub">Service health checks</div>
 
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head">
             <div class="card-title">Your Services</div>
-            <button class="btn-secondary" onclick="checkAll()">↻ Refresh All</button>
+            <button class="btn-secondary" data-hq="checkAll">↻ Refresh All</button>
           </div>
           <div id="status-services">
-            <div style="padding:32px;text-align:center;color:var(--text-dim);font-size:13px;">
+            <div class="empty-state-lg">
               Configure your Railway URL in Settings to enable status checks.
             </div>
           </div>
@@ -641,10 +787,10 @@ hr.divider{border-top-color:var(--border);}
           own server where the key lives as an environment variable — invisible to the browser.
         </div>
 
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head"><div class="card-title">Step 1 — Store Key in Railway</div></div>
           <div class="card-body" style="font-size:13px;color:var(--text-mid);line-height:1.8;">
-            <ol style="padding-left:20px;">
+            <ol class="pl-20">
               <li>Deploy <code>trace_backend_package.html</code> → download server.js + package.json</li>
               <li>Push both files to a private GitHub repo</li>
               <li>Railway.app → New Project → Deploy from GitHub</li>
@@ -655,18 +801,18 @@ hr.divider{border-top-color:var(--border);}
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head"><div class="card-title">Step 2 — Your Railway URL</div></div>
           <div class="card-body">
-            <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Railway proxy URL</div>
-            <div style="display:flex;gap:10px;">
+            <div class="section-label-dim">Railway proxy URL</div>
+            <div class="flex-gap-10">
               <input class="key-input" id="railway-url-input" 
                 placeholder="https://trace-api.up.railway.app"
-                style="margin-bottom:0;"
-                oninput="saveRailwayUrl(this.value)">
-              <button class="btn-dl" onclick="saveRailwayUrl(document.getElementById('railway-url-input').value);showToast('Saved')">Save</button>
+                class="mb-0"
+                data-hq-input="saveRailwayUrl">
+              <button class="btn-dl" data-hq="saveRailwayUrl">Save</button>
             </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">
+            <div class="text-dim-11 mt-8">
               This is used for status checks. Your key never leaves Railway's servers.
             </div>
           </div>
@@ -682,7 +828,7 @@ hr.divider{border-top-color:var(--border);}
               and remove the <code>x-api-key</code> and <code>anthropic-version</code> headers.
               The proxy adds them server-side.
             </div>
-            <button class="copy-btn" onclick="copyProxyUrl()">Copy Proxy URL</button>
+            <button class="copy-btn" data-hq="copyProxyUrl">Copy Proxy URL</button>
           </div>
         </div>
       </div>
@@ -691,11 +837,11 @@ hr.divider{border-top-color:var(--border);}
       <div class="panel" id="panel-checklist">
         <div class="panel-title">Launch Checklist</div>
         <div class="panel-sub">Click items to mark complete · Progress saves automatically</div>
-        <div style="margin-bottom:20px;">
-          <div class="progress-bar" style="height:8px;">
+        <div class="mb-20">
+          <div class="progress-bar h-8">
             <div class="progress-fill" id="check-progress" style="width:0%"></div>
           </div>
-          <div style="font-size:11px;color:var(--text-dim);margin-top:8px;" id="check-pct">0 of 0 complete</div>
+          <div class="text-dim-11 mt-8" id="check-pct">0 of 0 complete</div>
         </div>
         <div class="card" id="checklist-container"></div>
       </div>
@@ -705,21 +851,21 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">Revenue Model</div>
         <div class="panel-sub">Live calculator · Adjust subscriber counts</div>
 
-        <div class="card" style="margin-bottom:20px;">
+        <div class="card mb-20">
           <div class="card-head"><div class="card-title">Subscriber Inputs</div></div>
           <div class="card-body">
             <div class="calc-grid">
               <div class="calc-item">
                 <div class="calc-label">Discover Premium (€4.99/mo)</div>
-                <input class="calc-input" id="inp-discover" type="number" value="0" min="0" oninput="calcRevenue()">
+                <input class="calc-input" id="inp-discover" type="number" value="0" min="0" data-hq-input="calcRevenue">
               </div>
               <div class="calc-item">
                 <div class="calc-label">Collector (€49/mo)</div>
-                <input class="calc-input" id="inp-collector" type="number" value="0" min="0" oninput="calcRevenue()">
+                <input class="calc-input" id="inp-collector" type="number" value="0" min="0" data-hq-input="calcRevenue">
               </div>
               <div class="calc-item">
                 <div class="calc-label">Professional (€299/mo)</div>
-                <input class="calc-input" id="inp-pro" type="number" value="0" min="0" oninput="calcRevenue()">
+                <input class="calc-input" id="inp-pro" type="number" value="0" min="0" data-hq-input="calcRevenue">
               </div>
             </div>
             <div class="calc-results">
@@ -736,7 +882,7 @@ hr.divider{border-top-color:var(--border);}
                 <div class="calc-result-label">Fixed Costs</div>
               </div>
               <div class="calc-result">
-                <div class="calc-result-val" id="res-profit" style="color:var(--green);">€0</div>
+                <div class="calc-result-val" id="res-profit" class="text-green">€0</div>
                 <div class="calc-result-label">Monthly Profit</div>
               </div>
             </div>
@@ -748,11 +894,11 @@ hr.divider{border-top-color:var(--border);}
           <div class="card-body">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
               <div>
-                <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;">ARR</div>
+                <div class="section-label-sm">ARR</div>
                 <div style="font-family:var(--font-display);font-size:36px;color:var(--gold);" id="res-arr">€0</div>
               </div>
               <div>
-                <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;">Annual Profit</div>
+                <div class="section-label-sm">Annual Profit</div>
                 <div style="font-family:var(--font-display);font-size:36px;color:var(--green);" id="res-annual-profit">€0</div>
               </div>
             </div>
@@ -770,8 +916,8 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">Analytics</div>
         <div class="panel-sub">Usage statistics from TRACE app localStorage</div>
 
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-head"><div class="card-title">Summary</div><button class="btn-secondary" onclick="refreshAnalytics()">↻ Refresh</button></div>
+        <div class="card mb-16">
+          <div class="card-head"><div class="card-title">Summary</div><button class="btn-secondary" data-hq="refreshAnalytics">↻ Refresh</button></div>
           <div class="card-body">
             <div class="an-grid" id="an-summary">
               <div class="an-card"><div class="an-val" id="an-scans">—</div><div class="an-label">Total Scans</div></div>
@@ -780,7 +926,7 @@ hr.divider{border-top-color:var(--border);}
               <div class="an-card"><div class="an-val" id="an-tier">—</div><div class="an-label">Active Tier</div></div>
             </div>
             <!-- Mini activity chart -->
-            <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+            <div class="mt-16 pt-16 border-top">
               <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;">Activity Summary</div>
               <canvas id="an-chart" width="600" height="160" style="width:100%;height:80px;border-radius:2px;"></canvas>
             </div>
@@ -789,10 +935,10 @@ hr.divider{border-top-color:var(--border);}
 
         <div class="card">
           <div class="card-head"><div class="card-title">Recent Activity</div></div>
-          <div class="card-body" style="padding:0;">
+          <div class="card-body p-0">
             <table class="an-table">
               <thead><tr><th>Timestamp</th><th>Event</th><th>Details</th></tr></thead>
-              <tbody id="an-activity"><tr><td colspan="3" style="padding:24px;text-align:center;color:var(--text-dim);font-size:12px;">No data — open TRACE app and perform scans to populate analytics.</td></tr></tbody>
+              <tbody id="an-activity"><tr><td colspan="3" class="empty-state-md">No data — open TRACE app and perform scans to populate analytics.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -803,9 +949,9 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">Sacred Geometry</div>
         <div class="panel-sub">Composition analysis with golden ratio overlays</div>
 
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head"><div class="card-title">Analyze Artwork Composition</div></div>
-          <div class="card-body" style="padding:0;">
+          <div class="card-body p-0">
             <div class="sg-canvas-wrap">
               <canvas id="sg-canvas"></canvas>
               <div id="sg-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--text-dim);gap:12px;">
@@ -815,14 +961,14 @@ hr.divider{border-top-color:var(--border);}
               </div>
             </div>
             <div class="sg-controls">
-              <input type="file" id="sg-file-input" accept="image/*" style="display:none;" onchange="sgLoadImage(this)">
-              <button class="sg-upload-btn" onclick="document.getElementById('sg-file-input').click()">↑ Upload Image</button>
-              <button class="sg-btn" id="sg-golden" onclick="sgToggle('golden')">Golden Ratio</button>
-              <button class="sg-btn" id="sg-thirds" onclick="sgToggle('thirds')">Rule of Thirds</button>
-              <button class="sg-btn" id="sg-spiral" onclick="sgToggle('spiral')">Golden Spiral</button>
-              <button class="sg-btn" id="sg-diagonal" onclick="sgToggle('diagonal')">Dynamic Symmetry</button>
-              <button class="sg-btn" id="sg-radial" onclick="sgToggle('radial')">Radial</button>
-              <button class="sg-btn" onclick="sgClear()">Clear All</button><button class="sg-ai-btn" id="sg-ai-btn" onclick="sgAnalyzeWithAI()" style="margin-left:4px;">✦ AI Analyze</button>
+              <input type="file" id="sg-file-input" accept="image/*" style="display:none;" data-hq-change="sgLoadImage">
+              <button class="sg-upload-btn" data-hq="sgUpload">↑ Upload Image</button>
+              <button class="sg-btn" id="sg-golden" data-hq="sgToggle" data-hq-arg="golden">Golden Ratio</button>
+              <button class="sg-btn" id="sg-thirds" data-hq="sgToggle" data-hq-arg="thirds">Rule of Thirds</button>
+              <button class="sg-btn" id="sg-spiral" data-hq="sgToggle" data-hq-arg="spiral">Golden Spiral</button>
+              <button class="sg-btn" id="sg-diagonal" data-hq="sgToggle" data-hq-arg="diagonal">Dynamic Symmetry</button>
+              <button class="sg-btn" id="sg-radial" data-hq="sgToggle" data-hq-arg="radial">Radial</button>
+              <button class="sg-btn" data-hq="sgClear">Clear All</button><button class="sg-ai-btn" id="sg-ai-btn" data-hq="sgAnalyzeWithAI" class="ml-4">✦ AI Analyze</button>
             </div>
             <div class="sg-info" id="sg-info">
               <strong>Sacred geometry</strong> reveals the mathematical harmony underlying great artworks. Upload an image and toggle overlays to see how masters used these proportions.
@@ -833,8 +979,8 @@ hr.divider{border-top-color:var(--border);}
         <div class="card">
           <div class="card-head"><div class="card-title">About Sacred Geometry in Art</div></div>
           <div class="card-body" style="font-size:12px;color:var(--text-mid);line-height:1.8;">
-            <p style="margin-bottom:12px;">The <strong>golden ratio</strong> (φ ≈ 1.618) appears throughout Renaissance and Classical art — from Leonardo da Vinci's <em>Vitruvian Man</em> to Botticelli's <em>Birth of Venus</em>. The ratio creates compositions that feel naturally harmonious to the human eye.</p>
-            <p style="margin-bottom:12px;"><strong>Dynamic symmetry</strong> (root rectangles) was used by ancient Greek architects and artists like Georges Seurat. <strong>Radial harmony</strong> organizes composition around a central focal point, common in religious art and mandalas.</p>
+            <p class="mb-12">The <strong>golden ratio</strong> (φ ≈ 1.618) appears throughout Renaissance and Classical art — from Leonardo da Vinci's <em>Vitruvian Man</em> to Botticelli's <em>Birth of Venus</em>. The ratio creates compositions that feel naturally harmonious to the human eye.</p>
+            <p class="mb-12"><strong>Dynamic symmetry</strong> (root rectangles) was used by ancient Greek architects and artists like Georges Seurat. <strong>Radial harmony</strong> organizes composition around a central focal point, common in religious art and mandalas.</p>
             <p>Use overlays above to discover hidden structures in your artwork collection. TRACE can detect these mathematically in analysis results.</p>
           </div>
         </div>
@@ -845,22 +991,22 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">Event Log</div>
         <div class="panel-sub">Live server events monitoring</div>
 
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head">
             <div class="card-title">Recent Events</div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn-secondary" onclick="elRefresh()">↻ Refresh</button>
-              <button class="btn-secondary" onclick="elClear()">Clear</button>
+            <div class="flex-gap-8">
+              <button class="btn-secondary" data-hq="elRefresh">↻ Refresh</button>
+              <button class="btn-secondary" data-hq="elClear">Clear</button>
             </div>
           </div>
-          <div class="card-body" style="padding:0;">
+          <div class="card-body p-0">
             <div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;">
               <input id="el-filter" placeholder="&#x1F50D; Filter events..." 
                 style="flex:1;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;font-size:11px;border-radius:2px;outline:none;"
-                oninput="elApplyFilter(this.value)">
+                data-hq-input="elApplyFilter">
               <select id="el-type-filter" 
                 style="background:var(--bg2);border:1px solid var(--border2);color:var(--text-mid);padding:8px;font-size:10px;border-radius:2px;outline:none;cursor:pointer;"
-                onchange="elApplyFilter(document.getElementById('el-filter').value, this.value)">
+                data-hq-change="elTypeFilter">
                 <option value="">All Types</option>
                 <option value="info">Info</option>
                 <option value="warn">Warning</option>
@@ -876,11 +1022,11 @@ hr.divider{border-top-color:var(--border);}
 
         <div class="card">
           <div class="card-head"><div class="card-title">Simulate Test Events</div></div>
-          <div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="sg-btn" onclick="elAdd('info','Analytics ping received','Server heartbeat')">Info Event</button>
-            <button class="sg-btn" onclick="elAdd('warn','High API latency detected','Response time 2.4s')">Warn Event</button>
-            <button class="sg-btn" onclick="elAdd('error','API connection failed','Proxy unreachable')">Error Event</button>
-            <button class="sg-btn" onclick="elAdd('ok','All systems nominal','Health check passed')">OK Event</button>
+          <div class="card-body flex-gap-8-wrap">
+            <button class="sg-btn" data-hq="elAdd" data-hq-arg="info|Analytics ping received|Server heartbeat">Info Event</button>
+            <button class="sg-btn" data-hq="elAdd" data-hq-arg="warn|High API latency detected|Response time 2.4s">Warn Event</button>
+            <button class="sg-btn" data-hq="elAdd" data-hq-arg="error|API connection failed|Proxy unreachable">Error Event</button>
+            <button class="sg-btn" data-hq="elAdd" data-hq-arg="ok|All systems nominal|Health check passed">OK Event</button>
           </div>
         </div>
       </div>
@@ -891,100 +1037,100 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-sub">AI agent monitoring · auto-fix · health checks</div>
 
         <!-- Quick Status Summary -->
-        <div class="status-grid" style="margin-bottom:20px;">
+        <div class="status-grid mb-20">
           <div class="status-card">
             <div class="status-name">Health Score</div>
             <div class="status-val" id="aiops-score">—</div>
             <div class="status-indicator" id="aiops-score-ind">
               <div class="dot dot-grey"></div>
-              <span style="color:var(--text-dim);font-size:10px;">Not checked</span>
+              <span class="text-dim-sm">Not checked</span>
             </div>
           </div>
           <div class="status-card">
             <div class="status-name">Health Status</div>
-            <div class="status-val" id="aiops-status-val" style="font-size:20px;">—</div>
+            <div class="status-val" id="aiops-status-val" class="icon-20">—</div>
             <div class="status-indicator">
-              <span style="color:var(--text-dim);font-size:10px;" id="aiops-status-issues">No issues reported</span>
+              <span class="text-dim-sm" id="aiops-status-issues">No issues reported</span>
             </div>
           </div>
           <div class="status-card">
             <div class="status-name">Error Patterns</div>
             <div class="status-val" id="aiops-patterns">—</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;">In knowledge base</span></div>
+            <div class="status-indicator"><span class="text-dim-sm">In knowledge base</span></div>
           </div>
           <div class="status-card">
             <div class="status-name">Ops Events Today</div>
             <div class="status-val" id="aiops-events-today">—</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;">Total: <span id="aiops-events-total">0</span></span></div>
+            <div class="status-indicator"><span class="text-dim-sm">Total: <span id="aiops-events-total">0</span></span></div>
           </div>
         </div>
 
         <!-- Agent Alert Container -->
-        <div id="agent-alert-container" style="margin-bottom:16px;"></div>
+        <div id="agent-alert-container" class="mb-16"></div>
 
         <!-- Watchdog Status -->
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-head"><div class="card-title">Watchdog Status</div><button class="btn-secondary" onclick="refreshWatchdogStatus()">↻ Refresh</button></div>
+        <div class="card mb-16">
+          <div class="card-head"><div class="card-title">Watchdog Status</div><button class="btn-secondary" data-hq="refreshWatchdogStatus">↻ Refresh</button></div>
           <div class="card-body">
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
-              <div style="background:var(--surface2);padding:10px;text-align:center;border-radius:2px;">
-                <div style="font-size:16px;font-family:var(--font-display);color:var(--gold);" id="wd-error-count">—</div>
-                <div style="font-size:8px;color:var(--text-dim);margin-top:3px;letter-spacing:.1em;text-transform:uppercase;">Errors/Warnings</div>
+              <div class="surface2-box">
+                <div class="font-display-gold" id="wd-error-count">—</div>
+                <div class="meta-uppercase" id="wd-error-label">Errors/Warnings</div>
               </div>
-              <div style="background:var(--surface2);padding:10px;text-align:center;border-radius:2px;">
-                <div style="font-size:16px;font-family:var(--font-display);color:var(--gold);" id="wd-last-seen">—</div>
-                <div style="font-size:8px;color:var(--text-dim);margin-top:3px;letter-spacing:.1em;text-transform:uppercase;">Last Event</div>
+              <div class="surface2-box">
+                <div class="font-display-gold" id="wd-last-seen">—</div>
+                <div class="meta-uppercase">Last Event</div>
               </div>
-              <div style="background:var(--surface2);padding:10px;text-align:center;border-radius:2px;">
+              <div class="surface2-box">
                 <div style="font-size:12px;font-family:var(--font-display);color:var(--green);" id="wd-fix-rate">—</div>
-                <div style="font-size:8px;color:var(--text-dim);margin-top:3px;letter-spacing:.1em;text-transform:uppercase;">Fix Rate</div>
+                <div class="meta-uppercase">Fix Rate</div>
               </div>
-              <div style="background:var(--surface2);padding:10px;text-align:center;border-radius:2px;">
+              <div class="surface2-box">
                 <div style="font-size:12px;font-family:var(--font-display);color:var(--blue);" id="wd-patterns">—</div>
-                <div style="font-size:8px;color:var(--text-dim);margin-top:3px;letter-spacing:.1em;text-transform:uppercase;">Checks</div>
+                <div class="meta-uppercase">Checks</div>
               </div>
             </div>
             <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;letter-spacing:.12em;text-transform:uppercase;">Error Source Breakdown</div>
             <div id="wd-source-breakdown" style="font-size:11px;line-height:1.7;max-height:120px;overflow-y:auto;">
-              <div class="el-empty" style="padding:8px;">No events recorded yet.</div>
+              <div class="el-empty p-8">No events recorded yet.</div>
             </div>
-            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-              <div style="font-size:10px;color:var(--text-dim);margin-bottom:6px;letter-spacing:.12em;text-transform:uppercase;">Last Fix / Agent Activity</div>
+            <div class="border-top-mt10">
+              <div class="label-dim-mb6">Last Fix / Agent Activity</div>
               <div id="wd-last-fix" style="font-size:11px;color:var(--text-mid);">—</div>
             </div>
-            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-              <div style="font-size:10px;color:var(--text-dim);margin-bottom:6px;letter-spacing:.12em;text-transform:uppercase;">Recent Agent Reports</div>
+            <div class="border-top-mt10">
+              <div class="label-dim-mb6">Recent Agent Reports</div>
               <div id="wd-recent-reports" style="font-size:10px;line-height:1.6;max-height:150px;overflow-y:auto;">
-                <div class="el-empty" style="padding:6px;">No agent activity yet.</div>
+                <div class="el-empty p-6">No agent activity yet.</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Health Check -->
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head">
             <div class="card-title">Health Check</div>
-            <button class="btn-secondary" onclick="aiOpsRunCheck()">↻ Run Health Check</button>
+            <button class="btn-secondary" data-hq="aiOpsRunCheck">↻ Run Health Check</button>
           </div>
-          <div class="card-body" id="aiops-health-result" style="font-size:12px;color:var(--text-mid);line-height:1.7;">
+          <div class="card-body" id="aiops-health-result" class="card-body-text">
             Click <strong>Run Health Check</strong> to scan your TRACE server configuration, API keys, and subscription status.
           </div>
           <div id="aiops-health-details" style="display:none;padding:0 18px 18px;"></div>
         </div>
 
         <!-- Auto-Fix -->
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head">
             <div class="card-title">Auto-Fix Engine</div>
-            <button class="btn-secondary" onclick="document.getElementById('aiops-fix-input').value='';document.getElementById('aiops-fix-result').style.display='none'">Clear</button>
+            <button class="btn-secondary" data-hq="aiOpsClear">Clear</button>
           </div>
           <div class="card-body">
             <div style="display:flex;gap:10px;margin-bottom:10px;">
               <input id="aiops-fix-input" placeholder="Paste an error message to find a fix..."
                 class="key-input" style="margin-bottom:0;flex:1;"
-                onkeydown="if(event.key==='Enter')aiOpsAutoFix()">
-              <button class="btn-dl" onclick="aiOpsAutoFix()">Find Fix</button>
+                data-hq-key="aiOpsAutoFix">
+              <button class="btn-dl" data-hq="aiOpsAutoFix">Find Fix</button>
             </div>
             <div id="aiops-fix-result" style="display:none;background:var(--bg2);border:1px solid var(--border2);border-radius:3px;padding:14px;font-size:12px;line-height:1.6;"></div>
             <div style="font-size:10px;color:var(--text-dim);margin-top:8px;letter-spacing:.05em;">
@@ -994,14 +1140,14 @@ hr.divider{border-top-color:var(--border);}
         </div>
 
         <!-- Ops Event Log -->
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head">
             <div class="card-title">Ops Event Log</div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn-secondary" onclick="aiOpsRefreshLog()">↻ Refresh</button>
+            <div class="flex-gap-8">
+              <button class="btn-secondary" data-hq="aiOpsRefreshLog">↻ Refresh</button>
             </div>
           </div>
-          <div class="card-body" style="padding:0;">
+          <div class="card-body p-0">
             <div class="el-list" id="aiops-ops-log" style="max-height:300px;">
               <div class="el-empty">No ops events yet. Run a health check to populate.</div>
             </div>
@@ -1012,9 +1158,9 @@ hr.divider{border-top-color:var(--border);}
         <div class="card">
           <div class="card-head">
             <div class="card-title">Operations Report</div>
-            <button class="btn-secondary" onclick="aiOpsGetReport()">Generate Report</button>
+            <button class="btn-secondary" data-hq="aiOpsGetReport">Generate Report</button>
           </div>
-          <div class="card-body" id="aiops-report-result" style="font-size:12px;color:var(--text-mid);line-height:1.7;">
+          <div class="card-body" id="aiops-report-result" class="card-body-text">
             Click <strong>Generate Report</strong> for a daily operations summary with recommendations.
           </div>
         </div>
@@ -1026,24 +1172,24 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-sub">Toggle features across tiers</div>
 
         <div class="card" id="flags-list">
-          <div class="card-body" style="padding:0;" id="flags-container"></div>
+          <div class="card-body p-0" id="flags-container"></div>
         </div>
 
-        <div class="card" style="margin-top:16px;">
+        <div class="card mt-16">
           <div class="card-head"><div class="card-title">Bulk Actions</div></div>
-          <div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-dl" onclick="flagsEnableAll()">Enable All</button>
-            <button class="btn-secondary" onclick="flagsDisableAll()">Disable All</button>
-            <button class="btn-secondary" onclick="flagsReset()">Reset to Defaults</button>
+          <div class="card-body flex-gap-8-wrap">
+            <button class="btn-dl" data-hq="flagsEnableAll">Enable All</button>
+            <button class="btn-secondary" data-hq="flagsDisableAll">Disable All</button>
+            <button class="btn-secondary" data-hq="flagsReset">Reset to Defaults</button>
           </div>
         </div>
 
         <div class="card">
           <div class="card-head"><div class="card-title">Add Custom Flag</div></div>
-          <div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div class="card-body flex-gap-10-wrap">
             <input id="ff-name" placeholder="Feature name" style="flex:1;min-width:140px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;font-size:12px;border-radius:3px;outline:none;">
             <input id="ff-desc" placeholder="Description" style="flex:2;min-width:200px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;font-size:12px;border-radius:3px;outline:none;">
-            <button class="btn-dl" onclick="flagsAdd()">Add Flag</button>
+            <button class="btn-dl" data-hq="flagsAdd">Add Flag</button>
           </div>
           <div id="ff-msg" style="font-size:11px;color:var(--text-dim);padding:8px 18px 14px;display:none;"></div>
         </div>
@@ -1054,60 +1200,60 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">Deployment</div>
         <div class="panel-sub">Build &amp; deploy TRACE app</div>
 
-        <div class="status-grid" style="margin-bottom:16px;">
+        <div class="status-grid mb-16">
           <div class="status-card">
             <div class="status-name">Netlify</div>
             <div class="status-val" id="dp-netlify-status">—</div>
-            <div class="status-indicator" id="dp-netlify-ind"><div class="dot dot-grey"></div><span style="color:var(--text-dim);font-size:10px;">Not configured</span></div>
+            <div class="status-indicator" id="dp-netlify-ind"><div class="dot dot-grey"></div><span class="text-dim-sm">Not configured</span></div>
           </div>
           <div class="status-card">
             <div class="status-name">API Proxy (Railway)</div>
             <div class="status-val" id="dp-railway-status">—</div>
-            <div class="status-indicator" id="dp-railway-ind"><div class="dot dot-grey"></div><span style="color:var(--text-dim);font-size:10px;">Not configured</span></div>
+            <div class="status-indicator" id="dp-railway-ind"><div class="dot dot-grey"></div><span class="text-dim-sm">Not configured</span></div>
           </div>
           <div class="status-card">
             <div class="status-name">Last Deploy</div>
             <div class="status-val" id="dp-last-deploy">—</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;" id="dp-last-status">No deploys yet</span></div>
+            <div class="status-indicator"><span class="text-dim-sm" id="dp-last-status">No deploys yet</span></div>
           </div>
           <div class="status-card">
             <div class="status-name">Build Status</div>
             <div class="status-val" id="dp-build-status">Idle</div>
-            <div class="status-indicator" id="dp-build-ind"><div class="dot dot-grey"></div><span style="color:var(--text-dim);font-size:10px;">Ready</span></div>
+            <div class="status-indicator" id="dp-build-ind"><div class="dot dot-grey"></div><span class="text-dim-sm">Ready</span></div>
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head">
             <div class="card-title">Actions</div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn-secondary" onclick="dpCheckStatus()">↻ Check Status</button>
+            <div class="flex-gap-8">
+              <button class="btn-secondary" data-hq="dpCheckStatus">↻ Check Status</button>
             </div>
           </div>
           <div class="card-body">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-              <button class="btn-dl" onclick="dpBuildLocal()" style="padding:16px;font-size:10px;text-align:center;">
-                <div style="font-size:20px;margin-bottom:6px;">⚒</div>
+              <button class="btn-dl" data-hq="dpBuildLocal" class="btn-deploy">
+                <div class="icon-20-mb6">⚒</div>
                 <div>Build Local</div>
-                <div style="font-weight:400;margin-top:4px;font-size:8px;opacity:.7;">Prepare files for deploy</div>
+                <div class="btn-sub-desc">Prepare files for deploy</div>
               </button>
-              <button class="btn-dl" onclick="dpDeployNetlify()" style="padding:16px;font-size:10px;text-align:center;">
-                <div style="font-size:20px;margin-bottom:6px;">▲</div>
+              <button class="btn-dl" data-hq="dpDeployNetlify" class="btn-deploy">
+                <div class="icon-20-mb6">▲</div>
                 <div>Deploy to Netlify</div>
-                <div style="font-weight:400;margin-top:4px;font-size:8px;opacity:.7;">Drag &amp; drop deploy</div>
+                <div class="btn-sub-desc">Drag &amp; drop deploy</div>
               </button>
-              <button class="btn-dl" onclick="dpDeployRailway()" style="padding:16px;font-size:10px;text-align:center;">
-                <div style="font-size:20px;margin-bottom:6px;">⬡</div>
+              <button class="btn-dl" data-hq="dpDeployRailway" class="btn-deploy">
+                <div class="icon-20-mb6">⬡</div>
                 <div>Deploy API Proxy</div>
-                <div style="font-weight:400;margin-top:4px;font-size:8px;opacity:.7;">Railway API backend</div>
+                <div class="btn-sub-desc">Railway API backend</div>
               </button>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-head"><div class="card-title">Build Log</div><button class="btn-secondary" onclick="dpClearLog()">Clear</button></div>
-          <div class="card-body" style="padding:0;" id="dp-log-container">
+          <div class="card-head"><div class="card-title">Build Log</div><button class="btn-secondary" data-hq="dpClearLog">Clear</button></div>
+          <div class="card-body p-0" id="dp-log-container">
             <div class="dp-log" id="dp-log">
               <div class="dp-log-line info">[—] Deployment system ready. Configure Netlify URL in Settings to enable live status.</div>
             </div>
@@ -1120,20 +1266,20 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">Users</div>
         <div class="panel-sub">Manage subscribers &amp; access</div>
 
-        <div class="an-grid" style="margin-bottom:16px;">
+        <div class="an-grid mb-16">
           <div class="an-card"><div class="an-val" id="um-total">0</div><div class="an-label">Total Users</div></div>
-          <div class="an-card"><div class="an-val" id="um-pro" style="color:#7AADDA;">0</div><div class="an-label">Professional</div></div>
+          <div class="an-card"><div class="an-val" id="um-pro" class="text-blue-pro">0</div><div class="an-label">Professional</div></div>
           <div class="an-card"><div class="an-val" id="um-collector">0</div><div class="an-label">Collector</div></div>
           <div class="an-card"><div class="an-val" id="um-discover">0</div><div class="an-label">Discover</div></div>
         </div>
 
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-head"><div class="card-title">User List</div><button class="btn-secondary" onclick="umRefresh()">↻ Refresh</button></div>
-          <div class="card-body" style="padding:0;">
+        <div class="card mb-16">
+          <div class="card-head"><div class="card-title">User List</div><button class="btn-secondary" data-hq="umRefresh">↻ Refresh</button></div>
+          <div class="card-body p-0">
             <table class="um-table">
               <thead><tr><th>Name</th><th>Tier</th><th>Status</th><th>Since</th><th>Revenue</th></tr></thead>
               <tbody id="um-list">
-                <tr><td colspan="5" style="padding:24px;text-align:center;color:var(--text-dim);font-size:12px;">No users loaded. Use the form below to add users, or configure a backend.</td></tr>
+                <tr><td colspan="5" class="empty-state-md">No users loaded. Use the form below to add users, or configure a backend.</td></tr>
               </tbody>
             </table>
           </div>
@@ -1142,26 +1288,26 @@ hr.divider{border-top-color:var(--border);}
         <div class="card">
           <div class="card-head"><div class="card-title">Add User</div></div>
           <div class="card-body">
-            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="flex-gap-10-wrap-end">
               <div style="flex:2;min-width:160px;">
-                <div class="calc-label" style="margin-bottom:6px;">Name</div>
-                <input class="key-input" id="um-name" placeholder="User name" style="margin-bottom:0;">
+                <div class="calc-label mb-6">Name</div>
+                <input class="key-input" id="um-name" placeholder="User name" class="mb-0">
               </div>
-              <div style="flex:1;min-width:100px;">
-                <div class="calc-label" style="margin-bottom:6px;">Tier</div>
-                <select class="key-input" id="um-tier" style="margin-bottom:0;cursor:pointer;">
+              <div class="flex-min-100">
+                <div class="calc-label mb-6">Tier</div>
+                <select class="key-input" id="um-tier" class="mb-0-cursor">
                   <option value="discover">Discover</option>
                   <option value="collector">Collector</option>
                   <option value="professional">Professional</option>
                 </select>
               </div>
-              <div style="flex:1;min-width:100px;">
-                <div class="calc-label" style="margin-bottom:6px;">Revenue (€/mo)</div>
-                <input class="key-input" id="um-revenue" type="number" value="0" min="0" style="margin-bottom:0;">
+              <div class="flex-min-100">
+                <div class="calc-label mb-6">Revenue (€/mo)</div>
+                <input class="key-input" id="um-revenue" type="number" value="0" min="0" class="mb-0">
               </div>
-              <button class="btn-dl" onclick="umAdd()" style="padding:12px 20px;">Add User</button>
+              <button class="btn-dl p-12-20" data-hq="umAdd">Add User</button>
             </div>
-            <div id="um-msg" style="font-size:11px;color:var(--text-dim);margin-top:10px;min-height:16px;"></div>
+            <div id="um-msg" class="text-dim-11 mt-10" style="min-height:16px"></div>
           </div>
         </div>
       </div>
@@ -1170,41 +1316,41 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">Settings</div>
         <div class="panel-sub">HQ configuration</div>
 
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head"><div class="card-title">Change Password</div></div>
           <div class="card-body">
             <div style="display:flex;flex-direction:column;gap:10px;max-width:320px;">
               <input type="password" id="new-pw1" placeholder="New password" 
-                class="key-input" style="margin-bottom:0;">
+                class="key-input mb-0">
               <input type="password" id="new-pw2" placeholder="Confirm password"
-                class="key-input" style="margin-bottom:0;">
-              <button class="btn-dl" onclick="changePassword()" style="align-self:flex-start;">Update Password</button>
+                class="key-input mb-0">
+              <button class="btn-dl" data-hq="changePassword" style="align-self:flex-start;">Update Password</button>
               <div id="pw-msg" style="font-size:12px;min-height:16px;"></div>
             </div>
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:16px;">
+        <div class="card mb-16">
           <div class="card-head"><div class="card-title">App Configuration</div></div>
           <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
             <div>
-              <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">App Domain</div>
-              <input class="key-input" id="app-domain" placeholder="https://trace-art.com" style="max-width:360px;margin-bottom:0;" oninput="saveSetting('domain',this.value)">
+              <div class="section-label-dim">App Domain</div>
+              <input class="key-input" id="app-domain" placeholder="https://trace-art.com" class="max-w-360-mb0" data-hq-input="saveAppDomain">
             </div>
             <div>
-              <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Netlify URL</div>
-              <input class="key-input" id="netlify-url" placeholder="https://trace.netlify.app" style="max-width:360px;margin-bottom:0;" oninput="saveSetting('netlify',this.value)">
+              <div class="section-label-dim">Netlify URL</div>
+              <input class="key-input" id="netlify-url" placeholder="https://trace.netlify.app" class="max-w-360-mb0" data-hq-input="saveNetlifyUrl">
             </div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-head"><div class="card-title" style="color:var(--red);">Danger Zone</div></div>
+          <div class="card-head"><div class="card-title text-red">Danger Zone</div></div>
           <div class="card-body">
-            <button class="btn-secondary" onclick="clearAll()" style="border-color:rgba(196,72,72,.4);color:var(--red);">
+            <button class="btn-secondary" data-hq="clearAll" style="border-color:rgba(196,72,72,.4);color:var(--red);">
               Clear All Data &amp; Reset Password
             </button>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">
+            <div class="text-dim-11 mt-8">
               Removes password, checklist progress, notes, and settings. Cannot be undone.
             </div>
           </div>
@@ -1220,42 +1366,42 @@ hr.divider{border-top-color:var(--border);}
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
           <div class="status-card" style="border-left:2px solid #C8A028;">
             <div class="status-name" style="color:#C8A028;">Discover</div>
-            <div class="status-val" style="font-size:14px;font-family:var(--font-ui);">€0 · Free</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:4px;"><span id="td-features-disc">0</span> features enabled</div>
+            <div class="status-val font-ui-14">€0 · Free</div>
+            <div class="text-dim-sm-mt4"><span id="td-features-disc">0</span> features enabled</div>
           </div>
           <div class="status-card" style="border-left:2px solid var(--gold);">
-            <div class="status-name" style="color:var(--gold);">Collector</div>
-            <div class="status-val" style="font-size:14px;font-family:var(--font-ui);">€49/mo</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:4px;"><span id="td-features-col">0</span> features enabled</div>
+            <div class="status-name text-gold">Collector</div>
+            <div class="status-val font-ui-14">€49/mo</div>
+            <div class="text-dim-sm-mt4"><span id="td-features-col">0</span> features enabled</div>
           </div>
           <div class="status-card" style="border-left:2px solid #7AADDA;">
-            <div class="status-name" style="color:#7AADDA;">Professional</div>
-            <div class="status-val" style="font-size:14px;font-family:var(--font-ui);">€299/mo</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:4px;"><span id="td-features-pro">0</span> features enabled</div>
+            <div class="status-name text-blue-pro">Professional</div>
+            <div class="status-val font-ui-14">€299/mo</div>
+            <div class="text-dim-sm-mt4"><span id="td-features-pro">0</span> features enabled</div>
           </div>
         </div>
 
         <div class="card" id="td-flags-list">
-          <div class="card-head"><div class="card-title">Drag Features to Tiers</div><button class="btn-secondary" onclick="tdApplyToApp()">Apply to TRACE App</button></div>
-          <div class="card-body" style="padding:0;" id="td-flags-container"></div>
+          <div class="card-head"><div class="card-title">Drag Features to Tiers</div><button class="btn-secondary" data-hq="tdApplyToApp">Apply to TRACE App</button></div>
+          <div class="card-body p-0" id="td-flags-container"></div>
         </div>
 
-        <div class="card" style="margin-top:16px;">
+        <div class="card mt-16">
           <div class="card-head"><div class="card-title">Custom Tier Builder</div></div>
           <div class="card-body">
-            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
-              <div style="flex:2;min-width:200px;">
-                <div class="calc-label" style="margin-bottom:6px;">Tier Name</div>
-                <input class="key-input" id="td-custom-name" placeholder="e.g. Museum Partner" style="margin-bottom:0;">
+            <div class="flex-gap-10-wrap-end">
+              <div class="flex-2-min200">
+                <div class="calc-label mb-6">Tier Name</div>
+                <input class="key-input" id="td-custom-name" placeholder="e.g. Museum Partner" class="mb-0">
               </div>
-              <div style="flex:1;min-width:100px;">
-                <div class="calc-label" style="margin-bottom:6px;">Price (€/mo)</div>
-                <input class="key-input" id="td-custom-price" type="number" value="99" min="0" style="margin-bottom:0;">
+              <div class="flex-min-100">
+                <div class="calc-label mb-6">Price (€/mo)</div>
+                <input class="key-input" id="td-custom-price" type="number" value="99" min="0" class="mb-0">
               </div>
-              <button class="btn-dl" onclick="tdAddCustomTier()" style="padding:12px 20px;">Create Custom Tier</button>
+              <button class="btn-dl p-12-20" data-hq="tdAddCustomTier">Create Custom Tier</button>
             </div>
-            <div id="td-custom-tiers" style="margin-top:14px;"></div>
-            <div id="td-msg" style="font-size:11px;color:var(--text-dim);margin-top:10px;min-height:16px;"></div>
+            <div id="td-custom-tiers" class="mt-14"></div>
+            <div id="td-msg" class="text-dim-11 mt-10" style="min-height:16px"></div>
           </div>
         </div>
       </div>
@@ -1265,60 +1411,60 @@ hr.divider{border-top-color:var(--border);}
         <div class="panel-title">A/B Testing</div>
         <div class="panel-sub">Run pricing &amp; feature experiments</div>
 
-        <div class="status-grid" style="margin-bottom:16px;">
+        <div class="status-grid mb-16">
           <div class="status-card">
             <div class="status-name">Active Experiments</div>
             <div class="status-val" id="ab-active-count">0</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;">Running</span></div>
+            <div class="status-indicator"><span class="text-dim-sm">Running</span></div>
           </div>
           <div class="status-card">
             <div class="status-name">Total Participants</div>
             <div class="status-val" id="ab-total-users">0</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;">Across all experiments</span></div>
+            <div class="status-indicator"><span class="text-dim-sm">Across all experiments</span></div>
           </div>
           <div class="status-card">
             <div class="status-name">Conversion Rate</div>
-            <div class="status-val" id="ab-conv-rate" style="color:var(--green);">0%</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;">Control: <span id="ab-control-pct">0%</span> · Variant: <span id="ab-variant-pct">0%</span></span></div>
+            <div class="status-val" id="ab-conv-rate" class="text-green">0%</div>
+            <div class="status-indicator"><span class="text-dim-sm">Control: <span id="ab-control-pct">0%</span> · Variant: <span id="ab-variant-pct">0%</span></span></div>
           </div>
           <div class="status-card">
             <div class="status-name">Confidence Level</div>
-            <div class="status-val" id="ab-confidence" style="font-size:20px;">—</div>
-            <div class="status-indicator"><span style="color:var(--text-dim);font-size:10px;">Need more data</span></div>
+            <div class="status-val" id="ab-confidence" class="icon-20">—</div>
+            <div class="status-indicator"><span class="text-dim-sm">Need more data</span></div>
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-head"><div class="card-title">Experiments</div><button class="btn-secondary" onclick="abRefresh()">↻ Refresh</button></div>
-          <div class="card-body" id="ab-experiments" style="padding:0;">
-            <div style="padding:24px;text-align:center;color:var(--text-dim);font-size:12px;">No experiments yet. Create one below.</div>
+        <div class="card mb-16">
+          <div class="card-head"><div class="card-title">Experiments</div><button class="btn-secondary" data-hq="abRefresh">↻ Refresh</button></div>
+          <div class="card-body" id="ab-experiments" class="p-0">
+            <div class="empty-state-md">No experiments yet. Create one below.</div>
           </div>
         </div>
 
         <div class="card">
           <div class="card-head"><div class="card-title">Create Experiment</div></div>
           <div class="card-body">
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <div style="flex:2;min-width:200px;">
-                <div class="calc-label" style="margin-bottom:6px;">Experiment Name</div>
-                <input class="key-input" id="ab-name" placeholder="e.g. Pricing Page CTA" style="margin-bottom:0;">
+            <div class="flex-gap-10-wrap">
+              <div class="flex-2-min200">
+                <div class="calc-label mb-6">Experiment Name</div>
+                <input class="key-input" id="ab-name" placeholder="e.g. Pricing Page CTA" class="mb-0">
               </div>
               <div style="flex:1;min-width:120px;">
-                <div class="calc-label" style="margin-bottom:6px;">Variable</div>
-                <select class="key-input" id="ab-variable" style="margin-bottom:0;cursor:pointer;">
+                <div class="calc-label mb-6">Variable</div>
+                <select class="key-input" id="ab-variable" class="mb-0-cursor">
                   <option value="pricing">Pricing</option>
                   <option value="feature_flag">Feature Flag</option>
                   <option value="cta_text">CTA Text</option>
                   <option value="tier_name">Tier Name</option>
                 </select>
               </div>
-              <div style="flex:1;min-width:100px;">
-                <div class="calc-label" style="margin-bottom:6px;">Split %</div>
-                <input class="key-input" id="ab-split" type="number" value="50" min="5" max="95" style="margin-bottom:0;">
+              <div class="flex-min-100">
+                <div class="calc-label mb-6">Split %</div>
+                <input class="key-input" id="ab-split" type="number" value="50" min="5" max="95" class="mb-0">
               </div>
-              <button class="btn-dl" onclick="abCreate()" style="padding:12px 20px;">Launch Experiment</button>
+              <button class="btn-dl p-12-20" data-hq="abCreate">Launch Experiment</button>
             </div>
-            <div id="ab-msg" style="font-size:11px;color:var(--text-dim);margin-top:10px;min-height:16px;"></div>
+            <div id="ab-msg" class="text-dim-11 mt-10" style="min-height:16px"></div>
           </div>
         </div>
 
@@ -1326,10 +1472,10 @@ hr.divider{border-top-color:var(--border);}
           <div class="card-head"><div class="card-title">Results Visualisation</div></div>
           <div class="card-body">
             <canvas id="ab-chart" width="600" height="240" style="width:100%;height:120px;border-radius:2px;background:var(--bg2);border:1px solid var(--border);"></canvas>
-            <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+            <div class="mt-12 grid-3-gap8">
               <div class="calc-result"><div class="calc-result-val" id="ab-control-val">0</div><div class="calc-result-label">Control Conv.</div></div>
               <div class="calc-result"><div class="calc-result-val" id="ab-variant-val">0</div><div class="calc-result-label">Variant Conv.</div></div>
-              <div class="calc-result"><div class="calc-result-val" id="ab-lift" style="font-size:20px;">0%</div><div class="calc-result-label">Lift</div></div>
+              <div class="calc-result"><div class="calc-result-val" id="ab-lift" class="icon-20">0%</div><div class="calc-result-label">Lift</div></div>
             </div>
           </div>
         </div>
@@ -1353,13 +1499,13 @@ const FILE_ICONS = {'trace.html':'🔒','trace_server.js':'⚙️','trace_sw.js'
 async function buildFilesList(){
   const container = document.getElementById('files-list');
   if(!container) return;
-  container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-dim);font-size:13px;">Loading files…</div>';
+  container.innerHTML = '<div class="empty-state-lg">Loading files…</div>';
   try{
     const resp = await fetch('/api/files');
     if(!resp.ok) throw new Error('HTTP '+resp.status);
     const data = await resp.json();
     if(!data.files || !data.files.length){
-      container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-dim);font-size:13px;">No files available.</div>';
+      container.innerHTML = '<div class="empty-state-lg">No files available.</div>';
       return;
     }
     window._cachedFiles = data.files;
@@ -1371,11 +1517,11 @@ async function buildFilesList(){
           <div class="file-desc">${f.name.indexOf('.')>0?'TRACE app file':'App file'}</div>
         </div>
         <div class="file-size">${f.sizeHuman}</div>
-        <button class="btn-dl" onclick="dlFile('${f.name}')">↓ Download</button>
+        <button class="btn-dl" data-hq="dlFile" data-hq-arg="${f.name}">↓ Download</button>
       </div>
     `).join('');
   } catch(e){
-    container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-dim);font-size:13px;">Could not load file list. Make sure the TRACE server is running.<br><span style="font-size:10px;color:var(--red);">'+e.message+'</span></div>';
+    container.innerHTML = '<div class="empty-state-lg">Could not load file list. Make sure the TRACE server is running.<br><span style="font-size:10px;color:var(--red);">'+e.message+'</span></div>';
   }
 }
 
@@ -1418,7 +1564,7 @@ async function checkAll(){
       </div>
       <div class="status-indicator" id="ind-${s.key}">
         <div class="dot dot-grey"></div>
-        <span style="color:var(--text-dim);font-size:11px;">Checking…</span>
+        <span class="text-dim-11">Checking…</span>
       </div>
     </div>
   `).join('');
@@ -1426,7 +1572,7 @@ async function checkAll(){
   for(const svc of services){
     const ind = document.getElementById('ind-'+svc.key);
     if(!svc.url){
-      ind.innerHTML='<div class="dot dot-grey"></div><span style="color:var(--text-dim);font-size:11px;">Not configured</span>';
+      ind.innerHTML='<div class="dot dot-grey"></div><span class="text-dim-11">Not configured</span>';
       continue;
     }
     try{
@@ -1436,7 +1582,7 @@ async function checkAll(){
         const dp=document.getElementById('dash-proxy-status');
         const di=document.getElementById('dash-proxy-ind');
         if(dp)dp.textContent='Online';
-        if(di)di.innerHTML='<div class="dot dot-green"></div><span style="color:var(--text-dim);font-size:10px;">Connected</span>';
+        if(di)di.innerHTML='<div class="dot dot-green"></div><span class="text-dim-sm">Connected</span>';
       }
     }catch(e){
       ind.innerHTML='<div class="dot dot-amber"></div><span style="color:#c89820;font-size:11px;">Unreachable</span>';
@@ -1445,7 +1591,7 @@ async function checkAll(){
 
   // Anthropic status
   document.getElementById('anthropic-status').innerHTML =
-    'Visit <a href="https://status.anthropic.com" target="_blank" style="color:var(--gold);">status.anthropic.com</a> for live API status. (Browser security prevents direct pinging of external APIs from a local file.)';
+    'Visit <a href="https://status.anthropic.com" target="_blank" class="text-gold">status.anthropic.com</a> for live API status. (Browser security prevents direct pinging of external APIs from a local file.)';
 }
 
 // ── CHECKLIST ────────────────────────────────────────────
@@ -1484,11 +1630,11 @@ function buildChecklist(){
   let html = '';
   CHECKLIST.forEach(week=>{
     html += `<div class="check-week">${week.week}</div>`;
-    html += '<div style="padding:0 18px;">';
+    html += '<div class="px-18">';
     week.items.forEach(item=>{
       const isDone = done[item.id];
       html += `
-        <div class="check-item" onclick="toggleCheck('${item.id}')">
+        <div class="check-item" data-hq="toggleCheck" data-hq-arg="${item.id}">
           <div class="check-box ${isDone?'done':''}">
             ${isDone?'<svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1" stroke="#060402" stroke-width="1.8" fill="none"/></svg>':''}
           </div>
@@ -1603,7 +1749,7 @@ function show(name){
   for(var i=0;i<btns.length;i++) btns[i].classList.remove("active");
   var panel = document.getElementById("panel-"+name);
   if(panel) panel.classList.add("active");
-  var sel = ".nav-btn[onclick*=\'"+name+"\']";
+  var sel = ".nav-btn[data-hq-arg=\'"+name+"\']";
   var btn = document.querySelector(sel);
   if(btn) btn.classList.add("active");
 }
@@ -2046,7 +2192,7 @@ function flagsRender() {
   var container = document.getElementById('flags-container');
   if (!container) return;
   if (featureFlags.length === 0) {
-    container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:12px;">No feature flags configured.</div>';
+    container.innerHTML = '<div class="empty-state-md">No feature flags configured.</div>';
     return;
   }
   var html = '';
@@ -2056,13 +2202,13 @@ function flagsRender() {
     if (f.custom) { tierTag = ''; }
     else if (f.tiers === 'all') { tierTag = '<span class="ff-tag ff-tag-all">All Tiers</span>'; }
     else if (f.tiers === 'pro') { tierTag = '<span class="ff-tag ff-tag-pro">Pro</span>'; }
-    else if (f.tiers === 'pro,col') { tierTag = '<span class="ff-tag ff-tag-pro">Pro</span><span class="ff-tag ff-tag-col" style="margin-left:4px;">Collector</span>'; }
+    else if (f.tiers === 'pro,col') { tierTag = '<span class="ff-tag ff-tag-pro">Pro</span><span class="ff-tag ff-tag-col ml-4">Collector</span>'; }
     html += '<div class="ff-item">' +
       '<div class="ff-info"><div class="ff-name">' + esc(f.name) + '</div>' +
       '<div class="ff-desc">' + esc(f.desc) + ' ' + tierTag + '</div></div>' +
       '<label class="ff-toggle"><input type="checkbox" ' + (f.enabled ? 'checked' : '') +
-      ' onchange="flagsToggle(\'' + f.id + '\',this.checked)"><span class="ff-slider"></span></label>' +
-      (f.custom ? '<button class="btn-secondary" onclick="flagsRemove(\'' + f.id + '\')" style="margin-left:8px;padding:4px 8px;font-size:8px;">X</button>' : '') +
+      '  data-hq-change="flagsToggle" data-hq-flag="\' + f.id + \'">ff-slider"></span></label>' +
+      (f.custom ? '<button class="btn-secondary" data-hq="flagsRemove" data-hq-flag="' + f.id + '" style="margin-left:8px;padding:4px 8px;font-size:8px;">X</button>' : '') +
       '</div>';
   }
   container.innerHTML = html;
@@ -2191,14 +2337,14 @@ function dpCheckStatus() {
     dpLogEntry('info', 'Netlify: ' + netlifyUrl);
     document.getElementById('dp-netlify-status').textContent = 'Configured';
     var ind = document.getElementById('dp-netlify-ind');
-    if (ind) ind.innerHTML = '<div class="dot dot-amber"></div><span style="color:var(--text-dim);font-size:10px;">Checking...</span>';
+    if (ind) ind.innerHTML = '<div class="dot dot-amber"></div><span class="text-dim-sm">Checking...</span>';
     // Try a simple fetch
     fetch(netlifyUrl, {mode: 'no-cors'}).then(function() {
       dpLogEntry('ok', 'Netlify: Reachable');
-      if (ind) ind.innerHTML = '<div class="dot dot-green"></div><span style="color:var(--text-dim);font-size:10px;">Online</span>';
+      if (ind) ind.innerHTML = '<div class="dot dot-green"></div><span class="text-dim-sm">Online</span>';
     }).catch(function() {
       dpLogEntry('warn', 'Netlify: Not reachable (may be CORS)');
-      if (ind) ind.innerHTML = '<div class="dot dot-amber"></div><span style="color:var(--text-dim);font-size:10px;">Check URL</span>';
+      if (ind) ind.innerHTML = '<div class="dot dot-amber"></div><span class="text-dim-sm">Check URL</span>';
     });
   } else {
     dpLogEntry('warn', 'Netlify: Not configured');
@@ -2208,13 +2354,13 @@ function dpCheckStatus() {
     dpLogEntry('info', 'Railway: ' + railwayUrl);
     document.getElementById('dp-railway-status').textContent = 'Configured';
     var rind = document.getElementById('dp-railway-ind');
-    if (rind) rind.innerHTML = '<div class="dot dot-amber"></div><span style="color:var(--text-dim);font-size:10px;">Checking...</span>';
+    if (rind) rind.innerHTML = '<div class="dot dot-amber"></div><span class="text-dim-sm">Checking...</span>';
     fetch(railwayUrl + '/health', {mode: 'no-cors'}).then(function() {
       dpLogEntry('ok', 'Railway API: Reachable');
-      if (rind) rind.innerHTML = '<div class="dot dot-green"></div><span style="color:var(--text-dim);font-size:10px;">Online</span>';
+      if (rind) rind.innerHTML = '<div class="dot dot-green"></div><span class="text-dim-sm">Online</span>';
     }).catch(function() {
       dpLogEntry('warn', 'Railway: Not reachable');
-      if (rind) rind.innerHTML = '<div class="dot dot-amber"></div><span style="color:var(--text-dim);font-size:10px;">Check URL</span>';
+      if (rind) rind.innerHTML = '<div class="dot dot-amber"></div><span class="text-dim-sm">Check URL</span>';
     });
   } else {
     dpLogEntry('warn', 'Railway: Not configured');
@@ -2233,7 +2379,7 @@ function dpBuildLocal() {
   dpLogEntry('info', 'Starting local build...');
   document.getElementById('dp-build-status').textContent = 'Building...';
   var ind = document.getElementById('dp-build-ind');
-  if (ind) ind.innerHTML = '<div class="dot dot-amber"></div><span style="color:var(--text-dim);font-size:10px;">Building...</span>';
+  if (ind) ind.innerHTML = '<div class="dot dot-amber"></div><span class="text-dim-sm">Building...</span>';
   
   // Simulated build steps
   var steps = [
@@ -2256,7 +2402,7 @@ function dpBuildLocal() {
           document.getElementById('dp-build-status').textContent = 'Ready';
           document.getElementById('dp-last-deploy').textContent = localStorage.getItem('trace_hq_last_deploy');
           document.getElementById('dp-last-status').textContent = 'Local build passed';
-          if (ind) ind.innerHTML = '<div class="dot dot-green"></div><span style="color:var(--text-dim);font-size:10px;">Ready</span>';
+          if (ind) ind.innerHTML = '<div class="dot dot-green"></div><span class="text-dim-sm">Ready</span>';
           showToast('Local build complete');
         }
       }, totalDelay);
@@ -2332,7 +2478,7 @@ function umRender() {
   var tbody = document.getElementById('um-list');
   if (!tbody) return;
   if (umUsers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:var(--text-dim);font-size:12px;">No users yet.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state-md">No users yet.</td></tr>';
     return;
   }
   var html = '';
@@ -2347,7 +2493,7 @@ function umRender() {
       '<td><span class="' + tierClass + '">' + tierLabel + '</span></td>' +
       '<td><span class="' + statusClass + '">' + esc(u.status) + '</span></td>' +
       '<td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);">' + esc(u.since) + '</td>' +
-      '<td style="color:var(--gold);">' + revenue + '</td>' +
+      '<td class="text-gold">' + revenue + '</td>' +
       '</tr>';
   }
   tbody.innerHTML = html;
@@ -2415,7 +2561,7 @@ function sgAnalyzeWithAI() {
     '<strong>Golden Ratio (φ):</strong> ' + (goldenMatch < 0.05 ? '⚠ Close match!' : 'Not matched') + ' (deviation: ' + (goldenMatch * 100).toFixed(1) + '%)<br>';
   
   if (goldenMatch < 0.05) {
-    analysisHTML += '<strong style="color:var(--gold);">✓ This canvas closely matches the golden ratio proportion!</strong><br>';
+    analysisHTML += '<strong class="text-gold">✓ This canvas closely matches the golden ratio proportion!</strong><br>';
     analysisHTML += 'Classical artists often used 1:1.618 for harmonious compositions.<br>';
   }
   
@@ -2430,9 +2576,9 @@ function sgAnalyzeWithAI() {
   
   // Dynamic symmetry
   if (Math.abs(wRatio - 1.414) < 0.05) {
-    analysisHTML += '<strong style="color:#A0C8E0;">⬡ Root-2 rectangle detected (1:1.414)</strong> — common in Classical architecture<br>';
+    analysisHTML += '<strong class="text-blue-lt">⬡ Root-2 rectangle detected (1:1.414)</strong> — common in Classical architecture<br>';
   } else if (Math.abs(wRatio - 1.333) < 0.05) {
-    analysisHTML += '<strong style="color:#A0C8E0;">⬡ 4:3 ratio — standard in Renaissance panel paintings</strong><br>';
+    analysisHTML += '<strong class="text-blue-lt">⬡ 4:3 ratio — standard in Renaissance panel paintings</strong><br>';
   }
   
   analysisHTML += '<br><em>Toggle the overlays above to visualize these geometric structures on your image.</em></div>';
@@ -2504,21 +2650,21 @@ function aiOpsRunCheck() {
 
       document.getElementById('aiops-patterns').textContent = data.pattern_count || '—';
 
-      var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
-      html += '<div><span style="color:var(--text-dim);">API Key:</span> ' + (data.checks.api_key ? '<span style="color:var(--green);">✓ Configured</span>' : '<span style="color:var(--red);">✗ Missing</span>') + '</div>';
-      html += '<div><span style="color:var(--text-dim);">Stripe:</span> ' + (data.checks.stripe ? '<span style="color:var(--green);">✓ Live</span>' : '<span style="color:var(--text-dim);">Demo mode</span>') + '</div>';
-      html += '<div><span style="color:var(--text-dim);">Analyse Key:</span> ' + (data.checks.analyse_key ? '<span style="color:var(--green);">✓ Protected</span>' : '<span style="color:#c89820;">Open</span>') + '</div>';
-      html += '<div><span style="color:var(--text-dim);">Subscriptions:</span> ' + (data.checks.subscriptions || 0) + '</div>';
-      html += '<div><span style="color:var(--text-dim);">License Keys:</span> ' + (data.checks.license_keys || 0) + '</div>';
-      html += '<div><span style="color:var(--text-dim);">Timelines:</span> ' + (data.checks.timelines || 0) + '</div>';
-      html += '<div><span style="color:var(--text-dim);">Uptime:</span> ' + Math.round(data.checks.server_uptime / 60) + 'm</div>';
-      html += '<div><span style="color:var(--text-dim);">Errors:</span> ' + (data.checks.error_log_count || 0) + '</div>';
+      var html = '<div class="grid-2-gap8">';
+      html += '<div><span class="text-dim">API Key:</span> ' + (data.checks.api_key ? '<span class="text-green">✓ Configured</span>' : '<span class="text-red">✗ Missing</span>') + '</div>';
+      html += '<div><span class="text-dim">Stripe:</span> ' + (data.checks.stripe ? '<span class="text-green">✓ Live</span>' : '<span class="text-dim">Demo mode</span>') + '</div>';
+      html += '<div><span class="text-dim">Analyse Key:</span> ' + (data.checks.analyse_key ? '<span class="text-green">✓ Protected</span>' : '<span class="text-amber">Open</span>') + '</div>';
+      html += '<div><span class="text-dim">Subscriptions:</span> ' + (data.checks.subscriptions || 0) + '</div>';
+      html += '<div><span class="text-dim">License Keys:</span> ' + (data.checks.license_keys || 0) + '</div>';
+      html += '<div><span class="text-dim">Timelines:</span> ' + (data.checks.timelines || 0) + '</div>';
+      html += '<div><span class="text-dim">Uptime:</span> ' + Math.round(data.checks.server_uptime / 60) + 'm</div>';
+      html += '<div><span class="text-dim">Errors:</span> ' + (data.checks.error_log_count || 0) + '</div>';
       html += '</div>';
 
       resultEl.innerHTML = html;
 
       if (data.issues && data.issues.length > 0) {
-        var detailsHtml = '<div class="card-title" style="margin-bottom:8px;">Issues Found</div>';
+        var detailsHtml = '<div class="card-title mb-8">Issues Found</div>';
         data.issues.forEach(function(issue) {
           var c = issue.severity === 'critical' ? 'var(--red)' : issue.severity === 'warning' ? '#c89820' : 'var(--text-dim)';
           var icon = issue.severity === 'critical' ? '✗' : issue.severity === 'warning' ? '⚠' : 'ℹ';
@@ -2533,7 +2679,7 @@ function aiOpsRunCheck() {
       aiOpsRefreshLog();
     })
     .catch(function(err) {
-      resultEl.innerHTML = '<span style="color:var(--red);">Error: Could not reach server. Is the TRACE server running?</span>';
+      resultEl.innerHTML = '<span class="text-red">Error: Could not reach server. Is the TRACE server running?</span>';
     });
 }
 
@@ -2544,7 +2690,7 @@ function aiOpsAutoFix() {
 
   if (!errorText) {
     resultEl.style.display = 'block';
-    resultEl.innerHTML = '<span style="color:#c89820;">Please enter an error message first.</span>';
+    resultEl.innerHTML = '<span class="text-amber">Please enter an error message first.</span>';
     return;
   }
 
@@ -2559,13 +2705,13 @@ function aiOpsAutoFix() {
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (!data.matched) {
-        resultEl.innerHTML = '<span style="color:var(--text-dim);">No matching fix found for: <strong>' + escHtml(errorText) + '</strong></span>';
+        resultEl.innerHTML = '<span class="text-dim">No matching fix found for: <strong>' + escHtml(errorText) + '</strong></span>';
         return;
       }
 
       var c = data.severity === 'critical' ? 'var(--red)' : data.severity === 'high' ? '#c89820' : '#c89820';
       var html = '<div style="border-left:2px solid ' + c + ';padding-left:12px;">';
-      html += '<div style="margin-bottom:6px;"><span style="color:' + c + ';font-weight:600;">' + (data.severity || 'info').toUpperCase() + '</span> — ' + (data.description || data.pattern || 'Pattern found') + '</div>';
+      html += '<div class="mb-6"><span style="color:' + c + ';font-weight:600;">' + (data.severity || 'info').toUpperCase() + '</span> — ' + (data.description || data.pattern || 'Pattern found') + '</div>';
 
       if (data.fix && data.actionable) {
         var fixIcon = data.fix.success ? '✓' : '✗';
@@ -2582,14 +2728,14 @@ function aiOpsAutoFix() {
         else showAgentAlert('error', 'Auto-fix failed: ' + escHtml(data.fix.reason || ''));
       } else if (data.fix_command) {
         html += '<div style="margin-top:6px;background:var(--bg2);padding:8px 12px;font-family:var(--font-mono);font-size:11px;border-radius:2px;border:1px solid var(--border2);">$ ' + escHtml(data.fix_command) + '</div>';
-        html += '<div style="font-size:9px;color:var(--text-dim);margin-top:4px;">Manual execution required</div>';
+        html += '<div class="text-dim-sm mt-4">Manual execution required</div>';
       }
 
       html += '</div>';
       resultEl.innerHTML = html;
     })
     .catch(function(err) {
-      resultEl.innerHTML = '<span style="color:var(--red);">Agent auto-fix API error: ' + escHtml(err.message || 'connection failed') + '</span>';
+      resultEl.innerHTML = '<span class="text-red">Agent auto-fix API error: ' + escHtml(err.message || 'connection failed') + '</span>';
     });
 }
 
@@ -2641,10 +2787,10 @@ function aiOpsGetReport() {
       var activity = data.activity || {};
 
       var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">';
-      html += '<div style="background:var(--surface2);padding:10px;text-align:center;border-radius:2px;"><div style="font-size:20px;font-family:var(--font-display);color:var(--gold);">' + (summary.events_today || 0) + '</div><div style="font-size:8px;color:var(--text-dim);margin-top:4px;letter-spacing:.1em;text-transform:uppercase;">Events Today</div></div>';
+      html += '<div class="surface2-box"><div class="gold-display-20">' + (summary.events_today || 0) + '</div><div class="label-xs-mt4">Events Today</div></div>';
       var errColor = (summary.errors_today || 0) > 0 ? 'var(--red)' : 'var(--green)';
-      html += '<div style="background:var(--surface2);padding:10px;text-align:center;border-radius:2px;"><div style="font-size:20px;font-family:var(--font-display);color:' + errColor + ';">' + (summary.errors_today || 0) + '</div><div style="font-size:8px;color:var(--text-dim);margin-top:4px;letter-spacing:.1em;text-transform:uppercase;">Errors Today</div></div>';
-      html += '<div style="background:var(--surface2);padding:10px;text-align:center;border-radius:2px;"><div style="font-size:20px;font-family:var(--font-display);color:var(--green);">' + (summary.fixes_applied || 0) + '</div><div style="font-size:8px;color:var(--text-dim);margin-top:4px;letter-spacing:.1em;text-transform:uppercase;">Fixes Applied</div></div>';
+      html += '<div class="surface2-box"><div style="font-size:20px;font-family:var(--font-display);color:' + errColor + ';">' + (summary.errors_today || 0) + '</div><div class="label-xs-mt4">Errors Today</div></div>';
+      html += '<div class="surface2-box"><div class="font-display" style="font-size:20px;color:var(--green);">' + (summary.fixes_applied || 0) + '</div><div class="label-xs-mt4">Fixes Applied</div></div>';
       html += '</div>';
 
       html += '<div style="font-size:10px;color:var(--text-dim);margin-bottom:12px;line-height:1.7;">';
@@ -2666,25 +2812,25 @@ function aiOpsGetReport() {
       html += '</div>';
 
       if (recs.length > 0) {
-        html += '<div style="margin-bottom:12px;">';
-        html += '<div style="color:var(--gold);font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;">Recommendations</div>';
+        html += '<div class="mb-12">';
+        html += '<div class="gold-label-mb6">Recommendations</div>';
         recs.forEach(function(r) {
           var colors = { critical: 'var(--red)', high: '#c89820', medium: 'var(--text-mid)', low: 'var(--text-dim)' };
           var color = colors[r.priority] || 'var(--text-dim)';
           html += '<div style="padding:6px 10px;border-left:2px solid ' + color + ';margin-bottom:4px;font-size:11px;background:var(--bg2);border-radius:2px;">';
           html += '<span style="color:' + color + ';text-transform:uppercase;font-size:8px;letter-spacing:.1em;">[' + (r.priority || 'info') + ']</span> ';
-          html += '<span style="color:var(--text-mid);">' + escHtml(r.action) + '</span>';
+          html += '<span class="text-mid">' + escHtml(r.action) + '</span>';
           html += '</div>';
         });
         html += '</div>';
       }
 
       if (data.recent_issues && data.recent_issues.length > 0) {
-        html += '<div style="margin-bottom:12px;">';
+        html += '<div class="mb-12">';
         html += '<div style="color:var(--red);font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;">Recent Issues</div>';
         data.recent_issues.forEach(function(issue) {
           html += '<div style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono);padding:3px 0;border-bottom:1px solid var(--border);">';
-          html += '<span style="color:var(--text-dim);">[' + (issue.ts || '').slice(11, 19) + ']</span> ' + escHtml(issue.message || '').slice(0, 150);
+          html += '<span class="text-dim">[' + (issue.ts || '').slice(11, 19) + ']</span> ' + escHtml(issue.message || '').slice(0, 150);
           if (issue.context) html += ' <span style="color:var(--text-dim);font-size:9px;">(' + escHtml(issue.context) + ')</span>';
           html += '</div>';
         });
@@ -2701,11 +2847,11 @@ function aiOpsGetReport() {
         html += '</div></div>';
       }
 
-      html += '<div style="margin-top:12px;font-size:10px;color:var(--text-dim);text-align:right;">Report: ' + (data.report_date || '—') + '</div>';
+      html += '<div class="mt-12 text-dim-10 text-right">Report: ' + (data.report_date || '—') + '</div>';
       resultEl.innerHTML = html;
     })
     .catch(function(err) {
-      resultEl.innerHTML = '<span style="color:var(--red);">Agent report error: ' + escHtml(err.message || 'connection failed') + '</span>';
+      resultEl.innerHTML = '<span class="text-red">Agent report error: ' + escHtml(err.message || 'connection failed') + '</span>';
     });
 }
 
@@ -2739,11 +2885,11 @@ function showAgentAlert(type, message) {
   alert.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:6px;border-radius:3px;background:' + c.bg + ';border-left:3px solid ' + c.border + ';cursor:pointer;transition:all .3s;animation:fadeInAlert .3s ease-out;';
   alert.onmouseover = function() { this.style.opacity = '.85'; };
   alert.onmouseout = function() { this.style.opacity = '1'; };
-  alert.onclick = function() { dismissAlert(this); };
+  alert.addEventListener('click', function() { dismissAlert(this); });
 
   alert.innerHTML = '<span style="font-size:14px;">' + c.icon + '</span>' +
     '<span style="flex:1;font-size:11px;color:var(--text);line-height:1.4;">' + escHtml(message) + '</span>' +
-    '<span style="font-size:9px;color:var(--text-dim);cursor:pointer;flex-shrink:0;" onclick="event.stopPropagation();dismissAlert(this.parentElement)">✕</span>';
+    '<span class="text-dim-sm cursor-pointer flex-shrink-0" data-hq="dismissAlert">✕</span>';
 
   container.insertBefore(alert, container.firstChild);
   // Register dedup key so poller doesn't show the same alert
@@ -2767,7 +2913,7 @@ var isMuted = false;
 function initAudio() {
   try {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  } catch(e) {}
+  } catch(e) { TRACE_WATCHDOG?.warn('Audio', e); }
 }
 
 function playChime(type) {
@@ -2799,7 +2945,7 @@ function playChime(type) {
     }
     osc.start(audioCtx.currentTime);
     osc.stop(audioCtx.currentTime + 0.6);
-  } catch(e) {}
+  } catch(e) { TRACE_WATCHDOG?.warn('Audio', e); }
 }
 
 function toggleMute() {
@@ -2844,7 +2990,7 @@ function connectSSE() {
         } else if (e.type === 'warning' || e.type === 'warn') {
           showAgentAlert('warning', msg);
         }
-      } catch(e2) {}
+      } catch(e2) { TRACE_WATCHDOG?.warn('SSE', e2); }
     };
     sseSource.onerror = function() {
       // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 32s max
@@ -2899,7 +3045,7 @@ function startAgentPolling() {
           }
         });
       })
-      .catch(function() {});
+      .catch(function() { TRACE_WATCHDOG?.warn('SSE', 'fetch error'); });
   }, 30000);
 }
 function startAgentPolling() {
@@ -2933,7 +3079,7 @@ function startAgentPolling() {
           }
         });
       })
-      .catch(function() {});
+      .catch(function() { TRACE_WATCHDOG?.warn('Agent', 'poll error'); });
   }, 30000);
   setInterval(function() { agentAlertShown = {}; }, 300000);
 }
@@ -2989,12 +3135,12 @@ function refreshWatchdogStatus() {
       if (sourceEl) {
         var sorted = Object.keys(t.sources).sort(function(a, b) { return t.sources[b] - t.sources[a]; });
         if (sorted.length === 0) {
-          sourceEl.innerHTML = '<div class="el-empty" style="padding:8px;">No events yet.</div>';
+          sourceEl.innerHTML = '<div class="el-empty p-8">No events yet.</div>';
         } else {
           var sHtml = '';
           sorted.slice(0, 8).forEach(function(src) {
             sHtml += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);">' +
-              '<span style="color:var(--text-mid);">' + escHtml(src) + '</span>' +
+              '<span class="text-mid">' + escHtml(src) + '</span>' +
               '<span style="color:var(--text);font-family:var(--font-mono);font-size:10px;">' + t.sources[src] + '</span></div>';
           });
           sourceEl.innerHTML = sHtml;
@@ -3008,7 +3154,7 @@ function refreshWatchdogStatus() {
           return e.type.indexOf('auto_fix') >= 0 || e.type === 'watchdog' || e.type === 'report';
         }).slice(-8).reverse();
         if (agentEntries.length === 0) {
-          recentEl.innerHTML = '<div class="el-empty" style="padding:6px;">No agent activity yet.</div>';
+          recentEl.innerHTML = '<div class="el-empty p-6">No agent activity yet.</div>';
         } else {
           var rHtml = '';
           agentEntries.forEach(function(e) {
@@ -3018,18 +3164,28 @@ function refreshWatchdogStatus() {
             rHtml += '<div style="display:flex;gap:6px;padding:3px 0;font-size:9px;border-bottom:1px solid var(--border);">' +
               '<span style="color:var(--text-dim);width:45px;flex-shrink:0;">' + (e.ts || '').slice(11, 19) + '</span>' +
               '<span style="color:' + color + ';width:60px;flex-shrink:0;text-transform:uppercase;font-size:8px;letter-spacing:.08em;">' + e.type.slice(0, 10) + '</span>' +
-              '<span style="color:var(--text-mid);">' + escHtml((e.message || '').slice(0, 65)) + '</span></div>';
+              '<span class="text-mid">' + escHtml((e.message || '').slice(0, 65)) + '</span></div>';
           });
           recentEl.innerHTML = rHtml;
         }
       }
     })
-    .catch(function() {});
+    .catch(function() { TRACE_WATCHDOG?.warn('Agent', 'report error'); });
 }
 
 // ── Dashboard Watchdog refresh ──
 
 // Patch show() — refresh dashboard on navigation, debounce handles overlap
+// Stub: refreshDashboardWatchdog — called by show() when navigating to dashboard
+var refreshDashboardWatchdog = function() {
+  // TODO: implement actual watchdog refresh logic
+};
+  // ── Dashboard watchdog refresh stub ──
+  function refreshDashboardWatchdog() {
+    // Stub — prevents ReferenceError. Called by show() when navigating to dashboard panel
+    // TODO: implement actual watchdog refresh logic
+  }
+
 var origShow = show;
 show = function(name) {
   origShow(name);
@@ -3189,9 +3345,9 @@ function tdInit() {
     var html = '';
     features.forEach(function(f, idx) {
       html += '<div class="ff-item"><div class="ff-info"><div class="ff-name">' + f.name + '</div><div class="ff-desc">' + f.desc + '</div></div><div style="display:flex;gap:6px;align-items:center;">' +
-        '<label class="ff-toggle" title="Discover"><input type="checkbox" ' + (f.disc ? 'checked' : '') + ' onchange="tdToggle(' + idx + ',\'disc\')"><div class="ff-slider"></div></label><span style="font-size:7px;color:#C8A028;width:40px;text-align:center;letter-spacing:.05em;">FREE</span>' +
-        '<label class="ff-toggle" title="Collector"><input type="checkbox" ' + (f.col ? 'checked' : '') + ' onchange="tdToggle(' + idx + ',\'col\')"><div class="ff-slider"></div></label><span style="font-size:7px;color:var(--gold);width:46px;text-align:center;letter-spacing:.05em;">COLLECTOR</span>' +
-        '<label class="ff-toggle" title="Professional"><input type="checkbox" ' + (f.pro ? 'checked' : '') + ' onchange="tdToggle(' + idx + ',\'pro\')"><div class="ff-slider"></div></label><span style="font-size:7px;color:#7AADDA;width:54px;text-align:center;letter-spacing:.05em;">PROFESSIONAL</span>' +
+        '<label class="ff-toggle" title="Discover"><input type="checkbox" ' + (f.disc ? 'checked' : '') + ' data-hq-change="tdToggle" data-hq-idx="\' + idx + \'" data-hq-tier="disc"><div class="ff-slider"></div></label><span style="font-size:7px;color:#C8A028;width:40px;text-align:center;letter-spacing:.05em;">FREE</span>' +
+        '<label class="ff-toggle" title="Collector"><input type="checkbox" ' + (f.col ? 'checked' : '') + ' data-hq-change="tdToggle" data-hq-idx="\' + idx + \'" data-hq-tier="col"><div class="ff-slider"></div></label><span style="font-size:7px;color:var(--gold);width:46px;text-align:center;letter-spacing:.05em;">COLLECTOR</span>' +
+        '<label class="ff-toggle" title="Professional"><input type="checkbox" ' + (f.pro ? 'checked' : '') + ' data-hq-change="tdToggle" data-hq-idx="\' + idx + \'" data-hq-tier="pro"><div class="ff-slider"></div></label><span style="font-size:7px;color:#7AADDA;width:54px;text-align:center;letter-spacing:.05em;">PROFESSIONAL</span>' +
       '</div></div>';
     });
     container.innerHTML = html;
@@ -3248,7 +3404,7 @@ function tdRenderCustomTiers() {
   var tiers = JSON.parse(localStorage.getItem('trace_hq_custom_tiers') || '[]');
   if (tiers.length === 0) { container.innerHTML = '<div style="font-size:11px;color:var(--text-dim);padding:8px 0;">No custom tiers yet.</div>'; return; }
   container.innerHTML = tiers.map(function(t, i) {
-    return '<div class="ff-item" style="padding:10px 14px;"><div><div style="font-size:12px;color:var(--text);">' + t.name + '</div><div style="font-size:10px;color:var(--text-dim);">&euro;' + t.price + '/mo &middot; ' + new Date(t.createdAt).toLocaleDateString() + '</div></div><button class="btn-secondary" onclick="tdDeleteCustom(' + i + ')" style="padding:4px 10px;font-size:8px;">Remove</button></div>';
+    return '<div class="ff-item p-10-14"><div><div style="font-size:12px;color:var(--text);">' + t.name + '</div><div class="text-dim-sm">&euro;' + t.price + '/mo &middot; ' + new Date(t.createdAt).toLocaleDateString() + '</div></div><button class="btn-secondary" data-hq="tdDeleteCustom" data-hq-arg=" + i + " class="badge-sm">Remove</button></div>';
   }).join('');
 }
 
@@ -3285,7 +3441,7 @@ function abRefresh() {
   if (!container) return;
   var experiments = JSON.parse(localStorage.getItem('trace_hq_ab_experiments') || '[]');
   if (experiments.length === 0) {
-    container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:12px;">No experiments yet. Create one above.</div>';
+    container.innerHTML = '<div class="empty-state-md">No experiments yet. Create one above.</div>';
     abUpdateSummary([]); abRenderChart(); return;
   }
   container.innerHTML = experiments.map(function(e, idx) {
@@ -3293,7 +3449,7 @@ function abRefresh() {
     var controlRate = ((e.controlConversions / totalControl) * 100).toFixed(1);
     var variantRate = ((e.variantConversions / totalVariant) * 100).toFixed(1);
     var lift = ((variantRate - controlRate) / (controlRate || 1) * 100).toFixed(1);
-    return '<div class="ff-item" style="flex-direction:column;align-items:stretch;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div><div style="font-size:12px;color:var(--text);font-weight:500;">' + e.name + '</div><div style="font-size:10px;color:var(--text-dim);">Variable: ' + e.variable + ' &middot; Split: ' + e.split + '% &middot; ' + new Date(e.createdAt).toLocaleDateString() + '</div></div><div style="display:flex;gap:6px;"><button class="btn-secondary" onclick="abSimulate(' + idx + ')" style="padding:4px 10px;font-size:8px;">Simulate</button><button class="btn-secondary" onclick="abDelete(' + idx + ')" style="padding:4px 10px;font-size:8px;border-color:rgba(196,72,72,.3);color:var(--red);">Delete</button></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div style="background:var(--bg2);padding:10px;border-radius:3px;"><div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);">Control</div><div style="font-family:var(--font-mono);font-size:14px;color:var(--text);">' + e.controlConversions + '/' + e.controlViews + '</div><div style="font-size:10px;color:var(--text-mid);">' + controlRate + '% conv.</div></div><div style="background:var(--bg2);padding:10px;border-radius:3px;"><div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);">Variant</div><div style="font-family:var(--font-mono);font-size:14px;color:var(--text);">' + e.variantConversions + '/' + e.variantViews + '</div><div style="font-size:10px;color:var(--text-mid);">' + variantRate + '% conv.</div></div></div><div style="margin-top:6px;font-size:10px;color:' + (lift > 0 ? 'var(--green)' : 'var(--red)') + ';">Lift: ' + (lift > 0 ? '+' : '') + lift + '%</div></div>';
+    return '<div class="ff-item" style="flex-direction:column;align-items:stretch;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div><div style="font-size:12px;color:var(--text);font-weight:500;">' + e.name + '</div><div class="text-dim-sm">Variable: ' + e.variable + ' &middot; Split: ' + e.split + '% &middot; ' + new Date(e.createdAt).toLocaleDateString() + '</div></div><div style="display:flex;gap:6px;"><button class="btn-secondary" data-hq="abSimulate" data-hq-arg=" + idx + " class="badge-sm">Simulate</button><button class="btn-secondary" data-hq="abDelete" data-hq-arg=" + idx + " style="padding:4px 10px;font-size:8px;border-color:rgba(196,72,72,.3);color:var(--red);">Delete</button></div></div><div class="grid-2-gap8"><div class="bg2-p10"><div class="label-xs">Control</div><div class="text-mono-14">' + e.controlConversions + '/' + e.controlViews + '</div><div class="text-mid">' + controlRate + '% conv.</div></div><div class="bg2-p10"><div class="label-xs">Variant</div><div class="text-mono-14">' + e.variantConversions + '/' + e.variantViews + '</div><div class="text-mid">' + variantRate + '% conv.</div></div></div><div style="margin-top:6px;font-size:10px;color:' + (lift > 0 ? 'var(--green)' : 'var(--red)') + ';">Lift: ' + (lift > 0 ? '+' : '') + lift + '%</div></div>';
   }).join('');
   abUpdateSummary(experiments);
   abRenderChart();
@@ -3387,5 +3543,175 @@ function abRenderChart() {
   }
 })();
 
+
+
+
+// ── HQ Event Delegation Init ──
+(function() {
+  function initDel() {
+    // Lock screen Enter key handlers
+    var li = document.getElementById('lock-input');
+    if (li) li.addEventListener('keydown', function(e) { if (e.key==='Enter') unlock(); });
+    var sp = document.getElementById('set-pw2');
+    if (sp) sp.addEventListener('keydown', function(e) { if (e.key==='Enter') submitSetPassword(); });
+    // data-hq-key: Enter key handler
+    document.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter') return;
+      var el = document.activeElement;
+      if (!el) return;
+      var fn = el.getAttribute('data-hq-key');
+      if (fn && typeof window[fn] === 'function') { window[fn](); }
+    });
+    var app = document.getElementById('app');
+    if (!app) return;
+    // ── Wrapper functions for migrated onclick handlers ──
+    window.toggleSidebar = function toggleSidebar() {
+      var s = document.querySelector('.sidebar');
+      if (s) s.classList.toggle('open');
+    };
+    window.sgUpload = function sgUpload() {
+      var inp = document.getElementById('sg-file-input');
+      if (inp) inp.click();
+    };
+    window.aiOpsClear = function aiOpsClear() {
+      var inp = document.getElementById('aiops-fix-input');
+      if (inp) inp.value = '';
+      var res = document.getElementById('aiops-fix-result');
+      if (res) res.style.display = 'none';
+    };
+    window.hqElAdd = function hqElAdd(arg) {
+      if (!arg) return;
+      var parts = arg.split('|');
+      if (parts.length >= 3 && typeof window.elAdd === 'function') {
+        window.elAdd(parts[0], parts[1], parts[2]);
+      }
+    };
+    window.elTypeFilter = function() {
+      var filter = document.getElementById('el-filter');
+      var type = document.getElementById('el-type-filter');
+      if (typeof window.elApplyFilter === 'function') {
+        window.elApplyFilter(filter ? filter.value : '', type ? type.value : '');
+      }
+    };
+    // dismissAlert guard — if called via data-hq delegation without args,
+    // the alert.onclick handler on the parent fires via bubbling anyway
+    window.dismissAlert = (function(orig) {
+      return function(el) {
+        if (!el) return; // parent alert.onclick handles this via bubbling
+        orig(el);
+      };
+    })(window.dismissAlert || function(){});
+
+    // Wrap saveRailwayUrl to read input and show toast when called without args
+    window.saveRailwayUrl = (function(orig) {
+      return function(val) {
+        if (val === undefined) {
+          var inp = document.getElementById('railway-url-input');
+          val = inp ? inp.value : '';
+        }
+        orig(val);
+        if (typeof window.showToast === 'function') window.showToast('Saved');
+      };
+    })(window.saveRailwayUrl || function(){});
+
+    
+// ── Window exposure for data-hq delegation ──
+  window.abCreate = window.abCreate || abCreate;
+  window.abDelete = window.abDelete || abDelete;
+  window.abRefresh = window.abRefresh || abRefresh;
+  window.abSimulate = window.abSimulate || abSimulate;
+  window.addVersion = window.addVersion || addVersion;
+  window.aiOpsAutoFix = window.aiOpsAutoFix || aiOpsAutoFix;
+  window.aiOpsGetReport = window.aiOpsGetReport || aiOpsGetReport;
+  window.aiOpsRefreshLog = window.aiOpsRefreshLog || aiOpsRefreshLog;
+  window.aiOpsRunCheck = window.aiOpsRunCheck || aiOpsRunCheck;
+  window.calcRevenue = window.calcRevenue || calcRevenue;
+  window.changePassword = window.changePassword || changePassword;
+  window.clearAll = window.clearAll || clearAll;
+  window.copyProxyUrl = window.copyProxyUrl || copyProxyUrl;
+  window.dlFile = window.dlFile || dlFile;
+  window.downloadAll = window.downloadAll || downloadAll;
+  window.dpBuildLocal = window.dpBuildLocal || dpBuildLocal;
+  window.dpCheckStatus = window.dpCheckStatus || dpCheckStatus;
+  window.dpClearLog = window.dpClearLog || dpClearLog;
+  window.dpDeployNetlify = window.dpDeployNetlify || dpDeployNetlify;
+  window.dpDeployRailway = window.dpDeployRailway || dpDeployRailway;
+  window.elAdd = window.elAdd || elAdd;
+  window.elApplyFilter = window.elApplyFilter || elApplyFilter;
+  window.elClear = window.elClear || elClear;
+  window.elRefresh = window.elRefresh || elRefresh;
+  window.flagsAdd = window.flagsAdd || flagsAdd;
+  window.flagsDisableAll = window.flagsDisableAll || flagsDisableAll;
+  window.flagsEnableAll = window.flagsEnableAll || flagsEnableAll;
+  window.flagsRemove = window.flagsRemove || flagsRemove;
+  window.flagsReset = window.flagsReset || flagsReset;
+  window.flagsToggle = window.flagsToggle || flagsToggle;
+  window.lockApp = window.lockApp || lockApp;
+  window.refreshAnalytics = window.refreshAnalytics || refreshAnalytics;
+  window.refreshWatchdogStatus = window.refreshWatchdogStatus || refreshWatchdogStatus;
+  window.resetPassword = window.resetPassword || resetPassword;
+  window.saveNotes = window.saveNotes || saveNotes;
+  window.sgAnalyzeWithAI = window.sgAnalyzeWithAI || sgAnalyzeWithAI;
+  window.sgClear = window.sgClear || sgClear;
+  window.sgLoadImage = window.sgLoadImage || sgLoadImage;
+  window.sgToggle = window.sgToggle || sgToggle;
+  window.submitSetPassword = window.submitSetPassword || submitSetPassword;
+  window.tdAddCustomTier = window.tdAddCustomTier || tdAddCustomTier;
+  window.tdDeleteCustom = window.tdDeleteCustom || tdDeleteCustom;
+  window.toggleCheck = window.toggleCheck || toggleCheck;
+  window.toggleMute = window.toggleMute || toggleMute;
+  window.umAdd = window.umAdd || umAdd;
+  window.umRefresh = window.umRefresh || umRefresh;
+  window.unlock = window.unlock || unlock;
+
+
+
+// Click delegation: data-hq attribute
+    app.addEventListener('click', function(e) {
+      var t = e.target.closest('[data-hq]');
+      if (!t || e.defaultPrevented) return;
+      var fn = t.getAttribute('data-hq');
+      if (!fn || typeof window[fn] !== 'function') return;
+      e.preventDefault();
+      var arg = t.getAttribute('data-hq-arg');
+      var idx = t.getAttribute('data-hq-idx');
+      var flag = t.getAttribute('data-hq-flag');
+      if (arg !== null) { window[fn](arg); }
+      else if (idx !== null) { window[fn](parseInt(idx, 10)); }
+      else if (flag !== null) { window[fn](flag); }
+      else { window[fn](); }
+    });
+    // Change delegation: data-hq-change (checkbox toggles, selects)
+    app.addEventListener('change', function(e) {
+      var el = e.target;
+      var fn = el.getAttribute('data-hq-change');
+      if (!fn || typeof window[fn] !== 'function') return;
+      var flag = el.getAttribute('data-hq-flag');
+      var idx = el.getAttribute('data-hq-idx');
+      var tier = el.getAttribute('data-hq-tier');
+      if (flag !== null) { window[fn](flag, el.checked); }
+      else if (idx !== null && tier !== null) { window[fn](parseInt(idx, 10), tier); }
+      else { window[fn](el.checked); }
+    });
+    // Input delegation: data-hq-input (text inputs, textareas)
+    app.addEventListener('input', function(e) {
+      var el = e.target;
+      var fn = el.getAttribute('data-hq-input');
+      if (!fn || typeof window[fn] !== 'function') return;
+      window[fn](el.value);
+    });
+    // Mouse hover delegation: data-hq-hover
+    app.addEventListener('mouseover', function(e) {
+      var t = e.target.closest('[data-hq-hover="highlight"]');
+      if (t) { t.style.background = 'var(--surface2)'; }
+    });
+    app.addEventListener('mouseout', function(e) {
+      var t = e.target.closest('[data-hq-hover="highlight"]');
+      if (t) { t.style.background = ''; }
+    });
+  }
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', initDel);
+  else initDel();
+})();
 </script>
 </html>
