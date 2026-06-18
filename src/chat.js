@@ -59,6 +59,8 @@ window.sendChat = function sendChat(text) {
   msgs.innerHTML += '<div class="chat-msg user"><div class="chat-msg-label">You</div><div class="chat-msg-bubble">' + window.esc(msg) + '</div></div>';
   if (!window._chatHistory) window._chatHistory = [];
   window._chatHistory.push({ role: 'user', content: msg });
+  // Persist chat history
+  try { localStorage.setItem('trace_chat_history', JSON.stringify(window._chatHistory.slice(-50))); } catch(e) { TRACE_WATCHDOG?.warn('Chat', e); }
 
   // Hide suggestions
   var sug = document.getElementById('chat-suggestions');
@@ -118,6 +120,8 @@ window.sendChat = function sendChat(text) {
   }).then(function(r) { return r.json(); }).then(function(data) {
     var fullReply = data.content ? data.content.map(function(b) { return b.text || ''; }).join('') : 'I could not process that question.';
     window._chatHistory.push({ role: 'assistant', content: fullReply });
+    // Persist chat history
+    try { localStorage.setItem('trace_chat_history', JSON.stringify(window._chatHistory.slice(-50))); } catch(e) { TRACE_WATCHDOG?.warn('Chat', e); }
 
     // Streaming simulation
     var streamEl = document.getElementById('chat-stream-text');
@@ -201,12 +205,60 @@ window.openChat = function openChat() {
 
   var msgs = document.getElementById('chat-messages');
   var cfg = window.TIERS[tier];
+  
+  // Restore persisted chat history
+  var savedHistory = null;
+  try {
+    var raw = localStorage.getItem('trace_chat_history');
+    if (raw) savedHistory = JSON.parse(raw);
+  } catch(e) { TRACE_WATCHDOG?.warn('Chat', e); }
+  
+  if (savedHistory && savedHistory.length > 0) {
+    window._chatHistory = savedHistory;
+    if (msgs) {
+      msgs.innerHTML = savedHistory.map(function(m) {
+        var role = m.role === 'user' ? 'user' : 'ai';
+        var label = m.role === 'user' ? 'You' : 'AI';
+        return '<div class="chat-msg ' + role + '"><div class="chat-msg-label">' + label + '</div><div class="chat-msg-bubble">' + window.esc(m.content || '') + '</div></div>';
+      }).join('');
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+  } else {
+    var introText = (cfg && cfg.chatIntro) ? cfg.chatIntro : 'Ask me anything about the artwork. I can discuss style, provenance, period details, or suggest next investigation steps.';
+    if (msgs) {
+      msgs.innerHTML = '<div class="chat-msg ai"><div class="chat-msg-label">AI</div><div class="chat-msg-bubble">' + introText + '</div></div>';
+    }
+    window._chatHistory = [];
+  }
+  var suggestions = (cfg && cfg.chatSuggestions) ? cfg.chatSuggestions : ['Is this signature authentic?', 'What period does this style suggest?', 'Are there similar works to compare?'];
+  updateChatSuggestions(suggestions);
+};
+
+/**
+ * Clear chat history and reset the UI
+ */
+window.clearChat = function clearChat() {
+  window._chatHistory = [];
+  try {
+    localStorage.removeItem('trace_chat_history');
+  } catch(e) { TRACE_WATCHDOG?.warn('Chat', e); }
+
+  var msgs = document.getElementById('chat-messages');
+  var tier = window.TIER || 'collector';
+  var cfg = window.TIERS[tier];
   var introText = (cfg && cfg.chatIntro) ? cfg.chatIntro : 'Ask me anything about the artwork. I can discuss style, provenance, period details, or suggest next investigation steps.';
   if (msgs) {
     msgs.innerHTML = '<div class="chat-msg ai"><div class="chat-msg-label">AI</div><div class="chat-msg-bubble">' + introText + '</div></div>';
   }
+  // Restore suggestions
   var suggestions = (cfg && cfg.chatSuggestions) ? cfg.chatSuggestions : ['Is this signature authentic?', 'What period does this style suggest?', 'Are there similar works to compare?'];
-  updateChatSuggestions(suggestions);
+  var sugEl = document.getElementById('chat-suggestions');
+  if (sugEl) {
+    sugEl.innerHTML = suggestions.map(function(s) {
+      return '<div class="chat-sug">' + window.esc(s) + '</div>';
+    }).join('');
+  }
+  window.toast('Chat cleared');
 };
 
 window.closeChat = function closeChat() { window.nav('scan'); };
@@ -215,8 +267,18 @@ function updateChatSuggestions(sugs) {
   var el = document.getElementById('chat-suggestions');
   if (!el || !sugs.length) return;
   el.innerHTML = sugs.map(function(s) {
-    return '<div class="chat-sug" onclick="if(typeof sendChat===\'function\')sendChat(\'' + s.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\')">' + window.esc(s) + '</div>';
+    return '<div class="chat-sug">' + window.esc(s) + '</div>';
   }).join('');
+  // Wire up suggestion clicks via event delegation (parent listener)
+  if (!el._sugBound) {
+    el._sugBound = true;
+    el.addEventListener('click', function(e) {
+      var sug = e.target.closest('.chat-sug');
+      if (sug && typeof window.sendChat === 'function') {
+        window.sendChat(sug.textContent.trim());
+      }
+    });
+  }
 }
 
 // ── Add "Chat" button to result panel ──
@@ -231,7 +293,7 @@ function updateChatSuggestions(sugs) {
     btn.id = 'trace-chat-btn';
     btn.style.cssText = 'width:100%;background:var(--surface2);border:1px solid var(--border-mid);border-top:1px solid var(--border);color:var(--gold);padding:14px;font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;';
     btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Ask Follow-up Questions';
-    btn.onclick = function() { window.openChat(); };
+    btn.addEventListener('click', function() { window.openChat(); });
     btn.addEventListener('mouseenter', function() { btn.style.borderColor = 'var(--gold)'; });
     btn.addEventListener('mouseleave', function() { btn.style.borderColor = 'var(--border-mid)'; });
     resultPanel.parentNode.insertBefore(btn, resultPanel.nextSibling);

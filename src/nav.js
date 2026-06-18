@@ -2,7 +2,7 @@
 // TRACE — Navigation System
 // ══════════════════════════════════════════════
 
-window.ALL_SCREENS = ['intro', 'home', 'scan', 'chat', 'cases', 'timeline', 'learn', 'profile', 'research', 'spectral', 'geometry', 'viewer', 'knowledge'];
+window.ALL_SCREENS = ['intro', 'home', 'scan', 'chat', 'cases', 'timeline', 'learn', 'ops', 'profile', 'research', 'spectral', 'geometry', 'viewer', 'knowledge'];
 
 /**
  * Navigate to a screen
@@ -27,6 +27,11 @@ window.nav = function nav(id) {
   if (bnav) bnav.style.display = id === 'intro' ? 'none' : 'flex';
   var scrollEl = targetScreen ? targetScreen.querySelector('.scroll') : null;
   if (scrollEl) scrollEl.scrollTo(0, 0);
+  
+  // Dispatch nav:changed event for watchers (ops dashboard, profile ops, etc.)
+  try {
+    document.dispatchEvent(new CustomEvent('nav:changed', { detail: { screen: id } }));
+  } catch(e) { /* dispatch may fail in older browsers — ignore */ }
   if (id === 'scan') {
     if (typeof window.startPickerPulse === 'function') setTimeout(window.startPickerPulse, 300);
   } else {
@@ -82,13 +87,6 @@ window.renderSavedTimelines = function renderSavedTimelines() {
     var card = document.createElement('div');
     card.className = 'saved-tl-card';
     card.style.cssText = 'display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;';
-    card.onmouseenter = function() { card.style.background = 'var(--surface)'; };
-    card.onmouseleave = function() { card.style.background = ''; };
-    card.onclick = function() {
-      window._lastTimeline = t;
-      if (typeof window.navTimeline === 'function') window.navTimeline();
-    };
-
     var eventCount = events.length;
     var gapCount = events.filter(function(e) {
       return e.event && (e.event.toLowerCase().includes('gap') || e.event.includes('\u26a0'));
@@ -97,18 +95,53 @@ window.renderSavedTimelines = function renderSavedTimelines() {
     var lastYear = events.length > 0 ? events[events.length - 1].year : '—';
 
     card.innerHTML =
-      '<div style="flex:1;min-width:0;">' +
-      '<div style="font-size:13px;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + window.esc(t.title) + '</div>' +
-      '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + window.esc(t.sub || '') + '</div>' +
-      '<div style="display:flex;gap:12px;margin-top:6px;">' +
-      '<span style="font-size:8px;color:var(--text-dim);letter-spacing:.05em;">' + firstYear + ' → ' + lastYear + '</span>' +
-      '<span style="font-size:8px;color:var(--text-dim);letter-spacing:.05em;">' + eventCount + ' events</span>' +
-      (gapCount > 0 ? '<span style="font-size:8px;color:#E8A020;">' + gapCount + ' gaps</span>' : '') +
+      '<div class="flex-1">' +
+      '<div data-tl-card-title class="tl-card-title">' + window.esc(t.title) + '</div>' +
+      '<div class="tl-card-sub">' + window.esc(t.sub || '') + '</div>' +
+      '<div class="tl-card-meta">' +
+      '<span class="tl-card-stat">' + firstYear + ' → ' + lastYear + '</span>' +
+      '<span class="tl-card-stat">' + eventCount + ' events</span>' +
+      (gapCount > 0 ? '<span class="text-amber">' + gapCount + ' gaps</span>' : '') +
       '</div></div>' +
-      '<button class="tl-delete-btn" onclick="event.stopPropagation();window.deleteSavedTimeline(\'' + window.escAttr(t.title) + '\')" style="background:none;border:none;color:var(--text-dim);font-size:16px;cursor:pointer;padding:4px 8px;opacity:.4;transition:opacity .2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.4" title="Delete timeline">✕</button>';
+      '<button class="tl-delete-btn" data-tl-delete="' + window.escAttr(t.title) + '" title="Delete timeline">✕</button>';
+
+    // Wire card click — single event listener via delegation on parent
+    // Wire delete button
+    var delBtn = card.querySelector('.tl-delete-btn');
+    if (delBtn) {
+      delBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var title = this.dataset.tlDelete;
+        if (title && typeof window.deleteSavedTimeline === 'function') {
+          window.deleteSavedTimeline(title);
+        }
+      });
+    }
 
     items.appendChild(card);
   });
+
+  // Wire card click delegation on the container
+  var container = document.getElementById('tl-saved-items');
+  if (container && !container._tlCardBound) {
+    container._tlCardBound = true;
+    container.addEventListener('click', function(e) {
+      var card = e.target.closest('.saved-tl-card');
+      if (card && typeof window.navTimeline === 'function') {
+        // Find the timeline data from card content
+        var titleEl = card.querySelector('[data-tl-card-title]');
+        if (titleEl) {
+          var title = titleEl.textContent;
+          var timelines = window.listSavedTimelines();
+          var match = timelines.filter(function(t) { return t.title === title; });
+          if (match.length > 0) {
+            window._lastTimeline = match[0];
+            window.navTimeline();
+          }
+        }
+      }
+    });
+  }
 };
 
 /**
@@ -159,16 +192,26 @@ window.searchTimelines = function searchTimelines(query) {
       (t.artist || '').toLowerCase().indexOf(query) >= 0;
   });
   if (matches.length === 0) {
-    resultsEl.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-dim);font-size:11px;">No results found</div>';
+    resultsEl.innerHTML = '<div class="empty-state-md">No results found</div>';
     resultsEl.classList.add('open');
     return;
   }
   resultsEl.innerHTML = matches.slice(0, 10).map(function(t) {
-    return '<div class="search-item" onclick="window.searchSelectTimeline(\'' + window.escAttr(t.title) + '\')">' +
+    return '<div class="search-item" data-search-tl="' + window.escAttr(t.title) + '">' +
       '<div class="search-item-title">' + window.esc(t.title) + '</div>' +
       '<div class="search-item-sub">' + window.esc(t.sub || '') + '</div></div>';
   }).join('');
   resultsEl.classList.add('open');
+  // Wire search item clicks via delegation
+  if (!resultsEl._searchBound) {
+    resultsEl._searchBound = true;
+    resultsEl.addEventListener('click', function(e) {
+      var item = e.target.closest('.search-item[data-search-tl]');
+      if (item && typeof window.searchSelectTimeline === 'function') {
+        window.searchSelectTimeline(item.dataset.searchTl);
+      }
+    });
+  }
 };
 
 /**
@@ -263,18 +306,18 @@ function showKeyboardHelp() {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;cursor:pointer;';
   var content = document.createElement('div');
   content.style.cssText = 'background:var(--surface);border:1px solid var(--border-mid);padding:28px;max-width:380px;width:90%;max-height:80vh;overflow-y:auto;';
-  content.innerHTML = '<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--text);margin-bottom:16px;">Keyboard Shortcuts</div>' +
-    '<div style="font-size:12px;line-height:2;color:var(--text-mid);">' +
-    '<div><span style="color:var(--gold);font-family:Courier Prime,monospace;">1-7</span> Navigate screens</div>' +
-    '<div><span style="color:var(--gold);font-family:Courier Prime,monospace;">H S C F T L P</span> Home, Scan, Chat, Files, Timeline, Learn, Profile</div>' +
-    '<div><span style="color:var(--gold);font-family:Courier Prime,monospace;">↑ ↓ ← →</span> D-pad navigation (TV remote)</div>' +
-    '<div><span style="color:var(--gold);font-family:Courier Prime,monospace;">Enter / Space</span> Select / Activate</div>' +
-    '<div><span style="color:var(--gold);font-family:Courier Prime,monospace;">Esc / Backspace</span> Go back</div>' +
-    '<div><span style="color:var(--gold);font-family:Courier Prime,monospace;">?</span> Toggle this help</div>' +
+  content.innerHTML = '<div class="kbd-help-title">Keyboard Shortcuts</div>' +
+    '<div class="kbd-help-body">' +
+    '<div><span class="text-gold font-mono">1-7</span> Navigate screens</div>' +
+    '<div><span class="text-gold font-mono">H S C F T L P</span> Home, Scan, Chat, Files, Timeline, Learn, Profile</div>' +
+    '<div><span class="text-gold font-mono">↑ ↓ ← →</span> D-pad navigation (TV remote)</div>' +
+    '<div><span class="text-gold font-mono">Enter / Space</span> Select / Activate</div>' +
+    '<div><span class="text-gold font-mono">Esc / Backspace</span> Go back</div>' +
+    '<div><span class="text-gold font-mono">?</span> Toggle this help</div>' +
     '</div>' +
-    '<div style="margin-top:16px;font-size:10px;color:var(--text-ghost);">Press Esc or ? to close</div>';
+    '<div class="text-ghost text-xs mt-16">Press Esc or ? to close</div>';
   overlay.appendChild(content);
-  overlay.onclick = function() { overlay.remove(); };
+  overlay.addEventListener('click', function() { overlay.remove(); });
   document.body.appendChild(overlay);
 }
 

@@ -82,9 +82,19 @@ else
   echo "  → No subscription DB (fresh start)."
 fi
 
-# ── Step 3: Start server with memory limits ──
-echo "[3/4] Starting server..."
+# ── Step 3: Load environment variables and start server ──
+echo "[3/4] Loading environment and starting server..."
 cd "$TRACE_DIR"
+
+# Load .env file explicitly — sources all non-comment lines as env vars
+if [ -f "$TRACE_DIR/.env" ]; then
+  echo "  → Loading .env configuration..."
+  set -a
+  source "$TRACE_DIR/.env"
+  set +a
+  echo "  → Environment loaded (AI_PROVIDER=$(grep '^AI_PROVIDER' .env | cut -d= -f2))"
+fi
+
 # Cap Node heap at 128MB for this lightweight proxy server
 export NODE_OPTIONS="--max-old-space-size=128"
 

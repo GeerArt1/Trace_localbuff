@@ -29,6 +29,9 @@
 
       if (!data || !data.nodes || data.nodes.length < 2) {
         container.innerHTML = '<div class="kg-empty">Add timeline events to visualize the ownership chain.<div class="kg-empty-sub">Scan an artwork and run analysis to generate provenance data.</div></div>';
+        // Show the scan CTA button
+        var scanBtn = document.getElementById('kg-empty-scan-btn');
+        if (scanBtn) scanBtn.style.display = 'block';
         return;
       }
 
@@ -661,7 +664,7 @@
             var totalApis = Object.keys(apis).length;
 
             var summaryHtml = '<div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">' +
-              '<div><span style="font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-ghost);">Cross-Reference Status</span>' +
+              '<div><span class="provenance-label">Cross-Reference Status</span>' +
               '<div style="font-size:11px;font-weight:600;margin-top:2px;color:' + (alerts > 0 ? 'var(--red-lt)' : 'var(--green-lt)') + ';">' +
               (alerts > 0 ? '\u26a0 ' + alerts + ' Alert' + (alerts > 1 ? 's' : '') : '\u2713 Clear') + ' \u00b7 ' + liveCount + '/' + totalApis + ' live</div></div>';
 
@@ -676,8 +679,8 @@
             dbTypes.forEach(function(t) {
               var d = t.data || {};
               var clr = t.color(d);
-              summaryHtml += '<span style="font-size:7px;display:flex;align-items:center;gap:3px;color:var(--text-ghost);">' +
-                '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + clr + ';"></span>' +
+              summaryHtml += '<span class="provenance-status-item">' +
+                '<span class="provenance-dot" style="background:' + clr + '"></span>' +
                 t.label + '</span>';
             });
             summaryHtml += '</div></div>';

@@ -13,6 +13,7 @@
     ctx: null,
     img: null,
     overlays: {},           // { golden: false, thirds: false, spiral: false, symmetry: false, radial: false }
+    compareMode: false,
     imageLoaded: false,
     animFrame: null,
     W: 0,
@@ -156,12 +157,53 @@
         ctx.drawImage(this.img, 0, 0, W, H);
       }
 
-      // Draw active overlays
-      if (this.overlays.golden) this._drawGoldenRatio(ctx, W, H);
-      if (this.overlays.thirds) this._drawRuleOfThirds(ctx, W, H);
-      if (this.overlays.spiral) this._drawGoldenSpiral(ctx, W, H);
-      if (this.overlays.symmetry) this._drawDynamicSymmetry(ctx, W, H);
-      if (this.overlays.radial) this._drawRadial(ctx, W, H);
+      // In compare mode: draw original on left half, overlays on right half
+      if (this.compareMode) {
+        // Save full state, clip to left half, draw image only
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, W / 2 - 1, H);
+        ctx.clip();
+        if (this.img) ctx.drawImage(this.img, 0, 0, W, H);
+        ctx.restore();
+
+        // Draw divider
+        ctx.strokeStyle = 'rgba(212, 174, 82, 0.5)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(W / 2, 0);
+        ctx.lineTo(W / 2, H);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Labels
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.font = '10px "Courier Prime", monospace';
+        ctx.fillText('Original', 8, 18);
+        ctx.fillText('Overlays', W / 2 + 8, 18);
+
+        // Draw overlays on right half
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(W / 2 + 1, 0, W / 2 - 1, H);
+        ctx.clip();
+        // Re-draw the image on right half too
+        if (this.img) ctx.drawImage(this.img, 0, 0, W, H);
+        if (this.overlays.golden) this._drawGoldenRatio(ctx, W, H);
+        if (this.overlays.thirds) this._drawRuleOfThirds(ctx, W, H);
+        if (this.overlays.spiral) this._drawGoldenSpiral(ctx, W, H);
+        if (this.overlays.symmetry) this._drawDynamicSymmetry(ctx, W, H);
+        if (this.overlays.radial) this._drawRadial(ctx, W, H);
+        ctx.restore();
+      } else {
+        // Normal mode — draw all overlays across full canvas
+        if (this.overlays.golden) this._drawGoldenRatio(ctx, W, H);
+        if (this.overlays.thirds) this._drawRuleOfThirds(ctx, W, H);
+        if (this.overlays.spiral) this._drawGoldenSpiral(ctx, W, H);
+        if (this.overlays.symmetry) this._drawDynamicSymmetry(ctx, W, H);
+        if (this.overlays.radial) this._drawRadial(ctx, W, H);
+      }
 
       // Update analysis text
       this._updateAnalysis();
@@ -195,6 +237,11 @@
         var btn = document.getElementById('sg-btn-' + t);
         if (btn) btn.classList.remove('active');
       });
+      this.compareMode = false;
+      var cmpBtn = document.getElementById('sg-btn-compare');
+      if (cmpBtn) cmpBtn.classList.remove('active');
+      var hint = document.getElementById('sg-compare-hint');
+      if (hint) hint.style.display = 'none';
       this._draw();
     },
 
@@ -798,6 +845,9 @@
             if (analysisPanel) analysisPanel.style.display = 'block';
           }
 
+          // Update confidence indicators
+          self._renderConfidenceIndicators(result);
+
           self._draw();
           window.toast('AI composition analysis complete');
 
@@ -818,6 +868,105 @@
   window.sgClear = function() { SG.clear(); };
   window.sgRedraw = function() { SG.redraw(); };
   window.sgAnalyzeWithAI = function() { SG.analyzeWithAI(); };
+  window.sgExportPNG = function() { SG.exportPNG(); };
+  window.sgToggleCompare = function() { SG.toggleCompare(); };
+
+  /**
+   * Export the canvas with overlays as a PNG download
+   */
+  SG.exportPNG = function() {
+    var canvas = document.getElementById('sg-canvas');
+    if (!canvas || !this.imageLoaded) {
+      window.toast('No image loaded to export');
+      return;
+    }
+    // Temporarily disable compare mode for export if active — we want the full overlays view
+    var wasCompare = this.compareMode;
+    if (wasCompare) {
+      this.compareMode = false;
+      this._draw();
+    }
+    var link = document.createElement('a');
+    link.download = 'trace-geometry-' + new Date().toISOString().slice(0, 19).replace(/[:-]/g, '') + '.png';
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.toast('Exported composition analysis as PNG');
+    // Restore compare mode
+    if (wasCompare) {
+      this.compareMode = true;
+      this._draw();
+    }
+  };
+
+  /**
+   * Toggle split-comparison mode (original vs overlays)
+   */
+  SG.toggleCompare = function() {
+    if (!this.imageLoaded) {
+      window.toast('Load an image first');
+      return;
+    }
+    this.compareMode = !this.compareMode;
+    var btn = document.getElementById('sg-btn-compare');
+    if (btn) btn.classList.toggle('active', this.compareMode);
+    var hint = document.getElementById('sg-compare-hint');
+    if (hint) hint.style.display = this.compareMode ? 'block' : 'none';
+    // Add animation class to canvas for visual feedback
+    var canvas = document.getElementById('sg-canvas');
+    if (canvas) {
+      canvas.classList.remove('sg-compare-anim');
+      // Force reflow so the animation re-triggers
+      void canvas.offsetWidth;
+      canvas.classList.add('sg-compare-anim');
+    }
+    this._draw();
+  };
+
+  /**
+   * Render AI confidence indicators in the analysis panel
+   */
+  SG._renderConfidenceIndicators = function(result) {
+    var container = document.getElementById('sg-analysis-confidence');
+    if (!container) return;
+    if (!result) {
+      container.style.display = 'none';
+      return;
+    }
+
+    var patterns = [
+      { key: 'golden_ratio', label: 'Golden Ratio', enabled: result.golden_ratio && result.golden_ratio.active },
+      { key: 'thirds', label: 'Rule of Thirds', enabled: result.thirds && result.thirds.active },
+      { key: 'spiral', label: 'Golden Spiral', enabled: result.spiral && result.spiral.active },
+      { key: 'symmetry', label: 'Dynamic Symmetry', enabled: result.symmetry && result.symmetry.active },
+      { key: 'radial', label: 'Radial Harmony', enabled: result.radial && result.radial.active }
+    ];
+
+    var html = '<div class="sg-conf-title">AI Detected Patterns</div><div class="sg-conf-grid">';
+    patterns.forEach(function(p) {
+      html += '<div class="sg-conf-item' + (p.enabled ? ' sg-conf-detected' : ' sg-conf-not-detected') + '">' +
+        '<span class="sg-conf-dot"></span>' +
+        '<span class="sg-conf-label">' + p.label + '</span>' +
+        '<span class="sg-conf-status">' + (p.enabled ? 'Detected' : 'Not found') + '</span>' +
+        '</div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+    container.style.display = 'block';
+  };
+
+  // ── Keyboard shortcuts for geometry screen ──
+  window.addEventListener('keydown', function(e) {
+    // Only when geometry screen is active and not typing in input
+    var geo = document.getElementById('s-geometry');
+    if (!geo || !geo.classList.contains('active')) return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var key = e.key.toLowerCase();
+    if (key === 'c') { SG.toggleCompare(); e.preventDefault(); }
+    else if (key === 'e') { SG.exportPNG(); e.preventDefault(); }
+    else if (key === 'a') { SG.analyzeWithAI(); e.preventDefault(); }
+  });
 
   // Auto-redraw on resize
   var _resizeTimer = null;

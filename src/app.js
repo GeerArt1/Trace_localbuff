@@ -60,13 +60,32 @@
       window.loadTimelinesFromStorage();
     }
 
-    // ── Restore last result from localStorage ──
-    try {
-      var _sr = localStorage.getItem('trace_lastResult');
-      if (_sr) {
-        window._lastResult = JSON.parse(_sr);
+    // ── Restore last result — try IndexedDB first, fall back to localStorage ──
+    function restoreLastResult() {
+      // Try IndexedDB first (richer data)
+      if (typeof window.IDB !== 'undefined' && window.IDB.ready && window.IDB.ready()) {
+        return window.IDB.get('results', 'last_analysis').then(function(cached) {
+          if (cached && cached.result) {
+            window._lastResult = cached.result;
+            return;
+          }
+          // Fallback to localStorage
+          restoreFromLocalStorage();
+        }).catch(function() {
+          restoreFromLocalStorage();
+        });
       }
-    } catch(e) { TRACE_WATCHDOG?.warn('App', e); }
+      restoreFromLocalStorage();
+    }
+    function restoreFromLocalStorage() {
+      try {
+        var _sr = localStorage.getItem('trace_lastResult');
+        if (_sr) {
+          window._lastResult = JSON.parse(_sr);
+        }
+      } catch(e) { TRACE_WATCHDOG?.warn('App', e); }
+    }
+    restoreLastResult();
 
     // ── Restore most recent timeline ──
     if (typeof window.listSavedTimelines === 'function') {

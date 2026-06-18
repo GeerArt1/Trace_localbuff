@@ -60,13 +60,19 @@ window.zoomPreview = function zoomPreview() {
     return;
   }
   var existing = document.getElementById('zoom-preview-overlay');
-  if (existing) { existing.remove(); return; }
-  var overlay = document.createElement('div');
-  overlay.id = 'zoom-preview-overlay';
-  overlay.className = 'zoom-overlay';
-  overlay.innerHTML = '<button class="zoom-close" onclick="this.parentElement.remove()">✕</button>' +
-    '<img src="' + preview.src + '" alt="Zoom">';
-  overlay.onclick = function() { overlay.remove(); };
+  if (existing) { existing.remove(); return; }      var overlay = document.createElement('div');
+      overlay.id = 'zoom-preview-overlay';
+      overlay.className = 'zoom-overlay';
+      var closeBtn = document.createElement('button');
+      closeBtn.className = 'zoom-close';
+      closeBtn.textContent = '✕';
+      closeBtn.addEventListener('click', function() { overlay.remove(); });
+      var imgEl = document.createElement('img');
+      imgEl.src = preview.src;
+      imgEl.alt = 'Zoom';
+      overlay.appendChild(closeBtn);
+      overlay.appendChild(imgEl);
+  overlay.addEventListener('click', function() { overlay.remove(); });
   document.body.appendChild(overlay);
   requestAnimationFrame(function() { overlay.classList.add('open'); });
 };

@@ -234,8 +234,18 @@ window.buildTabs = function buildTabs(tabs) {
   var el = document.getElementById('scan-tabs');
   if (!el) return;
   el.innerHTML = tabs.map(function(t, i) {
-    return '<button class="mtab' + (i === 0 ? ' active' : '') + '" onclick="window.setTab(this,\'' + window.escAttr(t) + '\')">' + window.esc(t) + '</button>';
+    return '<button class="mtab' + (i === 0 ? ' active' : '') + '" data-scan-tab="' + window.escAttr(t) + '">' + window.esc(t) + '</button>';
   }).join('');
+  // Wire up tab clicks via delegation — only once
+  if (!el._tabBound) {
+    el._tabBound = true;
+    el.addEventListener('click', function(e) {
+      var btn = e.target.closest('.mtab[data-scan-tab]');
+      if (btn && typeof window.setTab === 'function') {
+        window.setTab(btn, btn.dataset.scanTab);
+      }
+    });
+  }
 };
 
 /**
@@ -247,11 +257,21 @@ window.buildNav = function buildNav(items) {
   if (!nav) return;
   nav.innerHTML = items.map(function(item) {
     var iconHtml = window.ICONS[item.icon] || '';
-    return '<button type="button" class="ni" id="ni-' + window.escAttr(item.id) + '" onclick="window.nav(\'' + window.escAttr(item.id) + '\')">' +
+    return '<button type="button" class="ni" id="ni-' + window.escAttr(item.id) + '" data-nav="' + window.escAttr(item.id) + '">' +
       iconHtml +
       '<span class="ni-label">' + window.esc(item.label) + '</span></button>';
   }).join('');
   nav.style.cssText = 'display:flex;width:100%;';
+  // Wire up nav clicks via delegation — only once
+  if (!nav._navBound) {
+    nav._navBound = true;
+    nav.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-nav]');
+      if (btn && typeof window.nav === 'function') {
+        window.nav(btn.dataset.nav);
+      }
+    });
+  }
 };
 
 /**

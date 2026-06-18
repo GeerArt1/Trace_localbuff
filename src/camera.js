@@ -101,7 +101,7 @@ window.TRACE_CAMERA = {
         (capabilities.fillLightMode && capabilities.fillLightMode.indexOf('torch') >= 0)
       );
       torchBtn.style.display = supported ? 'flex' : 'none';
-    } catch(e) {
+    } catch(e) { TRACE_WATCHDOG?.warn('Camera', e);
       torchBtn.style.display = 'none';
     }
   },
@@ -120,7 +120,7 @@ window.TRACE_CAMERA = {
       });
       var torchBtn = document.getElementById('camera-torch-btn');
       if (torchBtn) torchBtn.classList.toggle('on', self.torchOn);
-    } catch(e) {
+    } catch(e) { TRACE_WATCHDOG?.warn('Camera', e);
       window.toast('Torch not supported');
     }
   },
@@ -336,11 +336,22 @@ window.TRACE_CAMERA = {
     if (!roll || !rollGrid) return;
 
     rollGrid.innerHTML = allCaptures.map(function(c, i) {
-      return '<div class="cam-roll-item" onclick="window.TRACE_CAMERA.selectFromRoll(' + i + ')" title="' + window.esc(c.tab) + '">' +
+      return '<div class="cam-roll-item" data-roll-idx="' + i + '" title="' + window.esc(c.tab) + '">' +
         '<img src="' + c.url + '" alt="' + window.esc(c.tab) + '">' +
         '<span class="cam-roll-tab">' + window.esc(c.tab) + '</span>' +
         '</div>';
     }).join('');
+    // Wire roll clicks via delegation
+    if (!rollGrid._rollBound) {
+      rollGrid._rollBound = true;
+      rollGrid.addEventListener('click', function(e) {
+        var item = e.target.closest('[data-roll-idx]');
+        if (item && typeof window.TRACE_CAMERA !== 'undefined') {
+          var idx = parseInt(item.dataset.rollIdx, 10);
+          if (!isNaN(idx)) window.TRACE_CAMERA.selectFromRoll(idx);
+        }
+      });
+    }
 
     roll.style.display = 'block';
     var viewfinder = document.getElementById('camera-viewfinder');

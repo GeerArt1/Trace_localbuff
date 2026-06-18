@@ -271,6 +271,20 @@ window.loadCasesFromStorage = function loadCasesFromStorage() {
   var list = document.getElementById('cases-list');
   if (!list) return;
 
+  // Wire delegation on cases-list once (always — covers both persistence.js and cases.js cards)
+  if (!list._casesListBound) {
+    list._casesListBound = true;
+    list.addEventListener('click', function(e) {
+      var inner = e.target.closest('.card-inner[data-tl-title]');
+      if (inner && typeof window.openCaseTimeline === 'function') {
+        var title = inner.getAttribute('data-tl-title');
+        var sub = inner.getAttribute('data-tl-sub') || '';
+        var type = inner.getAttribute('data-tl-type') || 'artwork';
+        window.openCaseTimeline(title, sub, type);
+      }
+    });
+  }
+
   if (cases.length === 0) {
     var savedCards = list.querySelectorAll('.case-card[data-saved="true"]');
     savedCards.forEach(function(c) { c.remove(); });
@@ -294,7 +308,12 @@ window.loadCasesFromStorage = function loadCasesFromStorage() {
     card.className = 'case-card';
     card.dataset.status = 'active';
     card.dataset.type = c.type || 'artwork';
-    card.innerHTML = '<div class="card-inner" onclick="window.openCaseTimeline(\'' + window.escAttr(t.title || '') + '\',\'' + window.escAttr(t.sub || '') + '\',\'' + window.escAttr(t.type || 'artwork') + '\')"><div class="card-title">' + window.esc(t.title || 'Unknown') + '</div><div class="card-attr">' + window.esc(t.sub || '') + '</div><div class="card-foot"><div class="cbar"><div class="cfill" style="width:' + (t.confidence || 50) + '%"></div></div><div class="pill pill-inv">Active</div></div></div>' + tlStrip;
+    var innerHtml = '<div class="card-inner" data-tl-title="' + window.escAttr(t.title || '') + '" data-tl-sub="' + window.escAttr(t.sub || '') + '" data-tl-type="' + window.escAttr(t.type || 'artwork') + '">' +
+      '<div class="card-title">' + window.esc(t.title || 'Unknown') + '</div>' +
+      '<div class="card-attr">' + window.esc(t.sub || '') + '</div>' +
+      '<div class="card-foot"><div class="cbar"><div class="cfill" style="width:' + (t.confidence || 50) + '%"></div></div><div class="pill pill-inv">Active</div></div></div>' +
+      tlStrip;
+    card.innerHTML = innerHtml;
     list.appendChild(card);
   });
 

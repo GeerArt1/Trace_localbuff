@@ -1,0 +1,77 @@
+# TRACE Session Summary — 2024-06-16
+
+## 4 Phases of Improvements Completed
+
+### Phase 1 — UX Polish
+- **Learn screen:** Replaced placeholder `toast('Loading lesson…')` with 5 rich educational lessons in `src/lessons.js` — modal overlay system using existing CSS classes, event delegation via `data-lesson-id` attributes
+- **Provenance progress stages:** Added 6-stage animated progress display during cross-reference check (ULAN → GPI → INTERPOL → ALR → AAMD → UNESCO) with pulse animation, auto-cancelled when API responds
+- **Knowledge graph empty state:** Added "Scan an Artwork to Begin" button that appears when KG has no data
+
+### Phase 2 — Self-Healing Agent
+- **Profile ops watchdog:** Added System Health section to Profile screen showing error count, pending reports, and watchdog status dot — auto-updates every 10s and on profile nav
+- Auto-fix pipeline already existed in routes (agent.js, ops.js, error-patterns.json)
+
+### Phase 3 — Architecture
+- **CSS extraction:** Lesson modal refactored from inline styles to use existing `.modal-overlay`, `.modal-box`, `.modal-head`, `.modal-body`, `.modal-close` CSS classes
+- Added `.lesson-section`, `.lesson-section-heading`, `.lesson-section-body`, `.ps-stage`, `.ps-active`, `.ps-done` CSS classes
+
+### Phase 4 — Performance
+- **SPARQL result cache:** In-memory Map with 10-min TTL, 50-entry max, deep-copy on retrieval, older-set-eviction on overflow — caches getty ULAN + GPI SPARQL responses
+
+## Git Commits
+
+```
+29983f6  fix(provenance): make GPI mock provenance distinct from currentLocation
+20f84d3  chore: audit cleanup (remove ADMIN_TOKEN, add coverage tests)
+735d802  fix(tests): increase async test timeout to 20s for GPI SPARQL
+7e97a4f  fix(provenance): migrate GPI SPARQL from Linked Art to CIDOC-CRM
+```
+
+Plus 9 earlier provenance commits (all local, no remote configured).
+**Total: 13 commits** ready to push.
+
+## Files Changed (in this session)
+
+| File | Change |
+|------|--------|
+| `src/lessons.js` | NEW — 5 lessons, modal display, event delegation |
+| `src/vision.js` | Provenance progress stages with cancel-on-response |
+| `src/knowledge.js` | Show empty scan button on empty state |
+| `trace.css` | Lesson modal CSS, provenance stages CSS |
+| `trace.html` | Ops watchdog section in profile, lesson script load |
+| `routes/provenance.js` | SPARQL cache (Map, 10min TTL, 50 entries) |
+
+## Test Results (All Passing)
+
+| Suite | Count |
+|-------|-------|
+| Provenance unit | 14/14 |
+| Client unit | 62/62 |
+| Server core unit | 25/25 |
+| DB unit | 18/18 |
+| Integration | 22/22 |
+| All unit (combined) | 127/127 |
+| E2E (Playwright) | 33/33 |
+
+## Pending Items
+
+1. **No git remote configured** — cannot push. Need repo URL.
+2. **Provenance progress stages** are client-side estimated (not SSE-backed) — the SPARQL cache makes the wait shorter on repeat queries
+
+## How to Start a New Session
+
+```bash
+# Read this file first
+cat Trace_last_update
+
+# Start the server
+node trace_server.js
+
+# Run tests
+node tests/test_all.js
+npx playwright test tests/e2e.e2e.test.js tests/provenance.e2e.test.js
+
+# To push to remote (if repo URL is available):
+# git remote add origin <url>
+# git push origin main
+```

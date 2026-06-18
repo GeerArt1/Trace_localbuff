@@ -217,7 +217,7 @@
       }).text('\u2715')
     ).appendTo(document.body);
 
-    document.getElementById('pwa-install-btn').onclick = function() {
+    document.getElementById('pwa-install-btn').addEventListener('click', function() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(function(choice) {
@@ -231,10 +231,10 @@
       try { localStorage.setItem(INSTALL_PROMPT_KEY, 'true'); } catch(e) { TRACE_WATCHDOG?.warn('Offline', e); }
     };
 
-    document.getElementById('pwa-dismiss-btn').onclick = function() {
+    document.getElementById('pwa-dismiss-btn').addEventListener('click', function() {
       prompt.remove();
       try { localStorage.setItem(INSTALL_PROMPT_KEY, 'true'); } catch(e) { TRACE_WATCHDOG?.warn('Offline', e); }
-    };
+    });
   }
 
   // ── Event Handlers ──

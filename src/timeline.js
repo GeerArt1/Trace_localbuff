@@ -168,7 +168,7 @@ window.openTimeline = function openTimeline(title, sub, type, eventsArg) {
       var isGap = ev.event && (ev.event.toLowerCase().includes('gap') || ev.event.includes('\u26a0'));
       var wrap = document.createElement('div');
       wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:72px;flex-shrink:0;cursor:pointer;position:relative;z-index:1;gap:4px;';
-      wrap.onclick = function() { window.scrollToEvent(i); };
+      wrap.addEventListener('click', function() { window.scrollToEvent(i); });
       var dot = document.createElement('div');
       dot.style.cssText = 'width:8px;height:8px;border-radius:50%;border:1.5px solid ' + (isGap ? '#E8A020' : 'var(--gold-dim)') + ';background:var(--bg);transition:all .25s;' + (isGap ? 'box-shadow:0 0 5px rgba(232,160,32,0.5);' : '');
       var yr = document.createElement('div');
@@ -293,7 +293,20 @@ window.scrollToEvent = function scrollToEvent(idx) {
 if (typeof TRACE_REGISTRY !== 'undefined' && typeof TRACE_REGISTRY.register === 'function') {
   TRACE_REGISTRY.register('timeline', {
     version: '1.1.0',
-    dependsOn: ['utils', 'persistence', 'nav']
+    dependsOn: ['utils', 'persistence', 'nav'],
+    init: function() {
+      // Wire delegation for empty-state SCAN NOW button
+      var tlScreen = document.getElementById('s-timeline') || document.getElementById('tl-screen');
+      if (tlScreen && !tlScreen._tlActionBound) {
+        tlScreen._tlActionBound = true;
+        tlScreen.addEventListener('click', function(e) {
+          var btn = e.target.closest('[data-tl-action="go-scan"]');
+          if (btn && typeof window._goScan === 'function') {
+            window._goScan();
+          }
+        });
+      }
+    }
   });
 }
 

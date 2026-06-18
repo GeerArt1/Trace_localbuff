@@ -97,17 +97,17 @@ window.ValuationEngine = {
     if (!v) { wrap.style.display = 'none'; return; }
 
     var html = '<div class="val-header" style="padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--gold);margin-bottom:8px;">' +
-      '<div style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Dynamic Valuation Estimate</div>' +
-      '<div style="font-family:Courier Prime,monospace;font-size:20px;color:var(--gold);font-weight:700;">' + window.esc(v.range_label) + '</div>' +
-      '<div style="font-size:9px;color:var(--text-dim);margin-top:4px;">Based on period, medium, and provenance analysis</div></div>' +
-      '<div style="padding:0 14px;">';
+      '<div class="gold-label">Dynamic Valuation Estimate</div>' +
+      '<div class="val-amount">' + window.esc(v.range_label) + '</div>' +
+      '<div class="val-desc">Based on period, medium, and provenance analysis</div></div>' +
+      '<div class="px-14">';
     v.factors.forEach(function(f) {
-      html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);">' +
-        '<span style="font-size:10px;color:var(--text-dim);">' + window.esc(f.label) + '</span>' +
-        '<span style="font-size:10px;color:var(--text-mid);font-weight:600;">' + window.esc(f.value) + '</span></div>';
+      html += '<div class="val-factors-row">' +
+        '<span class="text-dim-sm">' + window.esc(f.label) + '</span>' +
+        '<span class="val-factor-value">' + window.esc(f.value) + '</span></div>';
     });
     html += '</div>' +
-      '<div style="padding:8px 14px;font-size:9px;color:var(--text-ghost);font-style:italic;">' + window.esc(v.disclaimer) + '</div>';
+      '<div class="val-disclaimer">' + window.esc(v.disclaimer) + '</div>';
     wrap.innerHTML = html;
     wrap.style.display = 'block';
   }
@@ -212,7 +212,7 @@ window.runResearch = function() {
     msgs.scrollTop = msgs.scrollHeight;
   }).catch(function(err) {
     loading.remove();
-    msgs.innerHTML += '<div class="ra-msg ai"><div class="ra-msg-label"><span class="ra-agent">AI</span></div><div class="ra-msg-bubble" style="color:var(--red-lt)">Error: ' + window.esc(err.message) + '</div></div>';
+    msgs.innerHTML += '<div class="ra-msg ai"><div class="ra-msg-label"><span class="ra-agent">AI</span></div><div class="ra-msg-bubble text-red-lt">Error: ' + window.esc(err.message) + '</div></div>';
   });
 };
 
@@ -277,12 +277,12 @@ window.DigitalFingerprint = {
     var hash = preview ? this.generate(preview) : null;
 
     if (!hash) {
-      wrap.innerHTML = '<div style="padding:12px 14px;font-size:11px;color:var(--text-dim);">Fingerprint generation requires the artwork image. Upload an image first.</div>';
+      wrap.innerHTML = '<div class="text-dim-11 p-12-14">Fingerprint generation requires the artwork image. Upload an image first.</div>';
       wrap.style.display = 'block';
       return;
     }
 
-    var gridHtml = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;width:80px;">';
+    var gridHtml = '<div class="fp-grid">';
     for (let i = 0; i < 16; i++) {
       var brightness = hash[i] === '1' ? 'var(--gold)' : 'var(--surface3)';
       gridHtml += '<div style="width:100%;aspect-ratio:1;background:' + brightness + ';border-radius:1px;"></div>';
@@ -290,11 +290,11 @@ window.DigitalFingerprint = {
     gridHtml += '</div>';
 
     var html = '<div style="padding:12px 14px;background:var(--surface);border:1px solid var(--border);margin-bottom:8px;">' +
-      '<div style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Digital Fingerprint</div>' +
+      '<div class="gold-label">Digital Fingerprint</div>' +
       '<div style="display:flex;align-items:flex-start;gap:14px;">' + gridHtml +
-      '<div style="flex:1;min-width:0;">' +
-      '<div style="font-family:Courier Prime,monospace;font-size:9px;color:var(--text-dim);word-break:break-all;line-height:1.6;">' + window.esc(hash) + '</div>' +
-      '<div style="font-size:9px;color:var(--text-ghost);margin-top:6px;">16-bit perceptual hash \u00b7 ' + hash.length + ' bits</div>' +
+      '<div class="flex-1">' +
+      '<div class="fp-hash">' + window.esc(hash) + '</div>' +
+      '<div class="fp-meta">16-bit perceptual hash \u00b7 ' + hash.length + ' bits</div>' +
       '</div></div></div>';
 
     wrap.innerHTML = html;
@@ -425,8 +425,8 @@ window.DatabaseQuery = {
           var label = key.replace(/([A-Z])/g, ' $1').replace(/^./, function(s) { return s.toUpperCase(); });
           var color = isReal ? 'var(--green-lt)' : 'var(--gold-dim)';
           var text = isReal ? 'LIVE' : 'SIMULATED';
-          return '<span style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid ' + color + ';color:' + color + ';border-radius:2px;">' +
-            '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + color + ';margin-right:4px;vertical-align:middle;"></span>' +
+          return '<span class="live-badge" style="border-color:' + color + ';color:' + color + '">' +
+            '<span class="status-dot" style="background:' + color + '"></span>' +
             window.esc(label) + ' ' + text + '</span>';
         }).join('') + '</div>';
     } else {
@@ -443,23 +443,23 @@ window.DatabaseQuery = {
       '<div style="font-family:Courier Prime,monospace;font-size:16px;color:' + (riskColors[risk] || 'var(--gold)') + ';font-weight:700;margin-top:4px;">' + (risk || 'Unknown').toUpperCase() + '</div>' +
       '<div style="font-size:11px;color:var(--text-mid);margin-top:4px;">' + window.esc(result.risk_details || 'No risk details available.') + '</div></div>' +
       '<div style="padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);">' +
-      '<div style="width:8px;height:8px;border-radius:50%;background:' + (result.interpol_match ? 'var(--red-lt)' : 'var(--green-lt)') + '"></div>' +
-      '<span style="font-size:10px;color:var(--text-mid);">INTERPOL Stolen Works: <strong style="color:' + (result.interpol_match ? 'var(--red-lt)' : 'var(--green-lt)') + '">' + (result.interpol_match ? 'MATCH FOUND' : 'CLEAR') + '</strong></span></div>' +
+      '<div class="db-dot" style="background:' + (result.interpol_match ? 'var(--red-lt)' : 'var(--green-lt)') + '"></div>' +
+      '<span class="text-mid text-sm">INTERPOL Stolen Works: <strong style="color:' + (result.interpol_match ? 'var(--red-lt)' : 'var(--green-lt)') + '">' + (result.interpol_match ? 'MATCH FOUND' : 'CLEAR') + '</strong></span></div>' +
       '<div style="padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);">' +
-      '<div style="width:8px;height:8px;border-radius:50%;background:' + ((result.alr_status || '').toLowerCase() === 'clear' ? 'var(--green-lt)' : 'var(--gold)') + '"></div>' +
-      '<span style="font-size:10px;color:var(--text-mid);">Art Loss Register: <strong style="color:var(--gold)">' + (result.alr_status || 'Unknown') + '</strong></span></div>';
+      '<div class="db-dot" style="background:' + ((result.alr_status || '').toLowerCase() === 'clear' ? 'var(--green-lt)' : 'var(--gold)') + '"></div>' +
+      '<span class="text-mid text-sm">Art Loss Register: <strong style="color:var(--gold)">' + (result.alr_status || 'Unknown') + '</strong></span></div>';
 
     if (result.getty_matches && result.getty_matches.length) {
-      html += '<div style="padding:10px 14px;"><div style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Getty Provenance Index Matches</div>';
+      html += '<div class="px-14 py-10"><div class="gold-label">Getty Provenance Index Matches</div>';
       result.getty_matches.forEach(function(m) {
-        html += '<div style="padding:8px 10px;background:var(--surface2);border:1px solid var(--border);margin-bottom:6px;">' +
+        html += '<div class="gpi-match-item">' +
           '<div style="font-family:Cormorant Garamond,serif;font-size:13px;color:var(--text);">' + window.esc(m.title || '') + '</div>' +
           '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + window.esc(m.artist || '') + (m.year ? ', ' + window.esc(m.year) : '') + '</div>' +
           '<div style="font-size:8px;color:var(--text-ghost);margin-top:3px;">Source: ' + window.esc(m.source || 'Getty') + ' \u00b7 Confidence: ' + window.esc(m.confidence || 'medium') + '</div></div>';
       });
       html += '</div>';
     } else {
-      html += '<div style="padding:12px 14px;font-size:11px;color:var(--text-dim);">No Getty Provenance Index matches found.</div>';
+      html += '<div class="text-dim-11 p-12-14">No Getty Provenance Index matches found.</div>';
     }
 
     wrap.innerHTML = html;
@@ -476,7 +476,18 @@ window.runDBQuery = function() {
     wrap.style.display = 'block';
     wrap.innerHTML = '<div class="db-loading">Cross-referencing Getty \u00b7 INTERPOL \u00b7 Art Loss Register</div>';
   }
-  window.DatabaseQuery.search(r.title, r.artist, r.period);
+  // Show spinner on button
+  var spinner = document.getElementById('db-query-spinner');
+  if (spinner) spinner.style.display = 'inline-block';
+  var btn = document.getElementById('db-query-btn');
+  if (btn) btn.style.opacity = '0.7';
+  window.DatabaseQuery.search(r.title, r.artist, r.period).then(function() {
+    if (spinner) spinner.style.display = 'none';
+    if (btn) btn.style.opacity = '1';
+  }).catch(function() {
+    if (spinner) spinner.style.display = 'none';
+    if (btn) btn.style.opacity = '1';
+  });
 };
 
 // ── PROVENANCE CROSS-REFERENCE CHECK (uses structured API results) ────
@@ -490,10 +501,49 @@ window.ProvenanceCheck = {
       return Promise.resolve(null);
     }
     var wrap = document.getElementById('provenance-results');
+    var stageTimeouts = [];
     if (wrap) {
       wrap.style.display = 'block';
-      wrap.innerHTML = '<div class="db-loading">Querying Getty ULAN \u00b7 GPI \u00b7 INTERPOL \u00b7 ALR \u00b7 AAMD</div>';
+      wrap.innerHTML = '<div class="provenance-stages" id="provenance-stages" style="padding:12px 14px;">' +
+        '<div class="ps-stage" data-stage="getty-ulan"><span class="ps-dot"></span>Getty ULAN SPARQL</div>' +
+        '<div class="ps-stage" data-stage="getty-gpi"><span class="ps-dot"></span>Getty Provenance Index</div>' +
+        '<div class="ps-stage" data-stage="interpol"><span class="ps-dot"></span>INTERPOL Check</div>' +
+        '<div class="ps-stage" data-stage="alr"><span class="ps-dot"></span>Art Loss Register</div>' +
+        '<div class="ps-stage" data-stage="aamd"><span class="ps-dot"></span>AAMD Nazi-Era Check</div>' +
+        '<div class="ps-stage" data-stage="unesco"><span class="ps-dot"></span>UNESCO 1970 Convention</div>' +
+        '</div>';
+      // Animate stages sequentially for visual progress feedback
+      var stages = ['getty-ulan', 'getty-gpi', 'interpol', 'alr', 'aamd', 'unesco'];
+      stages.forEach(function(id, i) {
+        var delay = i < 2 ? 500 + i * 2000 : 3500 + (i - 2) * 800;
+        var tid = setTimeout(function() {
+          var el = wrap.querySelector('[data-stage="' + id + '"]');
+          if (el) {
+            if (i < 3) {
+              el.className = 'ps-stage ps-active';
+            } else {
+              el.className = 'ps-stage ps-done';
+            }
+          }
+        }, delay);
+        stageTimeouts.push(tid);
+      });
     }
+
+    // ── Cancel stage timers when response arrives ──
+    function cancelStages() {
+      stageTimeouts.forEach(function(tid) { clearTimeout(tid); });
+      stageTimeouts = [];
+      var stagesEl = document.getElementById('provenance-stages');
+      if (stagesEl) {
+        Array.prototype.forEach.call(stagesEl.querySelectorAll('.ps-stage'), function(el) {
+          el.className = 'ps-stage ps-done';
+        });
+      }
+    }
+
+    // Store cancel function on the promise for cleanup
+    this._cancelStages = cancelStages;
     try {
       var res = await fetch(apiBase + '/api/provenance/cross-reference', {
         method: 'POST',
@@ -508,11 +558,14 @@ window.ProvenanceCheck = {
       });
       var data = await res.json();
       this.results = data;
+      // Cancel progress stages and render results
+      if (this._cancelStages) this._cancelStages();
       this.render(data);
       return data;
     } catch (e) {
+      if (this._cancelStages) this._cancelStages();
       if (wrap) {
-        wrap.innerHTML = '<div style="padding:14px;color:var(--red-lt);font-size:11px;">Error: ' + window.esc(e.message) + '</div>';
+        wrap.innerHTML = '<div class="error-msg">Error: ' + window.esc(e.message) + '</div>';
       }
       return null;
     }
@@ -523,7 +576,7 @@ window.ProvenanceCheck = {
     if (!wrap) return;
 
     if (!data || !data.databases) {
-      wrap.innerHTML = '<div style="padding:14px;color:var(--text-dim);font-size:11px;">No provenance data returned.</div>';
+      wrap.innerHTML = '<div class="text-dim-11" style="padding:14px;">No provenance data returned.</div>';
       return;
     }
 
@@ -540,8 +593,8 @@ window.ProvenanceCheck = {
       var isReal = info.real;
       var color = isReal ? 'var(--green-lt)' : 'var(--gold-dim)';
       var text = isReal ? 'LIVE' : 'SIMULATED';
-      return '<span style="font-size:7px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid ' + color + ';color:' + color + ';border-radius:2px;">' +
-        '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + color + ';margin-right:4px;vertical-align:middle;"></span>' +
+      return '<span class="live-badge" style="border-color:' + color + ';color:' + color + '">' +
+        '<span class="status-dot" style="background:' + color + '"></span>' +
         window.esc(label) + ' ' + text + '</span>';
     }
 
@@ -551,9 +604,9 @@ window.ProvenanceCheck = {
     // API Badges header
     html += '<div class="provenance-panel" style="margin-top:8px;background:var(--surface);border:1px solid var(--border);">' +
       '<div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;justify-content:space-between;align-items:center;">' +
-      '<span style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;">Provenance Check</span>' +
-      '<span style="font-size:8px;color:var(--text-ghost);font-family:var(--font-mono);">' + dateStr + ' ' + timeStr + '</span></div>' +
-      '<div style="padding:8px 14px;display:flex;gap:5px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--bg2);">' +
+      '<span class="section-label-8">Provenance Check</span>' +
+      '<span class="text-mono-ghost">' + dateStr + ' ' + timeStr + '</span></div>' +
+      '<div class="flex-gap-wrap-bg">' +
       badge('gettyUlan', 'Getty ULAN') + badge('gettyProvenance', 'GPI') + badge('interpol', 'INTERPOL') + badge('alr', 'ALR') + badge('aamd', 'AAMD') + badge('unesco', 'UNESCO') +
       '</div>';
 
@@ -561,28 +614,28 @@ window.ProvenanceCheck = {
     var alerts = (data.summary && data.summary.alerts) || 0;
     var total = (data.summary && data.summary.totalChecks) || 5;
     html += '<div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">' +
-      '<div><span style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;">Status</span>' +
+      '<div><span class="text-uppercase">Status</span>' +
       '<div style="font-size:13px;font-weight:600;margin-top:2px;color:' + (alerts > 0 ? 'var(--red-lt)' : 'var(--green-lt)') + ';">' +
       (alerts > 0 ? '\u26a0 ' + alerts + ' Alert' + (alerts > 1 ? 's' : '') : '\u2713 Clear') + '</div></div>' +
-      '<div style="text-align:right;"><span style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;">Real APIs</span>' +
+      '<div style="text-align:right;"><span class="text-uppercase">Real APIs</span>' +
       '<div style="font-size:13px;font-weight:600;margin-top:2px;color:var(--text-mid);">' + Object.keys(apis).filter(function(k) { return apis[k].real; }).length + '/' + Object.keys(apis).length + '</div></div></div>';
 
     // Getty ULAN Artist Results
     var ulanArtists = dbs.getty && dbs.getty.artist ? dbs.getty.artist : [];
     html += '<div style="border-bottom:1px solid var(--border);">' +
-      '<div style="padding:8px 14px;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="var n=this.nextElementSibling;n.style.display=n.style.display===\'none\'?\'block\':\'none\'">' +
+      '<div class="kg-section-toggle" style="padding:8px 14px;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between;align-items:center;cursor:pointer;">' +
       'Getty ULAN Artist' +
-      '<span style="font-size:9px;color:var(--text-ghost);">' + ulanArtists.length + ' result' + (ulanArtists.length !== 1 ? 's' : '') + ' \u25be</span></div>' +
-      '<div style="padding:6px 14px 10px;display:' + (ulanArtists.length > 0 ? 'block' : 'none') + ';">';
+      '<span class="text-ghost">' + ulanArtists.length + ' result' + (ulanArtists.length !== 1 ? 's' : '') + ' \u25be</span></div>' +
+      '<div class="kg-section-content" style="display:' + (ulanArtists.length > 0 ? 'block' : 'none') + ';">';
 
     if (ulanArtists.length === 0) {
-      html += '<div style="font-size:10px;color:var(--text-dim);padding:4px 0;">No ULAN artist matches.</div>';
+      html += '<div class="text-dim-10 p-4-0">No ULAN artist matches.</div>';
     } else {
       ulanArtists.slice(0, 5).forEach(function(a) {
         var lifespan = [a.birth, a.death].filter(Boolean).join('\u2013');
-        var mockTag = a.isMock ? '<span style="font-size:7px;color:var(--gold-dim);margin-left:4px;">(sim)</span>' : '<span style="font-size:7px;color:var(--green-lt);margin-left:4px;">(live)</span>';
+        var mockTag = a.isMock ? '<span class="text-gold-dim text-xs ml-4">(sim)</span>' : '<span class="text-green-lt text-xs ml-4">(live)</span>';
         html += '<div style="padding:6px 8px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border2);">' +
-          '<div style="font-size:11px;color:var(--text);font-weight:500;">' + window.esc(a.name || '') + mockTag + '</div>' +
+          '<div class="text-sm text-bold" style="color:var(--text);">' + window.esc(a.name || '') + mockTag + '</div>' +
           '<div style="font-size:8px;color:var(--text-dim);margin-top:2px;">' + (a.role || 'artist') + (lifespan ? ' \u00b7 ' + window.esc(lifespan) : '') + (a.nationality ? ' \u00b7 ' + window.esc(a.nationality) : '') + '</div></div>';
       });
       if (ulanArtists.length > 5) {
@@ -594,21 +647,21 @@ window.ProvenanceCheck = {
     // Getty Provenance Index Results
     var gpiWorks = dbs.getty && dbs.getty.provenance ? dbs.getty.provenance : [];
     html += '<div style="border-bottom:1px solid var(--border);">' +
-      '<div style="padding:8px 14px;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="var n=this.nextElementSibling;n.style.display=n.style.display===\'none\'?\'block\':\'none\'">' +
+      '<div class="kg-section-toggle" style="padding:8px 14px;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between;align-items:center;cursor:pointer;">' +
       'Getty Provenance Index' +
-      '<span style="font-size:9px;color:var(--text-ghost);">' + gpiWorks.length + ' result' + (gpiWorks.length !== 1 ? 's' : '') + ' \u25be</span></div>' +
-      '<div style="padding:6px 14px 10px;display:' + (gpiWorks.length > 0 ? 'block' : 'none') + ';">';
+      '<span class="text-ghost">' + gpiWorks.length + ' result' + (gpiWorks.length !== 1 ? 's' : '') + ' \u25be</span></div>' +
+      '<div class="kg-section-content kg-section-content" style="display:' + (gpiWorks.length > 0 ? 'block' : 'none') + ';">';
 
     if (gpiWorks.length === 0) {
-      html += '<div style="font-size:10px;color:var(--text-dim);padding:4px 0;">No provenance records found.</div>';
+      html += '<div class="text-dim-10 p-4-0">No provenance records found.</div>';
     } else {
       gpiWorks.slice(0, 5).forEach(function(w) {
-        var mockTag = w.isMock ? '<span style="font-size:7px;color:var(--gold-dim);margin-left:4px;">(sim)</span>' : '<span style="font-size:7px;color:var(--green-lt);margin-left:4px;">(live)</span>';
+        var mockTag = w.isMock ? '<span class="text-gold-dim text-xs ml-4">(sim)</span>' : '<span class="text-green-lt text-xs ml-4">(live)</span>';
         html += '<div style="padding:6px 8px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border2);">' +
-          '<div style="font-size:11px;color:var(--text);font-weight:500;">' + window.esc(w.title || '') + mockTag + '</div>' +
+          '<div class="text-sm text-bold" style="color:var(--text);">' + window.esc(w.title || '') + mockTag + '</div>' +
           '<div style="font-size:9px;color:var(--text-dim);margin-top:2px;">' + window.esc(w.artist || '') + (w.year ? ', ' + w.year : '') + '</div>' +
           (w.currentLocation ? '<div style="font-size:8px;color:var(--text-ghost);margin-top:2px;">' + window.esc(w.currentLocation) + '</div>' : '') +
-          (w.ref ? '<div style="font-size:7px;color:var(--text-ghost);margin-top:2px;font-family:var(--font-mono);">Ref: ' + window.esc(w.ref) + '</div>' : '') +
+          (w.ref ? '<div class="text-mono-ghost-small">Ref: ' + window.esc(w.ref) + '</div>' : '') +
           '</div>';
       });
       if (gpiWorks.length > 5) {
@@ -616,6 +669,23 @@ window.ProvenanceCheck = {
       }
     }
     html += '</div></div>';
+
+    // Wire collapsible sections via delegation — replace inline onclick
+    (function() {
+      var wrap = document.getElementById('provenance-results');
+      if (wrap && !wrap._provenanceToggleBound) {
+        wrap._provenanceToggleBound = true;
+        wrap.addEventListener('click', function(e) {
+          var toggle = e.target.closest('.kg-section-toggle');
+          if (toggle) {
+            var content = toggle.parentElement ? toggle.parentElement.querySelector('.kg-section-content') : null;
+            if (content) {
+              content.style.display = content.style.display === 'none' ? 'block' : 'none';
+            }
+          }
+        });
+      }
+    })();
 
     // Database Checks: INTERPOL, ALR, AAMD, UNESCO
     var dbChecks = [
@@ -625,7 +695,7 @@ window.ProvenanceCheck = {
       { key: 'unesco', label: 'UNESCO 1970 Convention', data: dbs.unesco, color: function(d) { return d && d.flagged ? 'var(--red-lt)' : 'var(--green-lt)'; }, status: function(d) { return d && d.flagged ? 'FLAGGED' : 'CLEAR'; } }
     ];
 
-    html += '<div style="padding:10px 14px;">';
+    html += '<div class="px-14 py-10">';
     dbChecks.forEach(function(c) {
       var d = c.data || {};
       var clr = c.color(d);
@@ -634,12 +704,12 @@ window.ProvenanceCheck = {
       var det = d.detail || '';
       var mockTag = d && d.isMock ? '<span style="font-size:7px;color:var(--gold-dim);margin-left:6px;">(simulated)</span>' : '';
       html += '<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border2);">' +
-        '<div style="width:8px;height:8px;border-radius:50%;background:' + clr + ';margin-top:3px;flex-shrink:0;"></div>' +
-        '<div style="flex:1;min-width:0;">' +
+        '<div class="db-dot-sm" style="background:' + clr + '"></div>' +
+        '<div class="flex-1">' +
         '<div style="font-size:9px;color:var(--text);font-weight:500;">' + window.esc(c.label) + mockTag + '</div>' +
         '<div style="font-size:10px;color:' + clr + ';font-weight:600;font-family:var(--font-mono);margin-top:1px;">' + st + '</div>' +
         (det ? '<div style="font-size:9px;color:var(--text-dim);margin-top:2px;line-height:1.4;">' + window.esc(det) + '</div>' : '') +
-        (ref ? '<div style="font-size:7px;color:var(--text-ghost);margin-top:2px;font-family:var(--font-mono);">Ref: ' + window.esc(ref) + '</div>' : '') +
+        (ref ? '<div class="text-mono-ghost-small">Ref: ' + window.esc(ref) + '</div>' : '') +
         '</div></div>';
     });
 
@@ -656,7 +726,7 @@ window.ProvenanceCheck = {
     html += '</div>';
 
     // Footer with checked timestamp
-    html += '<div style="padding:6px 14px;border-top:1px solid var(--border);background:var(--bg2);font-size:7px;color:var(--text-ghost);display:flex;justify-content:space-between;">' +
+    html += '<div class="provenance-footer">' +
       '<span>Checked: ' + dateStr + ' ' + timeStr + '</span>' +
       '<span>' + (data.realApisEnabled ? 'Live API mode' : 'Simulated mode') + '</span></div>';
 
@@ -672,8 +742,14 @@ window.runProvenanceCheck = function() {
   if (!r) { window.toast('No analysis to cross-reference'); return; }
   var btn = document.getElementById('provenance-btn');
   if (btn) btn.style.opacity = '0.5';
+  var spinner = document.getElementById('provenance-btn-spinner');
+  if (spinner) spinner.style.display = 'inline-block';
   window.ProvenanceCheck.search(r.title, r.artist, r.timeline, window.TIER).then(function() {
     if (btn) btn.style.opacity = '1';
+    if (spinner) spinner.style.display = 'none';
+  }).catch(function() {
+    if (btn) btn.style.opacity = '1';
+    if (spinner) spinner.style.display = 'none';
   });
 };
 
@@ -722,7 +798,7 @@ window.MSSpectral = {
     msPanel.className = 'ms-layers';
 
     if (this.bands.length === 0) {
-      msPanel.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:12px;">Import UV, IR, or X-Ray images to compare spectral bands.</div>';
+      msPanel.innerHTML = '<div class="empty-state-md" style="padding:20px;">Import UV, IR, or X-Ray images to compare spectral bands.</div>';
     } else {
       this.bands.forEach(function(band, i) {
         var colors = ['#5AAA78', '#8B5CF6', '#3B82F6', '#EF4444'];
@@ -732,10 +808,21 @@ window.MSSpectral = {
           '<img class="ms-layer-vis" src="' + band.data + '" alt="' + window.esc(band.name) + '">' +
           '<div class="ms-blend-controls"><span class="ms-blend-label">Opacity</span>' +
           '<input type="range" class="ms-blend-slider" min="0" max="100" value="' + Math.round(band.opacity * 100) + '" ' +
-          'oninput="window.MSSpectral.setOpacity(' + i + ', this.value/100)"></div></div>';
+          'data-ms-opacity="' + i + '"></div></div>';
       });
     }
     wrap.parentNode.insertBefore(msPanel, wrap);
+    // Wire opacity slider changes via delegation
+    if (!msPanel._msSliderBound) {
+      msPanel._msSliderBound = true;
+      msPanel.addEventListener('input', function(e) {
+        var slider = e.target.closest('[data-ms-opacity]');
+        if (slider && typeof window.MSSpectral !== 'undefined') {
+          var idx = parseInt(slider.dataset.msOpacity, 10);
+          window.MSSpectral.setOpacity(idx, slider.value / 100);
+        }
+      });
+    }
   },
 
   setOpacity(idx, val) {

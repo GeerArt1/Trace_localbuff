@@ -7,6 +7,40 @@ const { sendJSON, log, logError } = require('./helpers');
 // ── SPARQL query timeout (ms) ──
 const SPARQL_TIMEOUT = 20000;
 
+// ── SPARQL result cache (in-memory, TTL-based) ──
+const sparqlCache = new Map();
+const SPARQL_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const SPARQL_CACHE_MAX = 50;
+
+function getCachedResult(key) {
+  var entry = sparqlCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    sparqlCache.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+function setCachedResult(key, data) {
+  if (sparqlCache.size >= SPARQL_CACHE_MAX) {
+    // Evict oldest entry
+    var oldestKey = sparqlCache.keys().next().value;
+    sparqlCache.delete(oldestKey);
+  }
+  sparqlCache.set(key, { data: data, expiresAt: Date.now() + SPARQL_CACHE_TTL });
+}
+
+// ── Deterministic seeded hash (simple DJB2) ──
+function seededHash(str) {
+  var hash = 5381;
+  for (var i = 0; i < (str || '').length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+}
+
 module.exports = function(ctx) {
   const { db, checkRateLimitWithHeaders } = ctx;
 
@@ -24,6 +58,14 @@ module.exports = function(ctx) {
   // ── SPARQL helper: query a Getty SPARQL endpoint ──
   // Defaults to Getty Vocabularies (ULAN). Pass a custom endpoint for GPI.
   function sparqlQuery(sparql, endpoint) {
+    // Check cache first
+    var cacheKey = (endpoint || 'https://vocab.getty.edu/sparql') + '|' + sparql;
+    var cached = getCachedResult(cacheKey);
+    if (cached) {
+      log('INFO', 'SPARQL cache hit: ' + sparql.slice(0, 60) + '…');
+      return Promise.resolve(JSON.parse(JSON.stringify(cached)));
+    }
+
     return new Promise(function(resolve, reject) {
       var encoded = encodeURIComponent(sparql);
       endpoint = endpoint || 'https://vocab.getty.edu/sparql';
@@ -41,7 +83,10 @@ module.exports = function(ctx) {
             return;
           }
           try {
-            resolve(JSON.parse(data));
+            var parsed = JSON.parse(data);
+            // Cache the result
+            setCachedResult(cacheKey, parsed);
+            resolve(parsed);
           } catch (e) {
             reject(new Error('SPARQL JSON parse error'));
           }
@@ -333,8 +378,10 @@ module.exports = function(ctx) {
   }
 
   // ── INTERPOL Stolen Works Database Check — simulated; real access requires institutional application ──
+  // Uses a simple string-hash-based seed for deterministic output
   function checkINTERPOL(title, artist) {
-    var isMatch = Math.random() > 0.85;
+    var hash = seededHash((title || '') + '|' + (artist || '') + '|interpol');
+    var isMatch = hash % 10 >= 8; // ~20% match rate
     if (!isMatch) {
       return {
         status: 'CLEAR',
@@ -363,7 +410,8 @@ module.exports = function(ctx) {
       { title: 'Terra Cotta Votive Head', artist: 'Nok Culture, Nigeria', year: '2019', ref: 'SWD-19109', detail: 'Smuggled through international art market, recovered 2024 in London' },
       { title: 'Silk Embroidered Screen', artist: 'Chinese, Ming Dynasty', year: '2013', ref: 'SWD-13355', detail: 'Reported stolen from museum store, Beijing 2013' },
     ];
-    var match = mockMatches[Math.floor(Math.random() * mockMatches.length)];
+    var idx = hash % mockMatches.length;
+    var match = mockMatches[idx];
     return {
       status: 'ALERT',
       database: 'INTERPOL Stolen Works Database',
@@ -380,7 +428,8 @@ module.exports = function(ctx) {
 
   // ── Art Loss Register (ALR) Search — simulated; requires paid subscription ──
   function checkArtLossRegister(title, artist) {
-    var isMatch = Math.random() > 0.9;
+    var hash = seededHash((title || '') + '|' + (artist || '') + '|alr');
+    var isMatch = hash % 10 >= 9; // ~10% match rate
     if (!isMatch) {
       return {
         status: 'CLEAR',
@@ -392,10 +441,11 @@ module.exports = function(ctx) {
         isMock: true
       };
     }
+    var refNum = 'ALR-' + String(10000 + (hash % 90000));
     return {
       status: 'FLAGGED',
       database: 'Art Loss Register (ALR)',
-      reference: 'ALR-' + Math.floor(Math.random() * 90000 + 10000),
+      reference: refNum,
       detail: 'Similar work was reported lost in 2016. Further verification recommended.',
       matched: true,
       checkedAt: new Date().toISOString(),
@@ -424,22 +474,22 @@ module.exports = function(ctx) {
         }
       }
     }
-    // Add a small random element only when no timeline events are present
-    if (!naziPeriodGap && (!events || events.length === 0) && Math.random() > 0.95) {
-      naziPeriodGap = true;
-      gapYears.push(1942);
+    // No random element — purely deterministic based on timeline data
+    if (!naziPeriodGap && (!events || events.length === 0)) {
+      // No timeline data means no flag (deterministic)
     }
+    var aamdHash = seededHash(JSON.stringify(events) + '|aamd');
     return {
       database: 'AAMD Nazi-Era Provenance Project',
       status: naziPeriodGap ? 'FLAG' : 'CLEAR',
-      reference: naziPeriodGap ? 'AAMD-' + Math.floor(Math.random() * 90000 + 10000) : '—',
+      reference: naziPeriodGap ? 'AAMD-' + String(10000 + (aamdHash % 90000)) : '—',
       detail: naziPeriodGap
         ? 'Provenance gap during 1933-1945 period. Further research recommended under Washington Conference Principles.'
         : 'No Nazi-era provenance concerns identified.',
       flagged: naziPeriodGap,
       flaggedYears: gapYears,
       checkedAt: new Date().toISOString(),
-      isMock: naziPeriodGap && (!events || events.length === 0) // only mock when randomly flagged
+      isMock: false // Now deterministic — no random involved
     };
   }
 

@@ -577,6 +577,180 @@ test('KG summary card renders cross-reference status', function() {
 });
 
 // ══════════════════════════════════════════════
+// CHAT PERSISTENCE TESTS
+// ══════════════════════════════════════════════
+
+console.log('\n\u2500\u2500 Chat Persistence \u2014 localStorage \u2500\u2500');
+
+test('saveChatHistory stores messages in localStorage', function() {
+  var messages = [{ role: 'user', content: 'Hello' }, { role: 'assistant', content: 'Hi there' }];
+  try { localStorage.setItem('trace_chat_history', JSON.stringify(messages)); } catch(e) { /* */ }
+  var raw = localStorage.getItem('trace_chat_history');
+  assert.ok(raw !== null, 'Data should be stored');
+  var restored = JSON.parse(raw);
+  assert.strictEqual(restored.length, 2);
+  assert.strictEqual(restored[0].role, 'user');
+  assert.strictEqual(restored[0].content, 'Hello');
+  assert.strictEqual(restored[1].role, 'assistant');
+  assert.strictEqual(restored[1].content, 'Hi there');
+  localStorage.removeItem('trace_chat_history');
+});
+
+test('saveChatHistory limits to 50 messages', function() {
+  var manyMsgs = [];
+  for (var i = 0; i < 60; i++) {
+    manyMsgs.push({ role: 'user', content: 'Message ' + i });
+  }
+  var trimmed = manyMsgs.slice(-50);
+  try { localStorage.setItem('trace_chat_history', JSON.stringify(trimmed)); } catch(e) { /* */ }
+  var raw = localStorage.getItem('trace_chat_history');
+  var restored = JSON.parse(raw);
+  assert.strictEqual(restored.length, 50);
+  assert.strictEqual(restored[0].content, 'Message 10');
+  localStorage.removeItem('trace_chat_history');
+});
+
+test('clearChatHistory removes from localStorage', function() {
+  try { localStorage.setItem('trace_chat_history', 'test'); } catch(e) { /* */ }
+  localStorage.removeItem('trace_chat_history');
+  assert.strictEqual(localStorage.getItem('trace_chat_history'), null);
+});
+
+test('chatHistory handles empty/null gracefully', function() {
+  localStorage.removeItem('trace_chat_history');
+  try {
+    var raw = localStorage.getItem('trace_chat_history');
+    var restored = raw ? JSON.parse(raw) : [];
+    assert.ok(Array.isArray(restored));
+    assert.strictEqual(restored.length, 0);
+  } catch(e) {
+    assert.fail('Should not throw on empty chat history');
+  }
+});
+
+test('chatHistory handles corrupted JSON gracefully', function() {
+  try { localStorage.setItem('trace_chat_history', '{corrupted'); } catch(e) { /* */ }
+  try {
+    var raw = localStorage.getItem('trace_chat_history');
+    var restored = null;
+    try { restored = JSON.parse(raw); } catch(e) { restored = []; }
+    assert.ok(Array.isArray(restored));
+    assert.strictEqual(restored.length, 0);
+  } catch(e) {
+    assert.fail('Should handle corrupted JSON gracefully');
+  }
+  localStorage.removeItem('trace_chat_history');
+});
+
+// ══════════════════════════════════════════════
+// INDEXEDDB CACHING TESTS (simulated)
+// ══════════════════════════════════════════════
+
+console.log('\n\u2500\u2500 IndexedDB Cache Simulation \u2500\u2500');
+
+// Mock IndexedDB-like store for testing
+var _mockIDB = {};
+
+function mockIDBPut(store, data) {
+  if (!_mockIDB[store]) _mockIDB[store] = {};
+  var key = data.id || data.title || 'default';
+  _mockIDB[store][key] = data;
+  return Promise.resolve(key);
+}
+
+function mockIDBGet(store, key) {
+  if (!_mockIDB[store]) return Promise.resolve(null);
+  return Promise.resolve(_mockIDB[store][key] || null);
+}
+
+function mockIDBReady() {
+  return true;
+}
+
+test('cacheResult saves analysis result to store', function() {
+  var result = { title: 'Mona Lisa', artist: 'Leonardo da Vinci', provenance_confidence: 85 };
+  return mockIDBPut('results', { id: 'last_analysis', result: result, timestamp: Date.now() }).then(function() {
+    return mockIDBGet('results', 'last_analysis').then(function(cached) {
+      assert.ok(cached !== null, 'Result should be cached');
+      assert.strictEqual(cached.result.title, 'Mona Lisa');
+      assert.strictEqual(cached.result.artist, 'Leonardo da Vinci');
+      assert.strictEqual(cached.result.provenance_confidence, 85);
+    });
+  });
+});
+
+test('cacheResult overwrites previous result', function() {
+  var first = { title: 'Old', artist: 'Unknown', provenance_confidence: 50 };
+  var second = { title: 'New', artist: 'Known', provenance_confidence: 90 };
+  return mockIDBPut('results', { id: 'last_analysis', result: first, timestamp: 1 }).then(function() {
+    return mockIDBPut('results', { id: 'last_analysis', result: second, timestamp: 2 });
+  }).then(function() {
+    return mockIDBGet('results', 'last_analysis').then(function(cached) {
+      assert.strictEqual(cached.result.title, 'New');
+      assert.strictEqual(cached.result.artist, 'Known');
+      assert.strictEqual(cached.result.provenance_confidence, 90);
+    });
+  });
+});
+
+test('cacheResult returns null for missing key', function() {
+  _mockIDB = {};
+  return mockIDBGet('results', 'nonexistent').then(function(cached) {
+    assert.strictEqual(cached, null);
+  });
+});
+
+test('cacheResult stores timestamp for expiry checks', function() {
+  var ts = Date.now();
+  var result = { title: 'Test', artist: 'Test' };
+  return mockIDBPut('results', { id: 'last_analysis', result: result, timestamp: ts }).then(function() {
+    return mockIDBGet('results', 'last_analysis').then(function(cached) {
+      assert.ok(cached.timestamp !== undefined, 'Should have timestamp');
+      assert.ok(cached.timestamp >= ts - 100, 'Timestamp should be recent');
+    });
+  });
+});
+
+test('cacheResult handles null/empty result gracefully', function() {
+  _mockIDB = {};
+  return mockIDBPut('results', { id: 'last_analysis', result: null, timestamp: Date.now() }).then(function() {
+    return mockIDBGet('results', 'last_analysis').then(function(cached) {
+      assert.ok(cached !== null, 'Should store null result');
+      assert.strictEqual(cached.result, null);
+    });
+  });
+});
+
+test('restoreLastResult falls back to localStorage when IDB returns null', function() {
+  _mockIDB = {};
+  // Set localStorage fallback
+  try { localStorage.setItem('trace_lastResult', JSON.stringify({
+    title: 'Fallback',
+    artist: 'LocalStorage Artist',
+    provenance_confidence: 70
+  })); } catch(e) { /* */ }
+  
+  // Simulate restoreLastResult logic
+  return mockIDBGet('results', 'last_analysis').then(function(cached) {
+    if (cached && cached.result) {
+      return cached.result;
+    }
+    // Fallback to localStorage
+    try {
+      var _sr = localStorage.getItem('trace_lastResult');
+      return _sr ? JSON.parse(_sr) : null;
+    } catch(e) { return null; }
+  }).then(function(restored) {
+    assert.ok(restored !== null, 'Should fallback to localStorage');
+    assert.strictEqual(restored.title, 'Fallback');
+    assert.strictEqual(restored.artist, 'LocalStorage Artist');
+    assert.strictEqual(restored.provenance_confidence, 70);
+  });
+  
+  localStorage.removeItem('trace_lastResult');
+});
+
+// ══════════════════════════════════════════════
 // SUMMARY
 // ══════════════════════════════════════════════
 

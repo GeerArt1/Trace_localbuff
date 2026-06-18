@@ -19,12 +19,13 @@ window.addCase = function addCase() {
   card.dataset.status = 'active';
   card.dataset.type = r.subject_type || 'artwork';
   card.dataset.saved = 'true';
-  card.innerHTML =
-    '<div class="card-inner" onclick="window.openCaseTimeline(\'' + window.escAttr(r.title || '') + '\',\'' + window.escAttr(r.artist || '') + '\',\'' + window.escAttr(r.subject_type || 'artwork') + '\')">' +
+  // Build card without inline onclick — use data attributes for delegation
+  var innerHtml = '<div class="card-inner" data-tl-title="' + window.escAttr(r.title || '') + '" data-tl-sub="' + window.escAttr(r.artist || '') + '" data-tl-type="' + window.escAttr(r.subject_type || 'artwork') + '">' +
     '<div class="card-title">' + window.esc(r.title || 'Unknown') + '</div>' +
     '<div class="card-attr">' + window.esc(r.artist || '') + (r.period ? ', ' + window.esc(r.period) : '') + '</div>' +
     '<div class="card-foot"><div class="cbar"><div class="cfill" style="width:' + conf + '%"></div></div><div class="pill pill-inv">Active</div></div></div>' +
     tlStrip;
+  card.innerHTML = innerHtml;
 
   var list = document.getElementById('cases-list');
   list.prepend(card);
@@ -62,13 +63,25 @@ window.showUpgradeCard = window.showUpgradeCard || function showUpgradeCard(key)
   var overlay = document.createElement('div');
   overlay.id = 'upgrade-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(5,4,3,0.7);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
-  overlay.innerHTML =
-    '<div style="background:var(--surface);border:1px solid var(--border-strong);padding:28px 24px;max-width:360px;width:100%;text-align:center;">' +
-    '<div style="font-size:36px;color:var(--gold);margin-bottom:12px;">\u25C8</div>' +
-    '<div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;font-weight:400;color:var(--text);margin-bottom:10px;">' + card.title + '</div>' +
-    '<div style="font-size:12px;line-height:1.7;color:var(--text-mid);margin-bottom:20px;">' + card.body + '</div>' +
-    '<button onclick="this.closest(\'#upgrade-overlay\').remove();if(typeof TRACE_SUB !== \'undefined\')TRACE_SUB.showUpgradeFlow(\'' + card.tier + '\')" style="width:100%;background:var(--gold);color:#060402;border:none;padding:14px;font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;">UPGRADE NOW</button>' +
-    '<button onclick="this.closest(\'#upgrade-overlay\').remove()" style="background:none;border:none;color:var(--text-dim);padding:10px;font-family:Montserrat,sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;">Maybe later</button></div>';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:var(--surface);border:1px solid var(--border-strong);padding:28px 24px;max-width:360px;width:100%;text-align:center;';
+  box.innerHTML = '<div style="font-size:36px;color:var(--gold);margin-bottom:12px;">\u25C8</div>' +
+    '<div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:400;color:var(--text);margin-bottom:10px;">' + window.esc(card.title) + '</div>' +
+    '<div style="font-size:12px;line-height:1.7;color:var(--text-mid);margin-bottom:20px;">' + window.esc(card.body) + '</div>';
+  var upBtn = document.createElement('button');
+  upBtn.textContent = 'UPGRADE NOW';
+  upBtn.style.cssText = 'width:100%;background:var(--gold);color:#060402;border:none;padding:14px;font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;';
+  upBtn.addEventListener('click', function() {
+    overlay.remove();
+    if (typeof TRACE_SUB !== 'undefined') TRACE_SUB.showUpgradeFlow(card.tier);
+  });
+  var laterBtn = document.createElement('button');
+  laterBtn.textContent = 'Maybe later';
+  laterBtn.style.cssText = 'background:none;border:none;color:var(--text-dim);padding:10px;font-family:Montserrat,sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;';
+  laterBtn.addEventListener('click', function() { overlay.remove(); });
+  box.appendChild(upBtn);
+  box.appendChild(laterBtn);
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
 };
 

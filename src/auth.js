@@ -110,14 +110,19 @@ function authRegister() {
       if (d.ok) {
         sessionStorage.setItem('trace_auth_token', d.token);
         sessionStorage.setItem('trace_auth_user', JSON.stringify(d.user));
-        // Store CSRF token from response
         if (d.csrfToken) sessionStorage.setItem('trace_csrf_token', d.csrfToken);
         window.TRACE_AUTH.hideAuthScreen();
-        if (d.user.tier && typeof setTier === 'function') setTier(d.user.tier);
+        // Navigate to home even if setTier throws
+        try {
+          if (d.user.tier && typeof setTier === 'function') setTier(d.user.tier);
+        } catch(e) { console.warn('[Auth] setTier error:', e); }
+        if (typeof window.nav === 'function') {
+          window.nav('home');
+        }
       } else {
         errEl.textContent = d.error || 'Registration failed';
       }
-    } catch(e) { errEl.textContent = 'Server error'; }
+    } catch(e) { console.error('[Auth] Register error:', e); errEl.textContent = 'Server error'; }
   };
   xhr.onerror = function() { errEl.textContent = 'Connection failed — is the server running?'; };
   xhr.send(JSON.stringify({ name: name, email: email, password: password }));
@@ -140,14 +145,19 @@ function authLogin() {
       if (d.ok) {
         sessionStorage.setItem('trace_auth_token', d.token);
         sessionStorage.setItem('trace_auth_user', JSON.stringify(d.user));
-        // Store CSRF token from response
         if (d.csrfToken) sessionStorage.setItem('trace_csrf_token', d.csrfToken);
         window.TRACE_AUTH.hideAuthScreen();
-        if (d.user.tier && typeof setTier === 'function') setTier(d.user.tier);
+        // Navigate to home even if setTier throws
+        try {
+          if (d.user.tier && typeof setTier === 'function') setTier(d.user.tier);
+        } catch(e) { console.warn('[Auth] setTier error:', e); }
+        if (typeof window.nav === 'function') {
+          window.nav('home');
+        }
       } else {
         errEl.textContent = d.error || 'Invalid email or password';
       }
-    } catch(e) { errEl.textContent = 'Server error'; }
+    } catch(e) { console.error('[Auth] Login error:', e); errEl.textContent = 'Server error'; }
   };
   xhr.onerror = function() { errEl.textContent = 'Connection failed — is the server running?'; };
   xhr.send(JSON.stringify({ email: email, password: password }));

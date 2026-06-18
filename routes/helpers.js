@@ -93,7 +93,7 @@ function setSecurityHeaders(res, req, allowedOrigin) {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com; " +
     "img-src 'self' data: blob:; " +
-    "connect-src 'self' http://localhost:* http://127.0.0.1:* https://api.anthropic.com; " +
+    "connect-src 'self' http://localhost:* http://127.0.0.1:* https://api.anthropic.com https://generativelanguage.googleapis.com; " +
     "media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; " +
     "frame-ancestors 'none';");
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);

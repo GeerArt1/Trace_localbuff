@@ -65,6 +65,14 @@ module.exports = function(ctx) {
         });
       }
 
+      // SAFETY: cmd comes from ops/error-patterns.json — a curated file of predefined safe commands.
+      // Never allow user-supplied input to reach exec(). Only pattern-matched commands are executed.
+      // Block: ; (command injection), $( (command substitution), backticks (subshell)
+      // Allow: | (pipe — used in patterns like "lsof -ti:3000 | xargs kill -9")
+      if (cmd.indexOf(';') >= 0 || cmd.indexOf('$(') >= 0 || cmd.indexOf('`') >= 0) {
+        logAgent('auto_fix_blocked', 'Blocked dangerous command: ' + cmd.slice(0, 80), {});
+        return resolve({ executed: false, reason: 'Command blocked by security filter', command: cmd, output: '' });
+      }
       exec(cmd, opts, function(err, stdout, stderr) {
         if (err) {
           logAgent('auto_fix_failed', 'Fix failed: ' + cmd, {

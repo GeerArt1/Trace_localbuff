@@ -116,10 +116,22 @@
     });
   }
 
+  // ── Show a toast notification for user-facing feedback ──
+  function showToast(msg) {
+    if (typeof window.toast === 'function') {
+      try { window.toast(msg); } catch(e) { /* toast may not be ready yet */ }
+    }
+  }
+
   // ── Public: Report an event to the watchdog ──
   function report(type, source, message, detail) {
     var entry = createReport(type, source, message, detail);
     addToState(entry);
+
+    // Show user-facing toast for errors
+    if (type === 'error') {
+      showToast('⚠ ' + source + ': ' + String(message || 'error').slice(0, 80));
+    }
 
     // Add to pending batch for next flush
     pendingBatch.push(entry);
@@ -194,9 +206,30 @@
     report('warning', 'Watchdog', 'Connection lost — queuing reports');
   });
 
+  // ── Periodic health check (client→server) ──
+  function startHealthCheck() {
+    var proxy = window.TRACE_API_PROXY || '';
+    if (!proxy) return; // No server to check
+    function ping() {
+      fetch(proxy + '/health', { method: 'GET', headers: { 'Accept': 'application/json' } })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.status === 'shutting_down') {
+            showToast('⚠ Server is shutting down');
+          }
+        })
+        .catch(function() {
+          // Silent — server may be temporarily unreachable
+        });
+    }
+    ping();
+    setInterval(ping, 30000); // Check every 30s
+  }
+
   // ── Init: auto-start (called by registry lifecycle) ──
   function init() {
     startFlushTimer();
+    startHealthCheck();
 
     // Report app startup
     report('info', 'Watchdog', 'Watchdog initialized', {

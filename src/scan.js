@@ -283,6 +283,33 @@ window.analyse = async function analyse() {
     });
   }
 
+  // ── Fetch with retry (exponential backoff, max 3 attempts) ──
+  async function fetchWithRetry(url, options, retries) {
+    retries = retries || 3;
+    var lastErr;
+    for (var attempt = 0; attempt < retries; attempt++) {
+      try {
+        var resp = await fetch(url, options);
+        if (resp.ok) return resp;
+        // 429 (rate limit) or 5xx — retry
+        if ((resp.status === 429 || resp.status >= 500) && attempt < retries - 1) {
+          lastErr = new Error('HTTP ' + resp.status);
+          var delay = Math.min(1000 * Math.pow(2, attempt), 8000);
+          await new Promise(function(r) { setTimeout(r, delay); });
+          continue;
+        }
+        return resp;
+      } catch (e) {
+        lastErr = e;
+        if (attempt < retries - 1) {
+          var delay = Math.min(1000 * Math.pow(2, attempt), 8000);
+          await new Promise(function(r) { setTimeout(r, delay); });
+        }
+      }
+    }
+    throw lastErr || new Error('Fetch failed after ' + retries + ' retries');
+  }
+
   try {
     var apiBase = window.TRACE_API_PROXY || '';
     var apiUrl = apiBase ? apiBase + '/analyse' : 'https://api.anthropic.com/v1/messages';
@@ -306,7 +333,7 @@ window.analyse = async function analyse() {
         ? 'Investigate this ' + window._hwImageType + ' image. This is a specialized capture: ' + window._hwImageType + '. Adjust analysis accordingly. Build full provenance from creation to present day.'
         : 'Investigate this image. Build full provenance from creation to present day.');
 
-    var res = await fetch(apiUrl, {
+    var res = await fetchWithRetry(apiUrl, {
       method: 'POST',
       headers: apiHeaders,
       signal: _scanAbortController.signal,
@@ -385,6 +412,40 @@ window.analyse = async function analyse() {
       };
     }
 
+    // Clear chat history from previous session — fresh scan, fresh context
+    try {
+      localStorage.removeItem('trace_chat_history');
+      window._chatHistory = [];
+    } catch(e) { TRACE_WATCHDOG?.warn('Scan', e); }
+
+    // Cache result in IndexedDB for offline recovery
+    // Handles DB not-yet-ready by queuing the write directly
+    function cacheResultToIDB(res) {
+      if (typeof window.IDB === 'undefined') return;
+      var doCache = function() {
+        window.IDB.put('results', {
+          id: 'last_analysis',
+          result: res,
+          timestamp: Date.now(),
+          tier: window.TIER
+        }).catch(function() { /* non-critical */ });
+      };
+      if (window.IDB.ready && window.IDB.ready()) {
+        doCache();
+      } else {
+        // DB not ready yet — wait for it, then cache
+        var pollInterval = setInterval(function() {
+          if (window.IDB.ready && window.IDB.ready()) {
+            clearInterval(pollInterval);
+            doCache();
+          }
+        }, 100);
+        // Safety timeout after 10 seconds
+        setTimeout(function() { clearInterval(pollInterval); }, 10000);
+      }
+    }
+    if (result) cacheResultToIDB(result);
+
     // Store result
     if (result && result.title) {
       var _t2 = result.title;
@@ -420,7 +481,18 @@ window.analyse = async function analyse() {
     _done();
     var eb = document.getElementById('main-err');
     if (eb) {
-      eb.textContent = '\u26a0 ' + (err.message || 'Analysis failed. Please try again.');
+      var msgEl = document.getElementById('main-err-msg');
+      if (msgEl) msgEl.textContent = '\u26a0 ' + (err.message || 'Analysis failed. Please try again.');
+      var retryBtn = document.getElementById('main-err-retry');
+      if (retryBtn) {
+        retryBtn.style.display = 'inline-block';
+        retryBtn.addEventListener('click', function() {
+          // Re-run analysis
+          eb.classList.remove('on');
+          retryBtn.style.display = 'none';
+          setTimeout(function() { if (typeof window.analyse === 'function') window.analyse(); }, 100);
+        });
+      }
       eb.classList.add('on');
     }
 
@@ -640,7 +712,7 @@ window.shareResult = function shareResult() {
   if (!r) return;
   var txt = (r.title || 'Discovery') + ' — identified by TRACE\n\n' + (r.the_story || r.style_analysis || r.professional_assessment || '');
   if (navigator.share) {
-    navigator.share({ title: r.title || 'TRACE', text: txt }).catch(function() {});
+    navigator.share({ title: r.title || 'TRACE', text: txt }).catch(function() { /* Web Share API may not be supported */ });
   } else if (navigator.clipboard) {
     navigator.clipboard.writeText(txt).then(function() { window.toast('Copied to clipboard'); });
   } else {
