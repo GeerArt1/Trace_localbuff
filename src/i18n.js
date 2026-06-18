@@ -623,7 +623,7 @@ window.initLangPicker = function initLangPicker() {
         this.style.borderColor = 'var(--border-mid)';
       }
     };
-    btn.onclick = function() {
+    btn.addEventListener('click', function() {
       window.setLanguage(this.dataset.lang);
       // Update current display
       var currentEl = document.getElementById('lang-current');
@@ -643,7 +643,7 @@ window.initLangPicker = function initLangPicker() {
           b.style.borderColor = 'var(--border-mid)';
         }
       });
-    };
+    });
     container.appendChild(btn);
   });
 };

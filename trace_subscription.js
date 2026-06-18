@@ -225,7 +225,7 @@ var TRACE_SUB = (function() {
     var licBtn = document.createElement('button');
     licBtn.textContent = 'ACTIVATE LICENSE';
     licBtn.style.cssText = 'width:100%;background:var(--gold);color:#060402;border:none;padding:12px;font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .18s;';
-    licBtn.onclick = function() {
+    licBtn.addEventListener('click', function() {
       var key = licInput.value.trim();
       if (!key) { licStatus.textContent = 'Please enter a license key'; return; }
       licBtn.disabled = true;
@@ -245,7 +245,7 @@ var TRACE_SUB = (function() {
           licBtn.textContent = 'ACTIVATE LICENSE';
         }
       });
-    };
+    });
 
     sectionKey.appendChild(licInput);
     sectionKey.appendChild(licStatus);
@@ -263,7 +263,7 @@ var TRACE_SUB = (function() {
     var dismissBtn = document.createElement('button');
     dismissBtn.textContent = 'Cancel';
     dismissBtn.style.cssText = 'background:none;border:none;color:var(--text-dim);padding:10px 0 0;font-family:\'Montserrat\',sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;text-align:center;';
-    dismissBtn.onclick = function() { overlay.remove(); };
+    dismissBtn.addEventListener('click', function() { overlay.remove(); });
 
     sectionDemo.appendChild(dismissBtn);
 
@@ -278,7 +278,7 @@ var TRACE_SUB = (function() {
     setTimeout(function() {
       var stripeBtn = document.getElementById('sub-stripe-btn');
       if (stripeBtn) {
-        stripeBtn.onclick = function() {
+        stripeBtn.addEventListener('click', function() {
           stripeBtn.disabled = true;
           stripeBtn.textContent = 'OPENING CHECKOUT…';
           apiPost('/api/create-checkout-session', {
@@ -304,7 +304,7 @@ var TRACE_SUB = (function() {
               stripeBtn.textContent = '💳 SUBSCRIBE WITH STRIPE';
             }
           });
-        };
+        });
       }
     }, 100);
 
@@ -314,7 +314,7 @@ var TRACE_SUB = (function() {
     setTimeout(function() {
       var demoBtn = document.getElementById('demo-gen-key');
       if (demoBtn) {
-        demoBtn.onclick = function() {
+        demoBtn.addEventListener('click', function() {
           demoBtn.disabled = true;
           demoBtn.textContent = 'GENERATING…';
           apiPost('/api/subscribe', {
@@ -332,7 +332,7 @@ var TRACE_SUB = (function() {
               demoBtn.textContent = 'GENERATE DEMO KEY';
             }
           });
-        };
+        });
       }
     }, 100);
   }
@@ -434,7 +434,7 @@ function batchInterpolCheck() {
       btn.id = 'interpol-batch-btn';
       btn.textContent = '🔍 Cross-Reference';
       btn.style.cssText = 'background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 8px;font-size:8px;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;margin-left:6px;';
-      btn.onclick = batchInterpolCheck;
+      btn.addEventListener('click', batchInterpolCheck);
       batchControls.appendChild(btn);
       clearInterval(pollTimer);
     }
