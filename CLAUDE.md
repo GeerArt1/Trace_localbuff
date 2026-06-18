@@ -17,6 +17,7 @@ TRACE is a web app (`trace.html`) served by a Node.js backend (`trace_server.js`
 | E2E tests | **46/46** (23 e2e + 10 provenance + 13 hq) ✅ |
 | HQ E2E tests | **tests/hq.e2e.test.js** — 13 tests (lock screen, navigation, panel content, event log, sacred geometry) ✅ |
 | Empty catch blocks | **0** ✅ (all have TRACE_WATCHDOG?.warn() logging) |
+| JS `.onclick` property assignments → `addEventListener` | **15/15 migrated** ✅ |
 | Deployment config | Procfile (Railway/Heroku) + Dockerfile ✅ |
 | AI providers | Claude (Anthropic) + Gemini (Google) ✅
 
