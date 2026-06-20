@@ -113,109 +113,6 @@ window.ValuationEngine = {
   }
 };
 
-// ── AI RESEARCH AGENT ────────────────────────
-window.ResearchAgent = {
-  isOpen: false,
-
-  open() {
-    this.isOpen = true;
-    window.nav('research');
-  },
-
-  _abortController: null,
-
-  async investigate(artworkTitle, context) {
-    // Abort any previous research request
-    if (this._abortController) this._abortController.abort();
-    this._abortController = new AbortController();
-
-    var apiBase = window.TRACE_API_PROXY || '';
-    var apiUrl = apiBase ? apiBase + '/analyse' : 'https://api.anthropic.com/v1/messages';
-    var headers = { 'Content-Type': 'application/json' };
-    if (!apiBase) headers['anthropic-version'] = '2023-06-01';
-    if (window.TRACE_ANALYSE_KEY) headers['x-api-key'] = window.TRACE_ANALYSE_KEY;
-    if (window.TIER) headers['x-tier'] = window.TIER;
-
-    var systemPrompt = 'You are TRACE Research Agent — an autonomous provenance research assistant. Given an artwork, generate 3-5 investigation hypotheses with suggested sources. ' +
-      'Respond ONLY with a valid JSON array of objects, each with: hypothesis (string), confidence (string: high/medium/low), ' +
-      'sources (array of strings), next_steps (array of 1-2 actionable steps). No markdown, no backticks. Return only the JSON array.';
-
-    var res = await fetch(apiUrl, {
-      method: 'POST', headers: headers,
-      signal: this._abortController.signal,
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 1200,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: 'Research the provenance of: "' + artworkTitle + '" ' + (context || '') }]
-      })
-    });
-
-    var data = await res.json();
-    var raw = data.content ? data.content.map(function(b) { return b.text || ''; }).join('') : '[]';
-    var hypotheses = [];
-    try { hypotheses = JSON.parse(raw.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim()); } catch (e) {
-      try { var s = raw.indexOf('['), end = raw.lastIndexOf(']'); if (s >= 0 && end > s) hypotheses = JSON.parse(raw.slice(s, end + 1)); } catch(e2) { TRACE_WATCHDOG?.warn('Vision', e2); }
-    }
-    return hypotheses;
-  }
-};
-
-// ── RUN RESEARCH — UI Handler ────────────────
-window.runResearch = function() {
-  var input = document.getElementById('ra-input');
-  var msg = input ? input.value.trim() : '';
-  var r = window._lastResult;
-  if (!msg && r && r.title) msg = r.title;
-  if (!msg) { window.toast('Enter an artwork title or run an analysis first'); return; }
-  if (input) input.value = '';
-
-  var msgs = document.getElementById('ra-messages');
-  if (!msgs) return;
-
-  msgs.innerHTML += '<div class="ra-msg ai"><div class="ra-msg-label"><span class="ra-agent">You</span></div><div class="ra-msg-bubble">Research: ' + window.esc(msg) + '</div></div>';
-
-  var loading = document.createElement('div');
-  loading.className = 'ra-msg system';
-  loading.innerHTML = '<div class="ra-msg-bubble">TRACE Research Agent investigating\u2026</div>';
-  msgs.appendChild(loading);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  var context = r ? 'Period: ' + (r.period || 'unknown') + '. Medium: ' + (r.medium || 'unknown') + '. Keywords: ' + (r.keywords || []).join(', ') : '';
-  window.ResearchAgent.investigate(msg, context).then(function(hypotheses) {
-    loading.remove();
-    if (!hypotheses || !hypotheses.length) {
-      msgs.innerHTML += '<div class="ra-msg ai"><div class="ra-msg-label"><span class="ra-agent">AI</span></div><div class="ra-msg-bubble">No hypotheses generated. Try a more specific artwork title.</div></div>';
-      return;
-    }
-    var html = '<div class="ra-msg ai"><div class="ra-msg-label"><span class="ra-agent">AI</span> RESEARCH AGENT</div>';
-    html += '<div class="ra-msg-bubble">Found ' + hypotheses.length + ' investigation hypothesis' + (hypotheses.length > 1 ? 'es' : '') + ':</div>';
-    hypotheses.forEach(function(h, i) {
-      html += '<div class="ra-hypothesis">' +
-        '<div class="ra-hyp-title">' + (i + 1) + '. ' + window.esc(h.hypothesis || '') + '</div>' +
-        '<div class="ra-hyp-body">' + window.esc((h.confidence || 'medium') + ' confidence') + '</div>';
-      if (h.sources && h.sources.length) {
-        html += '<div class="ra-hyp-sources">';
-        h.sources.forEach(function(s) { html += '<span class="ra-hyp-src">' + window.esc(s) + '</span>'; });
-        html += '</div>';
-      }
-      if (h.next_steps && h.next_steps.length) {
-        html += '<div style="margin-top:6px;">';
-        h.next_steps.forEach(function(ns, si) {
-          html += '<div class="ra-step"><div class="ra-step-num">' + (si + 1) + '</div><div class="ra-step-text">' + window.esc(ns) + '</div></div>';
-        });
-        html += '</div>';
-      }
-      html += '</div>';
-    });
-    html += '</div>';
-    msgs.innerHTML += html;
-    msgs.scrollTop = msgs.scrollHeight;
-  }).catch(function(err) {
-    loading.remove();
-    msgs.innerHTML += '<div class="ra-msg ai"><div class="ra-msg-label"><span class="ra-agent">AI</span></div><div class="ra-msg-bubble text-red-lt">Error: ' + window.esc(err.message) + '</div></div>';
-  });
-};
-
 // ── DIGITAL FINGERPRINTING ──────────────────
 window.DigitalFingerprint = {
   hash: null,
@@ -391,7 +288,7 @@ window.DatabaseQuery = {
       method: 'POST', headers: headers,
       signal: this._abortController.signal,
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 800,
+        model: (window.TRACE_AI_CONFIG && window.TRACE_AI_CONFIG.getModel()) || 'claude-sonnet-4-20250514', max_tokens: 800,
         system: systemPrompt,
         messages: [{ role: 'user', content: 'Cross-reference: "' + (title || 'Unknown') + '" by ' + (artist || 'Unknown') + ' (' + (period || '') + '). Check Getty Provenance Index, INTERPOL stolen works database, and Art Loss Register.' }]
       })
@@ -734,6 +631,10 @@ window.ProvenanceCheck = {
 
     wrap.innerHTML = html;
     wrap.style.display = 'block';
+
+    // Emit provenance:complete event for correlation engine
+    var evt = new CustomEvent('provenance:complete', { detail: { data: this.results } });
+    document.dispatchEvent(evt);
   }
 };
 
@@ -964,8 +865,8 @@ window._visionShowResultHook = function(r) {
 
       commands: [
         { name: 'research', label: 'Open Research Agent', action: function() {
-          if (typeof window.ResearchAgent !== 'undefined') {
-            window.ResearchAgent.open();
+          if (typeof window.TRACE_ResearchAgent !== 'undefined') {
+            window.TRACE_ResearchAgent.open();
           }
         }},
         { name: 'valuation', label: 'Show Valuation Estimate', action: function() {

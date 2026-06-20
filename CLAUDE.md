@@ -46,6 +46,7 @@ scripts/                ← Utility scripts
 - `routes/helpers.js` — Shared HTTP utilities (sendJSON, collectBody, security headers, CSRF)
 - `routes/patterns.js` — Shared error-pattern loader (reads ops/error-patterns.json with mtime caching) and event logger (bounded log array); used by both ops.js and agent.js
 - `routes/provenance.js` — Provenance cross-reference: Getty ULAN SPARQL, GPI SPARQL, INTERPOL, ALR, AAMD, UNESCO
+- `src/correlation.js` — Cross-domain correlation engine (10 rules, auto-runs after provenance check)
 - `routes/auth.js` — Auth routes: register, login, verify
 - `routes/agent.js` — AI self-healing agent: watchdog reports, auto-fixes, developer reports
 ```
@@ -135,7 +136,7 @@ scripts/                ← Utility scripts
 - Run provenance tests: `node tests/test_provenance.js`
 - Run integration tests: `node tests/test_integration.js`
 - Run all unit tests: `node tests/test_all.js`
-- Run Playwright e2e tests: `npx playwright test tests/e2e.e2e.test.js tests/provenance.e2e.test.js tests/hq.e2e.test.js`
+- Run Playwright e2e tests: `npx playwright test tests/e2e.e2e.test.js tests/provenance.e2e.test.js tests/hq.e2e.test.js tests/monitor.e2e.test.js`
 
 ## Common Issues & Fixes
 
@@ -160,11 +161,21 @@ To restore: `cp .subscriptions.json.bak .subscriptions.json`
 
 ## Environment Variables
 ```
-# Choose 'claude' (Anthropic — requires API key) or 'gemini' (Google — generous free tier)
-AI_PROVIDER=claude                   # Set to 'gemini' for Google Gemini. Default: claude
-GEMINI_API_KEY=                      # Required if AI_PROVIDER=gemini. Get free key at https://aistudio.google.com/apikey
-GEMINI_MODEL=gemini-2.5-flash        # Gemini model to use
-ANTHROPIC_API_KEY=sk-ant-...         # Required for AI analysis (Claude)
+# AI Provider Routing
+AI_PROVIDER=claude                   # claude | gemini | openrouter | auto (fallback chain). Default: claude
+ANTHROPIC_API_KEY=sk-ant-...         # Required for Claude provider. Automatic fallback in 'auto' mode.
+GEMINI_API_KEY=                      # Required for Gemini provider. Get free key at https://aistudio.google.com/apikey
+GEMINI_MODEL=gemini-2.5-flash        # Gemini model to use (default: gemini-2.5-flash)
+OPENROUTER_API_KEY=sk-or-...        # Required for OpenRouter provider. Routes to any model via openrouter.ai
+OPENROUTER_MODEL=openai/gpt-4o      # Default model for OpenRouter (default: openai/gpt-4o)
+
+# ── Developer Alerting & Credit Monitoring ──
+SENDGRID_API_KEY=SG.xxxxx           # For email alerts when providers fail or credits low
+DEVELOPER_EMAIL=you@example.com     # Who receives the email alerts
+OPENROUTER_MANAGEMENT_KEY=sk-or-mgt-... # Separate key for checking OpenRouter credit balance
+CREDIT_WARN_THRESHOLD=20            # Warn when credits below this (USD). Default: $20
+CREDIT_CRITICAL_THRESHOLD=5         # Critical alert + email when credits below this. Default: $5
+
 ADMIN_SECRET=your-strong-secret-here # Min 16 chars. Weak tokens rejected at startup.
 ANALYSE_API_KEY=                     # Auto-generated if not set. Protects /analyse endpoint.
 SUBSCRIPTION_SECRET=                 # Auto-generated if not set. Signs subscription tokens.

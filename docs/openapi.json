@@ -1,0 +1,2062 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "TRACE Art Intelligence API",
+    "description": "AI-powered artwork identification, provenance cross-reference across 5 databases (Getty ULAN, GPI SPARQL, INTERPOL, ALR, AAMD, UNESCO), subscription management with Stripe, sacred geometry visualization, and real-time monitoring with self-healing capabilities.\n\n## Authentication\n- **Analyse API:** `x-api-key` header (auto-generated or user-configured via `ANALYSE_API_KEY`)\n- **Ops/Agent API:** `x-api-key` header (via `OPS_API_KEY` or `ANALYSE_API_KEY`)\n- **Auth (User):** `Authorization: Bearer <token>` header (from `/api/auth/login` or `/api/auth/register`)\n- **Subscription:** `x-sub-token` header or `licenseKey` in request body\n- **Tier:** `x-tier` header (`discover`, `collector`, `professional`)\n- **CSRF:** `x-csrf-token` header for state-changing POST endpoints",
+    "version": "3.1.0",
+    "contact": {
+      "url": "https://trace.art"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development"
+    },
+    {
+      "url": "https://trace.art",
+      "description": "Production"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health & Monitoring",
+      "description": "Server health, debug info, Prometheus metrics"
+    },
+    {
+      "name": "AI Analysis",
+      "description": "Multi-provider AI artwork analysis proxy"
+    },
+    {
+      "name": "Subscriptions",
+      "description": "Subscription management, Stripe checkout, license keys"
+    },
+    {
+      "name": "Authentication",
+      "description": "User registration, login, token verification"
+    },
+    {
+      "name": "Provenance",
+      "description": "Artwork provenance cross-reference: Getty ULAN, GPI, INTERPOL, ALR, AAMD, UNESCO"
+    },
+    {
+      "name": "Timeline",
+      "description": "Provenance timeline persistence"
+    },
+    {
+      "name": "Events",
+      "description": "Client telemetry events"
+    },
+    {
+      "name": "Ops & Agent",
+      "description": "Operations health checks, auto-fix patterns, watchdog reports"
+    },
+    {
+      "name": "Files",
+      "description": "App file listing and download for HQ admin"
+    },
+    {
+      "name": "Export",
+      "description": "Bulk CSV/JSON export"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Health & Monitoring"
+        ],
+        "summary": "Server health check",
+        "description": "Returns server health status, API key configuration, Stripe status, provider health, disk space, memory, and active connection count.",
+        "responses": {
+          "200": {
+            "description": "Server health information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok",
+                        "shutting_down"
+                      ]
+                    },
+                    "health": {
+                      "type": "string",
+                      "enum": [
+                        "healthy",
+                        "degraded",
+                        "critical"
+                      ]
+                    },
+                    "service": {
+                      "type": "string"
+                    },
+                    "apiKey": {
+                      "type": "string",
+                      "enum": [
+                        "configured",
+                        "missing"
+                      ]
+                    },
+                    "stripe": {
+                      "type": "string",
+                      "enum": [
+                        "configured",
+                        "demo mode"
+                      ]
+                    },
+                    "subscriptions": {
+                      "type": "integer"
+                    },
+                    "ai_provider": {
+                      "type": "string"
+                    },
+                    "uptime": {
+                      "type": "number"
+                    },
+                    "node": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "tags": [
+          "Health & Monitoring"
+        ],
+        "summary": "Prometheus metrics",
+        "description": "Exposes all monitoring data in Prometheus text format: uptime, memory RSS, connections, SSE clients, errors, subscriptions, provider health, disk space, DB file sizes, credits.",
+        "responses": {
+          "200": {
+            "description": "Prometheus-formatted metrics",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/debug": {
+      "get": {
+        "tags": [
+          "Health & Monitoring"
+        ],
+        "summary": "Full debug/diagnostic information",
+        "description": "Returns comprehensive server state: memory, config, subscriptions, rate limits, provider health monitoring, disk/SSL/credit status, memory trend, recent events and errors, DB file sizes.",
+        "responses": {
+          "200": {
+            "description": "Full debug information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events/stream": {
+      "get": {
+        "tags": [
+          "Health & Monitoring"
+        ],
+        "summary": "Server-Sent Events stream",
+        "description": "Real-time SSE stream for operational alerts. Establishes a persistent connection that pushes provider degradation, disk warnings, SSL expiry, credit thresholds, and other system events. Heartbeat every 30s.",
+        "responses": {
+          "200": {
+            "description": "SSE event stream (persistent connection)",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analyse": {
+      "post": {
+        "tags": [
+          "AI Analysis"
+        ],
+        "summary": "AI artwork analysis",
+        "description": "Proxies analysis requests to configured AI provider (Claude, Gemini, OpenRouter, or auto-fallback chain). Accepts Anthropic Messages API format with optional system prompt and image content.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "messages"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "description": "AI model identifier (defaults to provider default)"
+                  },
+                  "max_tokens": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 2000,
+                    "default": 1800
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "default": 0.7
+                  },
+                  "system": {
+                    "type": "string",
+                    "maxLength": 10240,
+                    "description": "System prompt"
+                  },
+                  "messages": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "role",
+                        "content"
+                      ],
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "user",
+                            "assistant"
+                          ]
+                        },
+                        "content": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 10000
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "text",
+                                      "image"
+                                    ]
+                                  },
+                                  "text": {
+                                    "type": "string"
+                                  },
+                                  "source": {
+                                    "type": "object",
+                                    "properties": {
+                                      "type": {
+                                        "type": "string"
+                                      },
+                                      "media_type": {
+                                        "type": "string"
+                                      },
+                                      "data": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI analysis response in Anthropic Messages format"
+          },
+          "400": {
+            "description": "Invalid request (JSON parse error, missing messages, invalid content)"
+          },
+          "401": {
+            "description": "Unauthorized (missing or invalid x-api-key)"
+          },
+          "413": {
+            "description": "Request too large (max 10MB)"
+          },
+          "415": {
+            "description": "Content-Type must be application/json"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "502": {
+            "description": "AI provider error"
+          },
+          "503": {
+            "description": "No AI provider configured"
+          }
+        }
+      }
+    },
+    "/api/create-checkout-session": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Create Stripe checkout session",
+        "description": "Creates a Stripe Checkout Session for subscription payment. Falls back to demo mode if Stripe is not configured.",
+        "security": [
+          {
+            "CsrfToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tier",
+                  "owner"
+                ],
+                "properties": {
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "collector",
+                      "professional"
+                    ]
+                  },
+                  "owner": {
+                    "type": "string",
+                    "description": "Owner name or email"
+                  },
+                  "successUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cancelUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout session created or demo response"
+          },
+          "400": {
+            "description": "Invalid tier or missing owner"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "502": {
+            "description": "Stripe API error"
+          }
+        }
+      }
+    },
+    "/api/stripe-webhook": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Stripe webhook handler",
+        "description": "Receives Stripe webhook events (checkout.session.completed, customer.subscription.deleted). Verifies webhook signature and auto-generates license keys on successful payment.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received (checkout.session.completed \u2192 license key created)"
+          },
+          "400": {
+            "description": "Invalid webhook payload"
+          },
+          "401": {
+            "description": "Invalid webhook signature"
+          }
+        }
+      }
+    },
+    "/api/subscribe": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Create subscription license key",
+        "description": "Admin endpoint to generate a license key manually. Requires adminToken matching ADMIN_SECRET on non-localhost requests.",
+        "security": [
+          {
+            "CsrfToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tier",
+                  "owner"
+                ],
+                "properties": {
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "discover",
+                      "collector",
+                      "professional"
+                    ]
+                  },
+                  "owner": {
+                    "type": "string"
+                  },
+                  "adminToken": {
+                    "type": "string",
+                    "description": "Required for non-localhost requests"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "License key created with subscription token"
+          },
+          "400": {
+            "description": "Invalid tier or missing owner"
+          },
+          "401": {
+            "description": "Unauthorized (invalid adminToken)"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/verify-subscription": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Verify subscription token or license key",
+        "description": "Verifies an HMAC-signed subscription token or a stored license key. Returns user tier, owner, and expiry on success.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "HMAC-signed subscription token (from sessionStorage)"
+                  },
+                  "licenseKey": {
+                    "type": "string",
+                    "description": "TRACE-XXXX-XXXX-XXXX-XXXX format key (from localStorage)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verified \u2014 returns tier, owner, expiresAt"
+          },
+          "400": {
+            "description": "Provide token or licenseKey"
+          },
+          "401": {
+            "description": "Invalid/expired token or license key"
+          }
+        }
+      }
+    },
+    "/api/subscription-status": {
+      "get": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "List active subscriptions",
+        "description": "Returns all active subscriptions with their license keys, tiers, owners, and expiry dates. Used by HQ admin panel.",
+        "responses": {
+          "200": {
+            "description": "List of active subscriptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "subscriptions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register a new user",
+        "description": "Creates a new user account with email and password (PBKDF2-hashed). Returns a signed auth token and CSRF token. Rate-limited per IP (10/min).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created \u2014 returns token, csrfToken, user info"
+          },
+          "400": {
+            "description": "Invalid email, weak password, or validation error"
+          },
+          "409": {
+            "description": "Email already registered"
+          },
+          "429": {
+            "description": "Too many registrations from this IP"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login with email and password",
+        "description": "Authenticates a user with email and password. Returns a signed auth token (7-day expiry) and CSRF token. Rate-limited per email (5 attempts/min).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful \u2014 returns token, csrfToken, user info"
+          },
+          "400": {
+            "description": "Missing email or password"
+          },
+          "401": {
+            "description": "Invalid email or password"
+          },
+          "429": {
+            "description": "Too many login attempts"
+          }
+        }
+      }
+    },
+    "/api/auth/verify": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verify auth token",
+        "description": "Verifies an existing auth token. Returns user info if valid, or unauthenticated status if invalid/expired.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Auth token from login/register"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "authenticated": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "email": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tier": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/provenance/cross-reference": {
+      "post": {
+        "tags": [
+          "Provenance"
+        ],
+        "summary": "Cross-reference artwork against 5 databases",
+        "description": "Full provenance cross-reference: Getty ULAN (artist name SPARQL), Getty Provenance Index (artwork SPARQL via CIDOC-CRM), INTERPOL Stolen Works Database, Art Loss Register (ALR), AAMD Nazi-Era Provenance Project, and UNESCO 1970 Convention. SPARQL queries run in parallel with synchronous mock checks.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "artworkTitle": {
+                    "type": "string",
+                    "description": "Title of the artwork"
+                  },
+                  "artist": {
+                    "type": "string",
+                    "description": "Artist name"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "timeline": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "year": {
+                          "type": "string"
+                        },
+                        "event": {
+                          "type": "string"
+                        },
+                        "category": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "discover",
+                      "collector",
+                      "professional"
+                    ],
+                    "default": "collector"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cross-reference results from all 5 databases",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "artworkTitle": {
+                      "type": "string"
+                    },
+                    "artist": {
+                      "type": "string"
+                    },
+                    "hasAlerts": {
+                      "type": "boolean"
+                    },
+                    "tier": {
+                      "type": "string"
+                    },
+                    "databases": {
+                      "type": "object",
+                      "properties": {
+                        "getty": {
+                          "type": "object"
+                        },
+                        "interpol": {
+                          "type": "object"
+                        },
+                        "alr": {
+                          "type": "object"
+                        },
+                        "aamd": {
+                          "type": "object"
+                        },
+                        "unesco": {
+                          "type": "object"
+                        }
+                      }
+                    },
+                    "summary": {
+                      "type": "object",
+                      "properties": {
+                        "totalChecks": {
+                          "type": "integer"
+                        },
+                        "alerts": {
+                          "type": "integer"
+                        },
+                        "clear": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/provenance/getty-search": {
+      "post": {
+        "tags": [
+          "Provenance"
+        ],
+        "summary": "Search Getty ULAN artist names via SPARQL",
+        "description": "Searches the Getty Union List of Artist Names (ULAN) public SPARQL endpoint. Returns artist names, birth/death years, nationality, and role. Falls back to mock data on error.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Artist name search query"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Getty ULAN search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "birth": {
+                            "type": "integer"
+                          },
+                          "death": {
+                            "type": "integer"
+                          },
+                          "nationality": {
+                            "type": "string"
+                          },
+                          "confidence": {
+                            "type": "string"
+                          },
+                          "isMock": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "isMock": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Search failed"
+          }
+        }
+      }
+    },
+    "/api/provenance/knowledge-graph": {
+      "post": {
+        "tags": [
+          "Provenance"
+        ],
+        "summary": "Build provenance knowledge graph",
+        "description": "Builds a provenance knowledge graph from timeline data. Returns nodes and edges for visualization: creation events, ownership transfers, exhibitions, and auctions.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "artist": {
+                    "type": "string"
+                  },
+                  "timeline": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "year": {
+                          "type": "string"
+                        },
+                        "event": {
+                          "type": "string"
+                        },
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "creation",
+                            "ownership",
+                            "exhibition",
+                            "auction",
+                            "life"
+                          ]
+                        },
+                        "detail": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Knowledge graph with nodes and edges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "artist": {
+                      "type": "string"
+                    },
+                    "nodes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "year": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "edges": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "from": {
+                            "type": "string"
+                          },
+                          "to": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "year": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "nodeCount": {
+                      "type": "integer"
+                    },
+                    "edgeCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/timeline/save": {
+      "post": {
+        "tags": [
+          "Timeline"
+        ],
+        "summary": "Save provenance timeline",
+        "description": "Saves a provenance timeline with events, artist info, and metadata to the database.",
+        "security": [
+          {
+            "CsrfToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "sub": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "default": "artwork"
+                  },
+                  "artist": {
+                    "type": "string"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "events": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Timeline saved"
+          },
+          "400": {
+            "description": "Timeline title required or invalid request"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/timeline/list": {
+      "get": {
+        "tags": [
+          "Timeline"
+        ],
+        "summary": "List saved timelines",
+        "description": "Returns all saved provenance timelines, sorted by most recent first.",
+        "responses": {
+          "200": {
+            "description": "List of timelines",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "timelines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string"
+                          },
+                          "artist": {
+                            "type": "string"
+                          },
+                          "events": {
+                            "type": "array"
+                          },
+                          "savedAt": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/timeline/delete": {
+      "post": {
+        "tags": [
+          "Timeline"
+        ],
+        "summary": "Delete saved timeline",
+        "description": "Deletes a saved timeline by title from the database.",
+        "security": [
+          {
+            "CsrfToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Timeline deleted"
+          },
+          "400": {
+            "description": "Timeline title required or invalid request"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/events": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "List recent telemetry events",
+        "description": "Returns the last 50 telemetry events logged by clients.",
+        "responses": {
+          "200": {
+            "description": "Recent events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "events": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Log telemetry event",
+        "description": "Logs a client-side telemetry event (screen views, tier info, error messages). Sanitized for HTML and length-limited.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 500
+                  },
+                  "screen": {
+                    "type": "string"
+                  },
+                  "tier": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event logged"
+          },
+          "400": {
+            "description": "Invalid event"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/interpol-check": {
+      "post": {
+        "tags": [
+          "Provenance"
+        ],
+        "summary": "Legacy cross-reference check",
+        "description": "Legacy endpoint for cross-referencing artwork against INTERPOL, ALR, AAMD, and UNESCO databases. Uses deterministic mock data. New clients should use /api/provenance/cross-reference instead.",
+        "security": [
+          {
+            "CsrfToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "artworkTitle"
+                ],
+                "properties": {
+                  "artworkTitle": {
+                    "type": "string"
+                  },
+                  "artist": {
+                    "type": "string"
+                  },
+                  "year": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cross-reference results"
+          },
+          "400": {
+            "description": "artworkTitle required"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/bulk-export": {
+      "get": {
+        "tags": [
+          "Export"
+        ],
+        "summary": "Bulk CSV/JSON export",
+        "description": "Exports scan results in CSV or JSON format by providing comma-separated IDs.",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated IDs"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ],
+              "default": "csv"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Export data",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No IDs provided"
+          }
+        }
+      }
+    },
+    "/api/files": {
+      "get": {
+        "tags": [
+          "Files"
+        ],
+        "summary": "List app files",
+        "description": "Lists all application files (HTML, JS, CSS, JSON, PNG, SVG) sorted by type. Used by the HQ admin panel for file download.",
+        "responses": {
+          "200": {
+            "description": "File listing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "files": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer"
+                          },
+                          "sizeHuman": {
+                            "type": "string"
+                          },
+                          "mtime": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/files/{name}": {
+      "get": {
+        "tags": [
+          "Files"
+        ],
+        "summary": "Download app file",
+        "description": "Downloads a specific application file by name. Path traversal is prevented by STATIC_DIR prefix check.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "File name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File content with Content-Disposition: attachment"
+          },
+          "403": {
+            "description": "Forbidden (path traversal detected)"
+          },
+          "404": {
+            "description": "File not found"
+          }
+        }
+      }
+    },
+    "/api/ops/health-check": {
+      "get": {
+        "tags": [
+          "Ops & Agent"
+        ],
+        "summary": "Operations health check",
+        "description": "Returns detailed operations health status with issue detection, health score (0-100), and auto-fix suggestions.",
+        "security": [
+          {
+            "OpsApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Health check results with score and issues",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "healthy",
+                        "degraded",
+                        "critical"
+                      ]
+                    },
+                    "score": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "checks": {
+                      "type": "object"
+                    },
+                    "issues": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "severity": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          },
+                          "auto_fixable": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "checked_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/ops/log": {
+      "get": {
+        "tags": [
+          "Ops & Agent"
+        ],
+        "summary": "List ops events",
+        "description": "Returns ops event log entries with optional type filtering.",
+        "security": [
+          {
+            "OpsApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by event type"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ops event log entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entries": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ts": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Ops & Agent"
+        ],
+        "summary": "Log ops event",
+        "description": "Logs a new opertations event. Also broadcasts via SSE.",
+        "security": [
+          {
+            "OpsApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "default": "info"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "detail": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event logged"
+          },
+          "400": {
+            "description": "Invalid event"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/ops/auto-fix": {
+      "post": {
+        "tags": [
+          "Ops & Agent"
+        ],
+        "summary": "Match and execute auto-fix",
+        "description": "Matches an error message against known fix patterns and returns the suggested fix command/script. Does not execute by default \u2014 the caller decides whether to run the fix.",
+        "security": [
+          {
+            "OpsApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "description": "Error message to match against patterns"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pattern match result with fix details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "matched": {
+                      "type": "boolean"
+                    },
+                    "pattern": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "action": {
+                      "type": "string"
+                    },
+                    "fix_command": {
+                      "type": "string"
+                    },
+                    "requires_sudo": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/ops/report": {
+      "get": {
+        "tags": [
+          "Ops & Agent"
+        ],
+        "summary": "Generate ops report",
+        "description": "Generates a daily operations report with health summary, top issues, and actionable recommendations.",
+        "security": [
+          {
+            "OpsApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daily operations report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "report_date": {
+                      "type": "string"
+                    },
+                    "summary": {
+                      "type": "object"
+                    },
+                    "health": {
+                      "type": "object"
+                    },
+                    "top_issues": {
+                      "type": "array"
+                    },
+                    "recommendations": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/agent/report": {
+      "get": {
+        "tags": [
+          "Ops & Agent"
+        ],
+        "summary": "Developer report from AI agent",
+        "description": "Returns a detailed report from the AI self-healing agent: period, events today, errors, auto-fix success rate, provider health, top error sources, and recommendations.",
+        "security": [
+          {
+            "OpsApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AI agent developer report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "report_date": {
+                      "type": "string"
+                    },
+                    "summary": {
+                      "type": "object",
+                      "properties": {
+                        "events_today": {
+                          "type": "integer"
+                        },
+                        "errors_today": {
+                          "type": "integer"
+                        },
+                        "fixes_applied": {
+                          "type": "integer"
+                        },
+                        "fix_success_rate": {
+                          "type": "string"
+                        },
+                        "active_subscriptions": {
+                          "type": "integer"
+                        },
+                        "memory_mb": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "health": {
+                      "type": "object"
+                    },
+                    "recent_issues": {
+                      "type": "array"
+                    },
+                    "recommendations": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Ops & Agent"
+        ],
+        "summary": "Watchdog report ingestion",
+        "description": "Ingests watchdog batch reports from the client. Logs errors, matches against auto-fix patterns, and returns matched fixes.",
+        "security": [
+          {
+            "OpsApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "detail": {
+                    "type": "object",
+                    "properties": {
+                      "batch": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "error",
+                                "warning",
+                                "info"
+                              ]
+                            },
+                            "source": {
+                              "type": "string"
+                            },
+                            "message": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report processed \u2014 returns matched auto-fixes"
+          },
+          "400": {
+            "description": "Invalid watchdog report"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/agent/auto-fix": {
+      "post": {
+        "tags": [
+          "Ops & Agent"
+        ],
+        "summary": "Execute auto-fix for error",
+        "description": "Matches an error message against patterns and EXECUTES the fix command. Requires Ops API key. Fix commands are safety-filtered against shell injection (blocks `;`, `$(`, backticks). Sudo-requiring commands are reported but not executed.",
+        "security": [
+          {
+            "OpsApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "description": "Error message to match and fix"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Auto-fix execution result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "matched": {
+                      "type": "boolean"
+                    },
+                    "pattern": {
+                      "type": "string"
+                    },
+                    "fix": {
+                      "type": "object",
+                      "properties": {
+                        "executed": {
+                          "type": "boolean"
+                        },
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "output": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/docs/openapi.json": {
+      "get": {
+        "tags": [
+          "Documentation"
+        ],
+        "summary": "OpenAPI specification",
+        "description": "Returns the full OpenAPI 3.0 specification for the TRACE API.",
+        "responses": {
+          "200": {
+            "description": "OpenAPI spec JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "API key for /analyse endpoint. Set via ANALYSE_API_KEY env var or auto-generated."
+      },
+      "OpsApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "API key for ops/agent endpoints. Set via OPS_API_KEY or ANALYSE_API_KEY env var."
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Auth token from /api/auth/login or /api/auth/register."
+      },
+      "CsrfToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-csrf-token",
+        "description": "CSRF token for state-changing POST endpoints. Obtained from login/register response headers."
+      },
+      "SubscriptionToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-sub-token",
+        "description": "Subscription token for tier-based rate limiting."
+      },
+      "TierHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-tier",
+        "description": "Subscription tier: discover, collector, or professional."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "health": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string"
+          },
+          "apiKey": {
+            "type": "string"
+          },
+          "subscriptions": {
+            "type": "integer"
+          },
+          "ai_provider": {
+            "type": "string"
+          },
+          "uptime": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

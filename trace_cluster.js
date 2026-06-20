@@ -163,6 +163,32 @@ if (cluster.isMaster) {
       if (!msg || !msg.type) return;
 
       switch (msg.type) {
+        
+        case 'auto_update_applied':
+          console.log('[CLUSTER] Rolling restart triggered by worker ' + worker.id + ' after auto-update');
+          (function() {
+            var awIds = Object.keys(activeWorkers);
+            function ruRestartNext(idx) {
+              if (idx >= awIds.length || shuttingDown) { console.log('[CLUSTER] Auto-update rolling restart complete'); return; }
+              var wid = awIds[idx];
+              var w = activeWorkers[wid];
+              if (!w || !w.isConnected()) { ruRestartNext(idx + 1); return; }
+              var newW = forkWorker();
+              var rTimeout = setTimeout(function() {
+                if (w && w.isConnected()) { w._plannedRestart = true; w.kill(isGraceful ? 'SIGTERM' : 'SIGKILL'); }
+                ruRestartNext(idx + 1);
+              }, isGraceful ? 10000 : 5000);
+              newW.once('listening', function() {
+                clearTimeout(rTimeout);
+                if (w && w.isConnected()) { w._plannedRestart = true; w.kill(isGraceful ? 'SIGTERM' : 'SIGKILL'); }
+                ruRestartNext(idx + 1);
+              });
+              newW.once('exit', function() { clearTimeout(rTimeout); ruRestartNext(idx + 1); });
+            }
+            ruRestartNext(0);
+          })();
+          break;
+
         case 'cluster_ready':
           console.log('[CLUSTER] Worker ' + worker.id + ' reported ready (pid: ' + msg.pid + ')');
           if (workerHealth[worker.id]) {

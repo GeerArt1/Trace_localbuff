@@ -17,7 +17,8 @@
   "dependencies": {
     "better-sqlite3": "^12.10.0",
     "dotenv": "^17.4.2",
-    "pg": "^8.21.0"
+    "pg": "^8.21.0",
+    "swagger-ui-dist": "^5.32.6"
   },
   "engines": {
     "node": ">=18.0.0"

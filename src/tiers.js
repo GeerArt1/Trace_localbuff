@@ -48,6 +48,7 @@ window.TIERS = {
       { id: 'scan', label: 'Scan', icon: 'scan' },
       { id: 'chat', label: 'Chat', icon: 'chat' },
       { id: 'cases', label: 'Cases', icon: 'cases' },
+      { id: 'investigation', label: 'Investigate', icon: 'investigation' },
       { id: 'timeline', label: 'Timeline', icon: 'timeline' },
       { id: 'geometry', label: 'Geometry', icon: 'geometry' },
       { id: 'knowledge', label: 'Graph', icon: 'knowledge' },
@@ -77,6 +78,7 @@ window.TIERS = {
       { id: 'scan', label: 'Scan', icon: 'scan' },
       { id: 'chat', label: 'Chat', icon: 'chat' },
       { id: 'cases', label: 'Cases', icon: 'cases' },
+      { id: 'investigation', label: 'Investigate', icon: 'investigation' },
       { id: 'timeline', label: 'Timeline', icon: 'timeline' },
       { id: 'research', label: 'Research', icon: 'research' },
       { id: 'viewer', label: 'Zoom', icon: 'viewer' },
@@ -104,7 +106,8 @@ window.ICONS = {
   geometry: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1010 10"/><path d="M12 2a10 10 0 0110 10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v20M2 12h20"/></svg>',
   viewer: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
   knowledge: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><line x1="7" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="17" y2="12"/><line x1="12" y1="7" x2="12" y2="10"/><line x1="12" y1="14" x2="12" y2="17"/></svg>',
-  research: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
+  investigation: '<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"9\" cy=\"9\" r=\"3\"/><path d=\"M9 1v2M9 15v2M1 9h2M15 9h2M3.5 3.5l1.5 1.5M14.5 14.5l1.5 1.5M3.5 14.5l1.5-1.5M14.5 3.5l-1.5 1.5\"/><line x1=\"17\" y1=\"17\" x2=\"20\" y2=\"20\"/></svg>',
+    research: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
 };
 
 /** @type {string} Current active tier */

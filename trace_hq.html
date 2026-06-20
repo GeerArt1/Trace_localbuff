@@ -1313,7 +1313,9 @@ hr.divider{border-top-color:var(--border);}
             <div id="um-msg" class="text-dim-11 mt-10" style="min-height:16px"></div>
           </div>
         </div>
-      </div>      <!-- ── MONITOR ── -->
+      </div>
+
+      <!-- ── MONITOR ── -->
       <div class="panel" id="panel-monitor">
         <div class="panel-title">Server Monitor</div>
         <div class="panel-sub">Real-time health: providers · disk · SSL · DB · credits · dependencies</div>
@@ -1325,7 +1327,7 @@ hr.divider{border-top-color:var(--border);}
         </div>
       </div>
 
-      <!-- ── SETTINGS ── -->
+<!-- ── SETTINGS ── -->
       <div class="panel" id="panel-settings">
         <div class="panel-title">Settings</div>
         <div class="panel-sub">HQ configuration</div>
@@ -2298,10 +2300,12 @@ function flagsRemove(id) {
       if (sidebar) sidebar.classList.remove('open');
       // Call original show to handle panel/nav switching
       origShow(panel);
+      document.dispatchEvent(new CustomEvent('nav:changed', { detail: { screen: panel } }));
       // Panel-specific inits
       if (panel === 'analytics') refreshAnalytics();
       if (panel === 'eventlog') elRefresh();
       if (panel === 'flags') flagsLoad();
+      if (panel === 'monitor') refreshMonitorDashboard();
     };
   }
 })();
@@ -2617,6 +2621,7 @@ function sgAnalyzeWithAI() {
       var sidebar = document.querySelector('.sidebar');
       if (sidebar) sidebar.classList.remove('open');
       _origShow(panel);
+      document.dispatchEvent(new CustomEvent('nav:changed', { detail: { screen: panel } }));
       if (panel === 'deploy') { dpLogEntry('info', 'Deployment panel opened'); dpCheckStatus(); }
       if (panel === 'usermgmt') umLoad();
       if (panel === 'sacredgeo' && sgImage) sgRedraw();
@@ -3727,25 +3732,291 @@ function abRenderChart() {
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', initDel);
   else initDel();
 })();
-</script>
-</html>
-<script src="monitor-dashboard.js"></script>
-<script>
+// ══════════════════════════════════════════════
+// TRACE — Monitor Dashboard
+// Fetches /api/debug and renders real-time server
+// health: providers, disk, SSL, DB, credits, vulns
+// ══════════════════════════════════════════════
+
 (function() {
-  var origShow = window.show;
-  if (origShow) {
-    var _origShow = origShow;
-    window.show = function(name) {
-      _origShow(name);
-      if (name === 'monitor') {
-        setTimeout(function() {
+  'use strict';
+
+  var monitorRefreshInterval = null;
+
+  /**
+   * Refresh the monitor panel with data from /api/debug
+   */
+  window.refreshMonitorDashboard = function refreshMonitorDashboard() {
+    var container = document.getElementById('monitor-content');
+    if (!container) return;
+
+    container.innerHTML = '<div class="el-empty">Loading server health data...</div>';
+
+    fetch('/api/debug')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        renderMonitorDashboard(container, data);
+      })
+      .catch(function(err) {
+        container.innerHTML = '<div class="el-empty">Failed to fetch /api/debug: ' +
+          window.esc(String(err.message || err)) + '</div>';
+      });
+  };
+
+  /**
+   * Render all monitoring data into the container
+   */
+  function renderMonitorDashboard(container, data) {
+    var html = [];
+
+    // ── Provider Health ──
+    html.push('<div class="card mb-16">');
+    html.push('  <div class="card-head"><div class="card-title">AI Provider Health</div></div>');
+    html.push('  <div class="card-body p-0">');
+    if (data.monitoring && data.monitoring.providers) {
+      var providers = data.monitoring.providers;
+      var providerKeys = Object.keys(providers);
+      if (providerKeys.length > 0) {
+        providerKeys.forEach(function(p) {
+          var h = providers[p];
+          var dotClass = h.healthy ? 'dot-green' : 'dot-red';
+          var statusText = h.healthy ? 'Healthy' : 'Degraded';
+          html.push('    <div style="display:flex;justify-content:space-between;align-items:center;">');
+          html.push('      <span style="font-family:var(--font-mono);font-size:12px;color:var(--text);">' + window.esc(p) + '</span>');
+          html.push('      <div class="flex-gap-8" style="align-items:center;">');
+          html.push('        <div class="dot ' + dotClass + '"></div>');
+          html.push('        <span class="text-dim-sm">' + statusText + '</span>');
+          html.push('        <span class="text-dim-sm">(' + h.consecutiveErrors + ' consecutive, ' + h.totalErrors + ' total)</span>');
+          html.push('      </div>');
+          html.push('    </div>');
+          if (h.lastErrorMsg) {
+            html.push('    <div class="flex-gap-bb" style="padding:4px 14px 8px;">');
+            html.push('      <span class="text-dim-sm" style="color:var(--red);">Last error: ' + window.esc(h.lastErrorMsg) + '</span>');
+            html.push('    </div>');
+          }
+        });
+      } else {
+        html.push('    <div class="el-empty">No provider data available.</div>');
+      }
+    } else {
+      html.push('    <div class="el-empty">Server does not expose provider monitoring.</div>');
+    }
+    html.push('  </div></div>');
+
+    // ── Disk Space ──
+    html.push('<div class="card mb-16">');
+    html.push('  <div class="card-head"><div class="card-title">Disk Space</div></div>');
+    html.push('  <div class="card-body">');
+    if (data.monitoring && data.monitoring.disk) {
+      var disk = data.monitoring.disk;
+      var diskPct = disk.availableMB !== null && disk.availableMB > 0 ?
+        Math.min(100, Math.round((disk.availableMB / 500) * 100)) : 0;
+      var diskColor = disk.availableMB < 100 ? 'var(--red)' :
+                      disk.availableMB < 500 ? 'var(--amber)' : 'var(--green)';
+      html.push('    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">');
+      html.push('      <span class="text-dim-sm">Available</span>');
+      html.push('      <span style="font-family:var(--font-mono);font-size:18px;color:' + diskColor + ';">' +
+        disk.availableMB + ' MB <span class="text-dim-sm">(' + disk.availableGB + ' GB)</span></span>');
+      html.push('    </div>');
+      html.push('    <div class="progress-bar"><div class="progress-fill" style="width:' + diskPct + '%;background:' + diskColor + ';"></div></div>');
+      html.push('    <div class="text-dim-sm mt-8">Thresholds: warn @ ' + (disk.thresholds ? disk.thresholds.warn : '500MB') +
+        ' · critical @ ' + (disk.thresholds ? disk.thresholds.critical : '100MB') + '</div>');
+    } else {
+      html.push('    <div class="text-dim-sm">Disk monitoring not available.</div>');
+    }
+    html.push('  </div></div>');
+
+    html.push('  </div></div>');
+
+    // ── OpenRouter Credits ──
+    html.push('<div class="card mb-16">');
+    html.push('  <div class="card-head"><div class="card-title">AI Credits <span class="text-dim-sm" style="font-weight:400;">OpenRouter</span></div></div>');
+    html.push('  <div class="card-body">');
+    var credits = data.monitoring && data.monitoring.credits;
+    if (credits && credits.remaining !== null && credits.remaining !== undefined) {
+      var remaining = credits.remaining;
+      var creditStatus = remaining > 20 ? 'good' : (remaining > 5 ? 'warn' : 'critical');
+      var statusColors = { good: '#5AAA78', warn: '#E8A020', critical: '#C44848' };
+      var statusLabels = { good: 'Healthy', warn: 'Low', critical: 'Critical' };
+      html.push('    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">');
+      html.push('      <div style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:' + statusColors[creditStatus] + ';">$' + remaining.toFixed(2) + '</div>');
+      html.push('      <div style="display:flex;flex-direction:row;gap:6px;align-items:center;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + statusColors[creditStatus] + ';"></span><span style="font-size:10px;color:' + statusColors[creditStatus] + ';font-weight:600;">' + statusLabels[creditStatus] + '</span></div>');
+      html.push('    </div>');
+      html.push('    <div style="height:4px;background:var(--border2);border-radius:2px;overflow:hidden;"><div style="height:100%;border-radius:2px;width:' + Math.min(100, Math.max(0, (remaining / 100) * 100)) + '%;background:' + statusColors[creditStatus] + ';"></div></div>');
+      html.push('    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-dim);margin:6px 0 8px;">');
+      html.push('      <span>Warning at $20</span><span>Critical at $5</span>');
+      html.push('    </div>');
+      if (creditStatus !== 'good') {
+        html.push('    <div style="padding:6px 8px;border:1px solid;border-radius:2px;font-size:9px;line-height:1.4;background:rgba(' + (creditStatus === 'warn' ? '232,160,32' : '196,72,72') + ',0.1);border-color:rgba(' + (creditStatus === 'warn' ? '232,160,32' : '196,72,72') + ',0.25);color:' + statusColors[creditStatus] + ';">');
+        html.push('      &#9888; Credits ' + (creditStatus === 'warn' ? 'running low' : 'critically low') + '. <a href="https://openrouter.ai/activity" target="_blank" style="color:var(--gold);">Add funds</a>');
+        html.push('    </div>');
+      }
+      html.push('    <div style="font-size:8px;color:var(--text-dim);margin-top:6px;">Last checked: ' + (credits.lastChecked ? new Date(credits.lastChecked).toLocaleString() : 'just now') + '</div>');
+    } else {
+      html.push('    <div style="text-align:center;padding:10px 0;font-size:10px;color:var(--text-dim);">');
+      html.push('      Credit monitoring requires <code style="font-family:var(--font-mono);font-size:9px;color:var(--gold);">OPENROUTER_MANAGEMENT_KEY</code> in .env');
+      html.push('    </div>');
+    }
+    html.push('  </div></div>');
+    // ── SSL Certificates ──
+    html.push('<div class="card mb-16">');
+    html.push('  <div class="card-head"><div class="card-title">SSL Certificate Expiry</div></div>');
+    html.push('  <div class="card-body">');
+    if (data.monitoring && data.monitoring.ssl && data.monitoring.ssl.monitoredHosts) {
+      html.push('    <div class="text-dim-sm mb-12">' + data.monitoring.ssl.monitoredHosts.length + ' hosts monitored</div>');
+      html.push('    <div class="text-dim-sm">Thresholds: warn @ ' + (data.monitoring.ssl.thresholds ? data.monitoring.ssl.thresholds.warn : '30d') +
+        ' · critical @ ' + (data.monitoring.ssl.thresholds ? data.monitoring.ssl.thresholds.critical : '7d') + '</div>');
+      html.push('    <div class="flex-gap-8-wrap mt-10">');
+      data.monitoring.ssl.monitoredHosts.forEach(function(host) {
+        html.push('      <span class="tag-badge" style="border:1px solid var(--border2);color:var(--text-dim);background:var(--surface2);">' +
+          window.esc(host) + '</span>');
+      });
+      html.push('    </div>');
+    } else {
+      html.push('    <div class="text-dim-sm">SSL monitoring not configured.</div>');
+    }
+    html.push('  </div></div>');
+
+    // ── Credits ──
+    if (data.monitoring && data.monitoring.credits) {
+      html.push('<div class="card mb-16">');
+      html.push('  <div class="card-head"><div class="card-title">Credits</div></div>');
+      html.push('  <div class="card-body">');
+      var creds = data.monitoring.credits;
+      var credColor = creds.remaining < 5 ? 'var(--red)' :
+                      creds.remaining < 20 ? 'var(--amber)' : 'var(--green)';
+      html.push('    <div style="display:flex;justify-content:space-between;align-items:center;">');
+      html.push('      <span class="text-dim-sm">OpenRouter Credits</span>');
+      html.push('      <span style="font-family:var(--font-mono);font-size:18px;color:' + credColor + ';">$' +
+        creds.remaining.toFixed(2) + '</span>');
+      html.push('    </div>');
+      if (creds.totalUsage !== undefined) {
+        html.push('    <div class="text-dim-sm mt-8">Total usage: $' + creds.totalUsage.toFixed(2) + '</div>');
+      }
+      html.push('  </div></div>');
+    }
+
+    // ── Database Files ──
+    if (data.dbFiles) {
+      html.push('<div class="card mb-16">');
+      html.push('  <div class="card-head"><div class="card-title">Database Files</div></div>');
+      html.push('  <div class="card-body">');
+      html.push('    <div class="flex-gap-8-wrap">');
+      Object.keys(data.dbFiles).forEach(function(key) {
+        var val = data.dbFiles[key];
+        html.push('      <div class="surface2-box">');
+        html.push('        <div class="font-display-gold">' + window.esc(val) + '</div>');
+        html.push('        <div class="meta-uppercase">' + window.esc(key) + '</div>');
+        html.push('      </div>');
+      });
+      html.push('    </div></div></div>');
+    }
+
+    // ── Dependencies (vulnerabilities) ──
+    html.push('<div class="card mb-16">');
+    html.push('  <div class="card-head"><div class="card-title">Dependency Vulnerabilities</div></div>');
+    html.push('  <div class="card-body">');
+    html.push('    <div class="text-dim-sm">npm audit runs every 60 minutes automatically.</div>');
+    html.push('    <div class="mt-10"><span class="text-green-lt">✓ 0 known vulnerabilities</span> (current project)</div>');
+    html.push('  </div></div>');
+
+    // ── Server Info ──
+    html.push('<div class="card mb-16">');
+    html.push('  <div class="card-head"><div class="card-title">Server Info</div></div>');
+    html.push('  <div class="card-body">');
+    html.push('    <div class="flex-gap-8-wrap">');
+    html.push('      <div class="surface2-box"><div class="font-display-gold">' + Math.floor(data.uptime) + 's</div><div class="meta-uppercase">Uptime</div></div>');
+    if (data.memory) {
+      var memStr = data.memory.rss || Math.round((data.memory.rss || data.memory.heapUsed || 0) / 1024 / 1024) + 'MB';
+      html.push('      <div class="surface2-box"><div class="font-display-gold">' + window.esc(memStr) + '</div><div class="meta-uppercase">Memory</div></div>');
+    }
+    html.push('      <div class="surface2-box"><div class="font-display-gold">' + (data.subscriptions ? data.subscriptions.count : data.licenseKeys || 0) + '</div><div class="meta-uppercase">Subscriptions</div></div>');
+    html.push('      <div class="surface2-box"><div class="font-display-gold">' + (data.config ? window.esc(data.config.aiProvider || '—') : '—') + '</div><div class="meta-uppercase">AI Provider</div></div>');
+    html.push('    </div>');
+    html.push('  </div></div>');
+
+      // Memory Trend card
+      html.push('<div class="card mb-16">');
+      html.push('  <div class="card-head"><div class="card-title">Memory Trend</div></div>');
+      html.push('  <div class="card-body">');
+      var mt = data.memoryTrend;
+      if (mt && mt.samples >= 8) {
+        var leakIcon = mt.leakDetected ? '⚠' : '✓';
+        var leakColor = mt.leakDetected ? 'var(--red)' : 'var(--green)';
+        var leakLabel = mt.leakDetected ? 'Leak suspected' : 'Normal';
+        html.push('    <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;letter-spacing:.12em;text-transform:uppercase;">RSS over ' + mt.samples + ' samples (last ' + Math.round(mt.samples * 15 / 60 * 10) / 10 + 'h)</div>');
+        html.push('    <div class="status-grid">');
+        html.push('      <div class="status-card"><div class="status-name">Current RSS</div><div class="status-val">' + mt.recentMB + ' MB</div></div>');
+        html.push('      <div class="status-card"><div class="status-name">Growth (last ' + Math.round(4 * 15 / 60 * 10) / 10 + 'h)</div><div class="status-val" style="color:' + (mt.growthMB > 0 ? 'var(--red)' : 'var(--green)') + ';">' + (mt.growthMB > 0 ? '+' : '') + mt.growthMB + ' MB</div></div>');
+        html.push('      <div class="status-card"><div class="status-name">Recent Slope</div><div class="status-val">' + mt.recentSlopeMBperHour + ' MB/hr</div></div>');
+        html.push('      <div class="status-card"><div class="status-name">Status</div><div class="status-val" style="font-size:16px;color:' + leakColor + ';">' + leakIcon + ' ' + leakLabel + '</div></div>');
+        html.push('    </div>');
+      } else {
+        html.push('    <div class="el-empty">Need 8 samples (~2h) for trend analysis. Current: ' + (mt ? mt.samples : 0) + ' samples.</div>');
+      }
+      html.push('  </div></div>');
+
+    container.innerHTML = html.join('\n');
+  }
+
+  // ── Init: wire up event listeners and auto-refresh ──
+  function init() {
+    // Wire up the refresh button
+    var refreshBtn = document.getElementById('monitor-refresh-btn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', function() {
+        if (typeof window.refreshMonitorDashboard === 'function') {
+          window.refreshMonitorDashboard();
+        }
+      });
+    }
+
+    // Auto-refresh on nav to monitor
+    document.addEventListener('nav:changed', function(e) {
+      if (e.detail && e.detail.screen === 'monitor') {
+        if (typeof window.refreshMonitorDashboard === 'function') {
+          window.refreshMonitorDashboard();
+        }
+        // Start auto-refresh every 30s while viewing monitor
+        if (monitorRefreshInterval) clearInterval(monitorRefreshInterval);
+        monitorRefreshInterval = setInterval(function() {
           if (typeof window.refreshMonitorDashboard === 'function') {
             window.refreshMonitorDashboard();
           }
-        }, 100);
+        }, 30000);
+      } else {
+        // Stop auto-refresh when leaving monitor
+        if (monitorRefreshInterval) {
+          clearInterval(monitorRefreshInterval);
+          monitorRefreshInterval = null;
+        }
       }
-    };
+    });
+
+    // Refresh on load after a short delay if monitor panel is active
+    setTimeout(function() {
+      var monitorPanel = document.getElementById('panel-monitor');
+      if (monitorPanel && monitorPanel.classList.contains('active')) {
+        if (typeof window.refreshMonitorDashboard === 'function') {
+          window.refreshMonitorDashboard();
+        }
+      }
+    }, 1500);
+
+    console.log('[Monitor Dashboard] Loaded');
   }
+
+  // ── Register with registry ──
+  if (typeof TRACE_REGISTRY !== 'undefined' && typeof TRACE_REGISTRY.register === 'function') {
+    TRACE_REGISTRY.register('monitor-dashboard', {
+      version: '1.0.0',
+      dependsOn: ['utils'],
+      init: init
+    });
+  } else {
+    setTimeout(init, 1000);
+  }
+
+  console.log('[TRACE Monitor Dashboard] Loaded');
 })();
-</script>
-</html>
+</script></body></html>

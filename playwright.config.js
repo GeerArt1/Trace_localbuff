@@ -11,6 +11,7 @@ module.exports = defineConfig({
   retries: 0,
   use: {
     baseURL: 'http://localhost:3000',
+    browserName: 'firefox',
   },
   webServer: {
     command: 'node trace_server.js',
@@ -18,4 +19,10 @@ module.exports = defineConfig({
     timeout: 15000,
     reuseExistingServer: false,
   },
+  projects: [
+    {
+      name: 'firefox',
+      use: { browserName: 'firefox' },
+    },
+  ],
 });

@@ -79,12 +79,12 @@
         <div class="cin-sub" id="cin-tagline">Art Intelligence</div>
       </div>
       <div class="cin-content" id="cin-content">
-        <div class="cin-slide" id="cs1" style="flex-shrink:0;">
+        <div class="cin-slide flex-shrink-0" id="cs1">
           <div class="cin-eye" id="cin-eye1">—</div>
           <div class="cin-h" id="cin-h1">—</div>
           <div class="cin-b" id="cin-b1">—</div>
         </div>
-        <div class="cin-slide" id="cs2" style="flex-grow:1;display:flex;flex-direction:column;justify-content:center;">
+        <div class="cin-slide flex-col-center flex-grow-1" id="cs2">
           <div class="cin-h font-23 mb-10" id="cin-h2">—</div>
           <div class="cin-b" id="cin-b2">—</div>
         </div>
@@ -230,7 +230,7 @@
           <div class="rp-head"><span class="rp-label" id="rp-label">◈ Analysis Complete</span><span class="rp-id" id="result-id">TRC-000000</span></div>
           <div class="rp-body" id="result-body">
             <!-- Skeleton loader shown during analysis -->
-            <div id="result-skeleton" class="skeleton-wrap d-none" style="padding:8px 0;">
+            <div id="result-skeleton" class="skeleton-wrap d-none py-8">
               <div class="skeleton-item skeleton-title"></div>
               <div class="skeleton-item skeleton-line"></div>
               <div class="skeleton-item skeleton-line"></div>
@@ -255,7 +255,7 @@
         <div id="result-tl-wrap" class="d-none border-top" style="background:var(--surface);scroll-snap-align:end;">
           <div class="rp-head p-12-14">
             <span class="page-eye">◈ Ownership Timeline</span>
-            <span class="text-9 text-dim cursor-pointer" id="tl-expand-link" style="letter-spacing:.1em;">EXPAND ›</span>
+            <span class="text-9 text-dim cursor-pointer ls-1" id="tl-expand-link">EXPAND ›</span>
           </div>
           <div class="tl-track-scroll scroll-hidden">
             <div class="d-flex" id="result-tl-track" style="align-items:flex-start;position:relative;min-width:max-content;gap:0;"></div>
@@ -276,6 +276,7 @@
         <div id="provenance-results"></div>
         <div id="valuation-results"></div>
         <div id="fingerprint-results"></div>
+        <div id="correlation-findings"></div>
         <button class="btn-add" id="btn-add" tabindex="0">+ Add to Investigations</button>
       </div>
     </div>
@@ -320,7 +321,7 @@
         <div class="page-eye" data-i18n="tl_eye">Provenance Timeline</div>
         <div class="page-title" id="tl-page-title" data-i18n="tl_title">Timeline</div>
         </div>
-        <button data-action="back" data-target="cases" class="border-none btn-icon-cancel">‹</button>
+        <button data-action="back" data-target="cases" class="border-none cursor-pointer btn-back-arrow">‹</button>
       </div>
       <!-- Subject info -->          <div class="p-12 px-20 border-bottom flex-shrink-0 bg-gold-gradient">
         <!-- Search bar for saved timelines -->
@@ -342,7 +343,7 @@
       <div id="tl-saved-list" class="d-none" style="flex-direction:column;flex:1;min-height:0;overflow-y:auto;">
         <div class="rp-head">
           <div class="text-gold-label">Saved Investigations</div>
-          <div class="text-11 text-dim" style="margin-top:3px;">Your saved provenance timelines persist across sessions</div>
+          <div class="text-11 text-dim mt-3">Your saved provenance timelines persist across sessions</div>
         </div>
         <div id="tl-saved-items" class="py-8"></div>
         <div id="tl-saved-empty" class="empty-state d-none">
@@ -542,10 +543,10 @@
           </button>
         <div class="sg-analysis" id="sg-analysis">
           <div class="sg-analysis-title">◈ Composition Analysis</div>
-          <div class="sg-analysis-confidence" id="sg-analysis-confidence" style="display:none;"></div>
+          <div class="sg-analysis-confidence d-none" id="sg-analysis-confidence"></div>
           <div class="sg-analysis-body" id="sg-analysis-body">Toggle overlays above to analyse the compositional structure. The golden ratio (φ≈1.618) appears throughout classical and Renaissance art.</div>
         </div>
-        <div class="sg-info" id="sg-compare-hint" style="display:none;border-left:3px solid var(--gold);background:var(--surface);padding:10px 14px;margin:0 14px 8px;font-size:10px;line-height:1.6;color:var(--text-mid);">
+        <div class="sg-info d-none sg-info-hint" id="sg-compare-hint">
           <strong>Compare mode</strong> — Left: original image · Right: with active overlays
         </div>
         <div class="sg-info">
@@ -561,7 +562,7 @@
           <div class="page-eye">Provenance Network</div>
           <div class="page-title">Knowledge Graph</div>
         </div>
-        <button data-action="back" data-target="timeline" class="cursor-pointer" style="background:none;border:none;color:var(--text-dim);font-size:22px;padding:4px 8px;">‹</button>
+        <button data-action="back" data-target="timeline" class="btn-back-arrow">‹</button>
       </div>
       <div class="scroll flex-col" style="gap:0;padding:0;">
         <div class="flex-shrink-0 px-16 py-12 border-bottom">
@@ -593,7 +594,7 @@
           <div class="page-eye">Deep Zoom Viewer</div>
           <div class="page-title">IIIF Artwork Viewer</div>
         </div>
-        <button data-action="back" data-target="scan" class="border-none cursor-pointer" style="background:none;color:var(--text-dim);font-size:22px;padding:4px 8px;">‹</button>
+        <button data-action="back" data-target="scan" class="btn-back-arrow">‹</button>
       </div>
       <div class="scroll" style="display:flex;flex-direction:column;gap:0;padding:0;">
         <div class="px-16 py-12 border-bottom flex-shrink-0">
@@ -620,7 +621,59 @@
       </div>
     </div>
 
-    <!-- ══ OPS DASHBOARD (System Health) ══ -->
+      </div>
+    </div>
+
+    <!-- ══ INVESTIGATION WORKSPACE ══ -->
+    <div class="screen" id="s-investigation" role="main" aria-label="Investigation Workspace">
+      <div class="page-head">
+        <div class="page-eye">&#x25C8; Investigation Workspace</div>
+        <div class="page-title">Board</div>
+      </div>
+      <div class="d-flex gap-12 mb-16" style="padding:0 20px;">
+        <div class="inv-stat"><span class="inv-stat-val" id="inv-total">0</span><span class="inv-stat-lbl">Total</span></div>
+        <div class="inv-stat"><span class="inv-stat-val" id="inv-active">0</span><span class="inv-stat-lbl">Active</span></div>
+        <div class="inv-stat"><span class="inv-stat-val" id="inv-pinned">0</span><span class="inv-stat-lbl">Pinned</span></div>
+        <div class="inv-stat"><span class="inv-stat-val" id="inv-annotations">0</span><span class="inv-stat-lbl">Pins</span></div>
+      </div>
+      <div id="inv-board-panel">
+        <div class="d-flex gap-8 mb-16" style="padding:0 20px;">
+          <button class="btn-gold-sm" data-inv-action="pin-result">+ Pin Current Result</button>
+          <button class="btn-outline-sm" data-inv-action="go-scan">New Scan</button>
+        </div>
+        <div class="scroll" id="inv-board-scroll">
+          <div id="inv-board"></div>
+        </div>
+      </div>
+      <div id="inv-detail" style="display:none;">
+        <div class="d-flex gap-8 mb-16" style="padding:0 20px;">
+          <button class="btn-outline-sm" data-inv-action="back">&larr; Back to Board</button>
+          <button class="btn-gold-sm" data-inv-action="save-notes">Save Notes</button>
+          <button class="btn-outline-sm" data-inv-action="export">Export</button>
+        </div>
+        <div class="scroll" id="inv-detail-scroll">
+          <div id="inv-image-container" class="inv-image-container" style="width:100%;min-height:200px;position:relative;overflow:hidden;"></div>
+          <div style="padding:16px 20px;">
+            <div class="inv-detail-title" id="inv-detail-title"></div>
+            <div class="inv-detail-artist" id="inv-detail-artist"></div>
+            <div class="rdiv"></div>
+            <div class="rsec">Investigation Notes</div>
+            <textarea id="inv-detail-notes" class="inv-notes-input" placeholder="Enter your investigation notes..." rows="5"></textarea>
+            <div class="rdiv"></div>
+            <div class="rsec">Provenance Timeline</div>
+            <div id="inv-detail-timeline" class="inv-timeline-list"></div>
+            <!-- Correlation findings panel (rendered dynamically) -->
+            <div id="inv-correlation-panel"></div>
+            <!-- Research results panel (rendered dynamically) -->
+            <div id="inv-research-panel"></div>
+            <!-- Quick actions bar (rendered dynamically) -->
+            <div id="inv-quick-actions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <!-- ══ OPS DASHBOARD (System Health) ══ -->
     <div class="screen" id="s-ops" role="main" aria-label="Ops Dashboard">
       <div class="page-head">
         <div class="page-eye">System Health</div>
@@ -714,7 +767,7 @@
         <div id="profile-ops-section">
           <div class="p-sec" style="display:flex;justify-content:space-between;align-items:center;">
             <span>System Health</span>
-            <span id="profile-ops-link" class="text-xs text-gold cursor-pointer uppercase" style="letter-spacing:.1em;">Full Dashboard ›</span>
+            <span id="profile-ops-link" class="text-xs text-gold cursor-pointer uppercase ls-1">Full Dashboard ›</span>
           </div>
           <div class="rp-body" style="padding:12px 20px;">
             <div class="flex-stats">
@@ -735,6 +788,9 @@
         <div class="p-sec" data-i18n="profile_settings">Settings</div>
         <div class="p-row"><div class="p-row-l" data-i18n="profile_alert_prefs">Alert Preferences</div><div class="p-row-r" data-i18n="on">On</div></div>
         <div class="p-row"><div class="p-row-l" data-i18n="profile_export_format">Export Format</div><div class="p-row-r" id="export-row-val">PDF / CSV</div></div>
+        <div class="p-row" id="ai-model-selector-row"><div class="p-row-l">AI Model</div><div class="p-row-r">Configure ›</div></div>
+        <!-- AI Model picker (hidden, toggle via row click) -->
+        <div id="ai-model-picker" class="d-none" style="padding:10px 20px 14px;border-bottom:1px solid var(--border);"></div>
         <div class="p-row"><div class="p-row-l" data-i18n="profile_switch_tier">Switch Tier (Demo)</div><div class="p-row-r">›</div></div>
         <!-- Language selector -->
         <div class="p-row" id="lang-selector-row">
@@ -742,7 +798,7 @@
           <div class="p-row-r" id="lang-current">English</div>
         </div>
         <div id="lang-picker" style="display:none;padding:6px 20px 14px;border-bottom:1px solid var(--border);">
-          <div class="text-dim-sm mb-8" style="letter-spacing:.1em;text-transform:uppercase;" data-i18n="language_select">Select Language</div>
+          <div class="text-dim-sm mb-8 ls-1 uppercase" data-i18n="language_select">Select Language</div>
           <div id="lang-options" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
         </div>
         <!-- Logout -->
@@ -861,11 +917,14 @@
 <script src="src/cases.js"></script>
 <script src="src/results.js"></script>
 <script src="src/timeline.js"></script>
+<script src="src/correlation.js"></script>
 <script src="src/vision.js"></script>
 <script src="src/geometry.js"></script>
 <script src="src/viewer.js"></script>
 <script src="src/export.js"></script>
 <script src="src/knowledge.js"></script>
+<script src="src/research-agent.js"></script>
+<script src="src/ai-config.js"></script>
 <script src="src/idb.js"></script>
 <script src="src/sync.js"></script>
 <script src="src/upload.js"></script>
@@ -878,7 +937,8 @@
 <script src="src/sse.js"></script>
 <script src="src/ops-dashboard.js"></script>
 <script src="src/profile-ops.js"></script>
-<script src="src/app.js"></script>
+<script src="src/investigation.js"></script>
+  <script src="src/app.js"></script>
 <!-- ── Event Binding Init — replaces 68 inline onclick handlers ── -->
 <script>
 (function() {
@@ -1052,6 +1112,22 @@
     else if (text.indexOf('Alert Preferences') >= 0) window.toast('Alert preferences');
     else if (text.indexOf('Export Format') >= 0) window.toast('Export options');
     else if (text.indexOf('Switch Tier') >= 0) window.toast('Switch tier · Demo');
+  });
+  
+  // ── AI Model selector toggle ──
+  bid('ai-model-selector-row', function() {
+    var picker = document.getElementById('ai-model-picker');
+    if (!picker) return;
+    if (picker.style.display === 'none' || picker.classList.contains('d-none')) {
+      picker.classList.remove('d-none');
+      picker.style.display = 'block';
+      if (window.TRACE_AI_CONFIG && typeof window.TRACE_AI_CONFIG.renderSelector === 'function') {
+        window.TRACE_AI_CONFIG.renderSelector(picker);
+      }
+    } else {
+      picker.style.display = 'none';
+      picker.classList.add('d-none');
+    }
   });
   
   // ── Language picker toggle ──

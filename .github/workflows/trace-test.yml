@@ -56,7 +56,7 @@ jobs:
         run: node tests/test_all.js
 
       - name: Install Playwright browsers
-        run: npx playwright install chromium --with-deps 2>/dev/null
+        run: npx playwright install firefox --with-deps 2>/dev/null
 
       - name: Run E2E tests
         run: npx playwright test tests/e2e.e2e.test.js tests/provenance.e2e.test.js

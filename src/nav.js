@@ -2,7 +2,7 @@
 // TRACE — Navigation System
 // ══════════════════════════════════════════════
 
-window.ALL_SCREENS = ['intro', 'home', 'scan', 'chat', 'cases', 'timeline', 'learn', 'ops', 'profile', 'research', 'spectral', 'geometry', 'viewer', 'knowledge'];
+window.ALL_SCREENS = ['intro', 'home', 'scan', 'chat', 'cases', 'timeline', 'learn', 'ops', 'profile', 'research', 'spectral', 'geometry', 'viewer', 'knowledge', 'investigation'];
 
 /**
  * Navigate to a screen
