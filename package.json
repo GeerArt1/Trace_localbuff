@@ -15,6 +15,7 @@
     "test:watch": "node -e \"setInterval(function(){require('child_process').spawn('node',['tests/test_all.js'],{stdio:'inherit',env:process.env})},10000).unref();console.log('Watching — tests re-run every 10s')\""
   },
   "dependencies": {
+    "@sentry/node": "^10.61.0",
     "better-sqlite3": "^12.10.0",
     "dotenv": "^17.4.2",
     "pg": "^8.21.0",

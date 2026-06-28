@@ -60,6 +60,14 @@
       description: 'Google\'s fast vision model — good free tier alternative',
       speed: 'Fast',
       tier: 'standard'
+    },
+    'deepseek/deepseek-v4-flash': {
+      label: 'DeepSeek V4 Flash',
+      provider: 'DeepSeek',
+      cost: 'Cheapest ($0.14/M)',
+      description: 'Most cost-effective vision model — ideal for high-volume art screening',
+      speed: 'Fast',
+      tier: 'standard'
     }
   };
 

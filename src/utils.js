@@ -58,7 +58,7 @@ window.buildEmptyTL = function buildEmptyTL() {
   return '<div style="padding:40px 20px;text-align:center;color:var(--text-dim);font-size:13px;line-height:1.8;">' +
     '<div style="font-size:28px;opacity:.35;margin-bottom:14px;">◈</div>' +
     'Scan any artwork, person or landmark<br>to build its provenance timeline.' +
-    '<div style="margin-top:20px;"><button data-tl-action="go-scan" style="background:var(--gold);color:#060402;border:none;padding:12px 24px;font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;">SCAN NOW ›</button></div>' +
+    '<div style="margin-top:20px;"><button data-tl-action="go-scan" style="background:var(--gold);color:#060402;border:none;padding:12px 24px;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;">SCAN NOW ›</button></div>' +
     '</div>';
 };
 

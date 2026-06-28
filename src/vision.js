@@ -337,7 +337,7 @@ window.DatabaseQuery = {
 
     var html = apiBadges + '<div class="db-risk-header" style="border-left:3px solid ' + (riskColors[risk] || 'var(--gold)') + ';padding:10px 14px;background:var(--surface);margin-bottom:10px;">' +
       '<div style="font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);">Risk Assessment</div>' +
-      '<div style="font-family:Courier Prime,monospace;font-size:16px;color:' + (riskColors[risk] || 'var(--gold)') + ';font-weight:700;margin-top:4px;">' + (risk || 'Unknown').toUpperCase() + '</div>' +
+      '<div style="font-family:var(--font-mono);font-size:16px;color:' + (riskColors[risk] || 'var(--gold)') + ';font-weight:700;margin-top:4px;">' + (risk || 'Unknown').toUpperCase() + '</div>' +
       '<div style="font-size:11px;color:var(--text-mid);margin-top:4px;">' + window.esc(result.risk_details || 'No risk details available.') + '</div></div>' +
       '<div style="padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);">' +
       '<div class="db-dot" style="background:' + (result.interpol_match ? 'var(--red-lt)' : 'var(--green-lt)') + '"></div>' +
@@ -350,7 +350,7 @@ window.DatabaseQuery = {
       html += '<div class="px-14 py-10"><div class="gold-label">Getty Provenance Index Matches</div>';
       result.getty_matches.forEach(function(m) {
         html += '<div class="gpi-match-item">' +
-          '<div style="font-family:Cormorant Garamond,serif;font-size:13px;color:var(--text);">' + window.esc(m.title || '') + '</div>' +
+          '<div style="font-family:var(--font-display);font-size:13px;color:var(--text);">' + window.esc(m.title || '') + '</div>' +
           '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + window.esc(m.artist || '') + (m.year ? ', ' + window.esc(m.year) : '') + '</div>' +
           '<div style="font-size:8px;color:var(--text-ghost);margin-top:3px;">Source: ' + window.esc(m.source || 'Getty') + ' \u00b7 Confidence: ' + window.esc(m.confidence || 'medium') + '</div></div>';
       });
@@ -788,6 +788,11 @@ window._visionShowResultHook = function(r) {
     }
   }
 
+  // PROVENANCE TIMELINE VISUALIZATION
+  if (r.timeline && r.timeline.length && window.ProvenanceTimeline) {
+    window.ProvenanceTimeline.render(r.timeline);
+  }
+
   // DATABASE QUERY BUTTON (Professional)
   var dbBtn = document.getElementById('db-query-btn');
   if (dbBtn) dbBtn.style.display = (window.TIER === 'professional') ? 'flex' : 'none';
@@ -832,6 +837,154 @@ window._visionShowResultHook = function(r) {
 
 // ══════════════════════════════════════════════
 // TRACE — Register vision module with the Module Registry
+
+// ── PROVENANCE TIMELINE VISUALIZATION ─────────
+// Interactive horizontal timeline showing ownership with severity-coded gaps
+window.ProvenanceTimeline = {
+  render: function(events) {
+    if (!events || !events.length) return;
+    // Find or create the timeline container
+    var container = document.getElementById('provenance-timeline');
+    if (!container) {
+      var alt = document.getElementById('provenance-results');
+      if (alt) {
+        container = document.createElement('div');
+        container.id = 'provenance-timeline';
+        alt.appendChild(container);
+      } else {
+        var rp = document.querySelector('.r-panel, .results-panel, .result-content');
+        if (rp) {
+          container = document.createElement('div');
+          container.id = 'provenance-timeline';
+          rp.appendChild(container);
+        } else {
+          return;
+        }
+      }
+    }
+
+    var gaps = window.GAP_SEVERITY.calculate(events);
+    var gapMap = {};
+    gaps.forEach(function(g) { gapMap[g.index] = g; });
+
+    var years = [];
+    events.forEach(function(e) {
+      var y = parseInt(e.year);
+      if (!isNaN(y)) years.push(y);
+    });
+    if (!years.length) return;
+
+    var minYear = Math.min.apply(null, years);
+    var maxYear = Math.max.apply(null, years);
+    var yearSpan = maxYear - minYear || 1;
+    var now = new Date().getFullYear();
+    var totalSpan = Math.max(yearSpan, 50);
+    var endYear = Math.max(maxYear, now);
+    var startYear = Math.min(minYear, endYear - totalSpan);
+
+    var html = '<div class="pt-container">';
+    html += '<div class="pt-header">Provenance Timeline</div>';
+    html += '<div class="pt-track-wrap">';
+    html += '<div class="pt-track">';
+
+    var prevEndYear = null;
+    events.forEach(function(ev, i) {
+      var yearStr = ev.year || '';
+      var yearNum = parseInt(yearStr);
+      var eventText = ev.event || '';
+      var isGap = eventText.toLowerCase().indexOf('gap') !== -1 || eventText.indexOf('\u26a0') !== -1;
+
+      if (isGap) {
+        var gapInfo = gapMap[i];
+        var severity = gapInfo ? gapInfo.severity : 'minor';
+        var nextYear = endYear;
+        for (var j = i + 1; j < events.length; j++) {
+          var ny = parseInt(events[j].year);
+          if (!isNaN(ny)) { nextYear = ny; break; }
+        }
+        var gapStart = prevEndYear !== null ? prevEndYear : (yearNum || startYear);
+        var gapEnd = nextYear;
+        var gapDuration = gapEnd - gapStart;
+
+        var leftPct = ((gapStart - startYear) / (endYear - startYear)) * 100;
+        var widthPct = Math.max(5, (gapDuration / (endYear - startYear)) * 100);
+
+        html += '<div class="pt-gap pt-gap-' + severity + '"';
+        html += ' style="left:' + leftPct + '%;width:' + widthPct + '%;"';
+        html += ' data-severity="' + severity + '"';
+        html += ' data-gap-start="' + gapStart + '"';
+        html += ' data-gap-end="' + gapEnd + '"';
+        html += ' title="' + window.esc(eventText) + ' (' + gapDuration + ' yrs)">';
+        html += '<div class="pt-gap-pattern"></div>';
+        html += '<div class="pt-gap-sev">' + severity.toUpperCase() + '</div>';
+        html += '<div class="pt-gap-dur">' + gapDuration + 'yrs</div>';
+        html += '</div>';
+      } else if (!isNaN(yearNum)) {
+        var leftPct2 = ((yearNum - startYear) / (endYear - startYear)) * 100;
+        html += '<div class="pt-owner" style="left:' + leftPct2 + '%;"';
+        html += ' title="' + window.esc(yearStr) + ': ' + window.esc(eventText) + '">';
+        html += '<div class="pt-owner-marker"></div>';
+        html += '<div class="pt-owner-year">' + window.esc(yearStr) + '</div>';
+        html += '</div>';
+        if (!isNaN(yearNum)) prevEndYear = yearNum;
+      }
+    });
+
+    // End marker
+    var nowPct = ((now - startYear) / (endYear - startYear)) * 100;
+    html += '<div class="pt-now" style="left:' + Math.min(nowPct, 100) + '%;" title="Present Day">';
+    html += '<div class="pt-now-marker"></div>';
+    html += '<div class="pt-now-label">Now</div></div>';
+    html += '</div></div>';
+
+    // Century scale
+    html += '<div class="pt-scale">';
+    var scaleStep = Math.max(10, Math.ceil((endYear - startYear) / 8 / 10) * 10);
+    for (var sy = Math.ceil(startYear / scaleStep) * scaleStep; sy <= endYear; sy += scaleStep) {
+      var pct = ((sy - startYear) / (endYear - startYear)) * 100;
+      html += '<div class="pt-scale-mark" style="left:' + pct + '%;">';
+      html += '<span class="pt-scale-label">' + sy + '</span></div>';
+    }
+    html += '</div>';
+
+    // Legend
+    html += '<div class="pt-legend">';
+    html += '<span class="pt-legend-item"><span class="pt-legend-swatch pt-swatch-owner"></span> Owner</span>';
+    html += '<span class="pt-legend-item"><span class="pt-legend-swatch pt-swatch-gap-minor"></span> Minor Gap</span>';
+    html += '<span class="pt-legend-item"><span class="pt-legend-swatch pt-swatch-gap-moderate"></span> Moderate</span>';
+    html += '<span class="pt-legend-item"><span class="pt-legend-swatch pt-swatch-gap-critical"></span> Critical</span>';
+    html += '<span class="pt-legend-item"><span class="pt-legend-swatch pt-swatch-now"></span> Present</span>';
+    html += '</div>';
+
+    // Detail panel
+    html += '<div class="pt-detail" id="pt-detail" style="display:none;"></div>';
+    html += '</div>';
+
+    container.innerHTML = html;
+    container.style.display = 'block';
+
+    // Click handlers for gaps
+    setTimeout(function() {
+      var gapEls = container.querySelectorAll('.pt-gap');
+      Array.prototype.forEach.call(gapEls, function(el) {
+        el.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var detailPanel = document.getElementById('pt-detail');
+          if (!detailPanel) return;
+          var severity = this.getAttribute('data-severity') || 'minor';
+          var gapStart = parseInt(this.getAttribute('data-gap-start')) || 0;
+          var gapEnd = parseInt(this.getAttribute('data-gap-end')) || 0;
+          var duration = gapEnd - gapStart;
+          var suggestion = window.GAP_SEVERITY.suggestion(severity, duration + ' years');
+          detailPanel.innerHTML = '<div class="pt-detail-head pt-detail-' + severity + '">\u26a0 Provenance Gap: ' + gapStart + '\u2013' + gapEnd + '</div>' +
+            '<div class="pt-detail-body">' + window.esc(suggestion) + '</div>' +
+            '<div class="pt-detail-foot">Severity: ' + severity.toUpperCase() + ' | Duration: ' + duration + ' years</div>';
+          detailPanel.style.display = 'block';
+        });
+      });
+    }, 50);
+  }
+};
 // ══════════════════════════════════════════════
 
 (function() {

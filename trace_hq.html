@@ -12,41 +12,44 @@
 <meta http-equiv="Expires" content="0">
 <style>
 :root{
-  --bg:#050403;--bg2:#0b0907;--surface:#111008;--surface2:#181410;
-  --border:#2a2418;--border2:#3a3020;
-  --gold:#D4AE52;--gold-dim:#8B6914;--gold-lt:#e8c870;
-  --text:#e8dfc8;--text-mid:#a09070;--text-dim:#665840;
-  --red:#c44848;--green:#4a9460;--blue:#4a7494;
-  --font-display:'Georgia',serif;
-  --font-ui:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --font-mono:'Courier New',monospace;
+  --bg:#080E26;--bg2:#0d1535;--surface:rgba(6,10,30,0.96);--surface2:#121a3a;
+  --border:rgba(210,172,52,0.14);--border2:rgba(210,172,52,0.22);
+  --gold:#E8C14A;--gold-dim:#C4A040;--gold-lt:#ECD080;
+  --text:#F5F3F0;--text-mid:#d8d4cc;--text-dim:#8a8aaa;
+  --red:#c0392b;--green:#27ae60;--blue:#4a7494;
+  --font-display:'Cormorant Garamond','Georgia',serif;
+  --font-ui:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'Courier Prime','Courier New',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-ui);min-height:100vh;}
 
 /* ── LOCK SCREEN ── */
 #lock-screen{
-  position:fixed;inset:0;background:var(--bg);z-index:1000;
+  position:fixed;inset:0;background:#080E26;z-index:1000;
   display:none;flex-direction:column;align-items:center;justify-content:center;
   gap:0;
 }
-.lock-logo{font-family:var(--font-display);font-size:52px;font-weight:300;
-  color:var(--gold);letter-spacing:.05em;margin-bottom:6px;}
-.lock-sub{font-size:10px;letter-spacing:.3em;text-transform:uppercase;
+.lock-logo{font-family:var(--font-display);font-size:56px;font-weight:300;
+  color:var(--gold);letter-spacing:.06em;margin-bottom:4px;text-shadow:0 0 32px rgba(232,193,74,0.5);}
+.lock-sub{font-size:10px;letter-spacing:.32em;text-transform:uppercase;
   color:var(--text-dim);margin-bottom:48px;}
-.lock-box{background:var(--surface);border:1px solid var(--border2);
-  border-radius:6px;padding:32px;width:320px;}
-.lock-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+.lock-box{background:rgba(6,10,30,0.96);border:1px solid rgba(210,172,52,0.15);
+  border-radius:6px;padding:32px;width:340px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.lock-label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;
   color:var(--text-dim);margin-bottom:10px;}
-.lock-input{width:100%;background:var(--bg2);border:1px solid var(--border2);
+.lock-input{width:100%;background:rgba(5,10,28,0.65);border:1px solid rgba(210,172,52,0.2);
   color:var(--text);padding:13px 16px;font-family:var(--font-mono);font-size:14px;
-  border-radius:3px;outline:none;letter-spacing:.15em;}
-.lock-input:focus{border-color:var(--gold-dim);}
-.lock-btn{width:100%;margin-top:14px;background:var(--gold);color:#060402;
-  border:none;padding:14px;font-family:var(--font-ui);font-size:11px;font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;cursor:pointer;border-radius:3px;
-  transition:background .15s;}
-.lock-btn:hover{background:var(--gold-lt);}
+  border-radius:3px;outline:none;letter-spacing:.15em;transition:border-color .25s,box-shadow .25s;}
+.lock-input:focus{border-color:rgba(210,172,52,0.5);box-shadow:0 0 0 3px rgba(210,172,52,0.05);}
+.lock-btn{width:100%;margin-top:14px;background:transparent;color:var(--gold);
+  border:1px solid var(--gold);padding:14px;font-family:var(--font-ui);font-size:11px;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;cursor:pointer;border-radius:3px;
+  transition:all .25s;position:relative;overflow:hidden;}
+.lock-btn::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateX(-100%);transition:transform .32s ease;}
+.lock-btn:hover::before{transform:translateX(0);}
+.lock-btn:hover{color:#080E26;}
+.lock-btn span{position:relative;z-index:1;}
 .lock-error{color:var(--red);font-size:11px;margin-top:10px;text-align:center;
   min-height:16px;letter-spacing:.05em;}
 .lock-hint{font-size:10px;color:var(--text-dim);text-align:center;margin-top:20px;
@@ -58,60 +61,61 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);min-heigh
 #app{display:flex;min-height:100vh;flex-direction:column;}
 
 /* Topbar */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);
+.topbar{background:rgba(6,10,30,0.96);border-bottom:1px solid rgba(210,172,52,0.14);
   padding:0 28px;display:flex;align-items:center;justify-content:space-between;
-  height:56px;position:sticky;top:0;z-index:100;}
+  height:56px;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
 .topbar-logo{font-family:var(--font-display);font-size:22px;color:var(--gold);
-  font-weight:400;letter-spacing:.06em;}
+  font-weight:500;letter-spacing:.08em;text-shadow:0 0 16px rgba(232,193,74,0.3);}
 .topbar-right{display:flex;align-items:center;gap:16px;}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);
   animation:pulse-dot 2s ease-in-out infinite;}
 @keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.4;}}
 .topbar-time{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);}
-.lock-btn-sm{background:none;border:1px solid var(--border2);color:var(--text-dim);
-  padding:6px 12px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-  cursor:pointer;border-radius:2px;font-family:var(--font-ui);}
+.lock-btn-sm{background:none;border:1px solid rgba(210,172,52,0.2);color:var(--text-dim);
+  padding:6px 12px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:2px;font-family:var(--font-ui);transition:all .15s;}
 .lock-btn-sm:hover{color:var(--gold);border-color:var(--gold-dim);}
+#agent-alert-container > div:hover{opacity:.85!important;}
 
 /* Layout */
 .main{display:grid;grid-template-columns:240px 1fr;flex:1;}
-.sidebar{background:var(--surface);border-right:1px solid var(--border);
+.sidebar{background:rgba(6,10,30,0.96);border-right:1px solid rgba(210,172,52,0.14);
   padding:20px 0;position:sticky;top:56px;height:calc(100vh - 56px);
   overflow-y:auto;}
 .nav-section{padding:0 16px;margin-bottom:6px;}
-.nav-label{font-size:9px;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--text-dim);padding:12px 8px 6px;}
+.nav-label{font-size:9px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--text-dim);padding:14px 8px 6px;font-weight:500;}
 .nav-btn{width:100%;background:none;border:none;color:var(--text-mid);
   padding:9px 10px;text-align:left;font-size:12px;cursor:pointer;
   border-radius:3px;display:flex;align-items:center;gap:10px;
   font-family:var(--font-ui);transition:all .15s;}
-.nav-btn:hover{background:var(--surface2);color:var(--text);}
-.nav-btn.active{background:rgba(212,174,82,.1);color:var(--gold);}
+.nav-btn:hover{background:rgba(210,172,52,0.06);color:var(--text);}
+.nav-btn.active{background:rgba(232,193,74,0.1);color:var(--gold);}
 .nav-icon{font-size:14px;width:18px;text-align:center;}
 
 /* Content area */
-.content{padding:32px;overflow-y:auto;}
+.content{padding:32px;overflow-y:auto;background:#080E26;}
 .panel{display:none;}
 .panel.active{display:block;}
-.panel-title{font-family:var(--font-display);font-size:32px;font-weight:300;
-  color:var(--text);margin-bottom:4px;}
-.panel-sub{font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+.panel-title{font-family:var(--font-display);font-size:34px;font-weight:300;
+  color:var(--text);margin-bottom:4px;letter-spacing:0.01em;}
+.panel-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--text-dim);margin-bottom:32px;}
 
 /* Cards */
-.card{background:var(--surface);border:1px solid var(--border);
-  border-radius:4px;overflow:hidden;margin-bottom:16px;}
-.card-head{padding:14px 18px;background:var(--surface2);border-bottom:1px solid var(--border);
+.card{background:rgba(6,10,30,0.96);border:1px solid rgba(210,172,52,0.13);
+  border-radius:4px;overflow:hidden;margin-bottom:16px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.card-head{padding:14px 18px;background:#121a3a;border-bottom:1px solid rgba(210,172,52,0.1);
   display:flex;justify-content:space-between;align-items:center;}
-.card-title{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);}
+.card-title{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;}
 .card-body{padding:18px;}
 
 /* File rows */
 .file-row{display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px;border-bottom:1px solid var(--border);gap:12px;
+  padding:14px 18px;border-bottom:1px solid rgba(210,172,52,0.1);gap:12px;
   transition:background .15s;}
 .file-row:last-child{border-bottom:none;}
-.file-row:hover{background:var(--surface2);}
+.file-row:hover{background:rgba(210,172,52,0.04);}
 .file-icon{font-size:20px;flex-shrink:0;}
 .file-info{flex:1;min-width:0;}
 .file-name{font-family:var(--font-mono);font-size:12px;color:var(--gold);
@@ -119,20 +123,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);min-heigh
 .file-desc{font-size:11px;color:var(--text-dim);margin-top:2px;}
 .file-size{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);
   flex-shrink:0;}
-.btn-dl{background:var(--gold);color:#060402;border:none;padding:8px 16px;
+.btn-dl{background:var(--gold);color:#080E26;border:none;padding:8px 16px;
   font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
   cursor:pointer;border-radius:2px;text-decoration:none;white-space:nowrap;
-  font-family:var(--font-ui);transition:background .15s;}
-.btn-dl:hover{background:var(--gold-lt);}
-.btn-secondary{background:none;border:1px solid var(--border2);color:var(--text-mid);
+  font-family:var(--font-ui);transition:all .15s;}
+.btn-dl:hover{background:var(--gold-lt);box-shadow:0 0 12px rgba(232,193,74,0.2);}
+.btn-secondary{background:none;border:1px solid rgba(210,172,52,0.14);color:var(--text-mid);
   padding:7px 14px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
   cursor:pointer;border-radius:2px;font-family:var(--font-ui);transition:all .15s;}
 .btn-secondary:hover{border-color:var(--gold-dim);color:var(--gold);}
 
 /* Status indicators */
 .status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-.status-card{background:var(--surface);border:1px solid var(--border);
-  border-radius:4px;padding:16px;}
+.status-card{background:rgba(6,10,30,0.96);border:1px solid rgba(210,172,52,0.13);
+  border-radius:4px;padding:16px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
 .status-name{font-size:10px;letter-spacing:.15em;text-transform:uppercase;
   color:var(--text-dim);margin-bottom:8px;}
 .status-val{font-size:22px;font-family:var(--font-display);color:var(--text);}
@@ -141,7 +145,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);min-heigh
 .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .dot-green{background:var(--green);}
 .dot-red{background:var(--red);}
-.dot-amber{background:#c89820;}
+.dot-amber{background:#E8A020;}
 .dot-grey{background:#444;}
 
 /* Revenue calculator */
@@ -149,12 +153,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);min-heigh
 .calc-item{}
 .calc-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;
   color:var(--text-dim);margin-bottom:8px;}
-.calc-input{width:100%;background:var(--bg2);border:1px solid var(--border2);
+.calc-input{width:100%;background:rgba(5,10,28,0.65);border:1px solid rgba(210,172,52,0.2);
   color:var(--text);padding:11px 14px;font-family:var(--font-mono);font-size:18px;
-  border-radius:3px;outline:none;}
-.calc-input:focus{border-color:var(--gold-dim);}
+  border-radius:3px;outline:none;transition:border-color .25s;}
+.calc-input:focus{border-color:var(--gold-dim);box-shadow:0 0 0 3px rgba(210,172,52,0.05);}
 .calc-results{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-.calc-result{background:var(--surface2);border:1px solid var(--border);
+.calc-result{background:#121a3a;border:1px solid rgba(210,172,52,0.13);
   border-radius:4px;padding:16px;text-align:center;}
 .calc-result-val{font-family:var(--font-display);font-size:24px;color:var(--gold);}
 .calc-result-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;
@@ -181,7 +185,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);min-heigh
   color:var(--text-dim);display:flex;justify-content:space-between;align-items:center;
   margin-bottom:12px;}
 .key-masked{letter-spacing:.1em;}
-.key-warning{background:rgba(196,72,72,.08);border:1px solid rgba(196,72,72,.25);
+.key-warning{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.25);
   border-radius:3px;padding:12px 16px;font-size:12px;color:#e08080;
   line-height:1.6;margin-bottom:16px;}
 .key-safe{background:rgba(74,148,96,.08);border:1px solid rgba(74,148,96,.25);
@@ -206,7 +210,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);min-heigh
 .version-date{font-size:11px;color:var(--text-dim);margin-top:2px;}
 .version-badge{font-size:9px;padding:2px 7px;border-radius:2px;
   letter-spacing:.1em;text-transform:uppercase;flex-shrink:0;align-self:flex-start;}
-.badge-current{background:rgba(212,174,82,.15);color:var(--gold);}
+.badge-current{background:rgba(232,193,74,.15);color:var(--gold);}
 .badge-prev{background:var(--surface2);color:var(--text-dim);}
 
 /* Tabs */
@@ -234,7 +238,7 @@ hr.divider{border-top-color:var(--border);}
 .sg-controls{display:flex;flex-wrap:wrap;gap:8px;padding:14px 18px;background:var(--surface2);border-top:1px solid var(--border);}
 .sg-btn{background:none;border:1px solid var(--border2);color:var(--text-mid);padding:8px 14px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;font-family:var(--font-ui);transition:all .15s;}
 .sg-btn:hover{border-color:var(--gold-dim);color:var(--gold);}
-.sg-btn.active{background:rgba(212,174,82,.12);border-color:var(--gold-dim);color:var(--gold);}
+.sg-btn.active{background:rgba(232,193,74,.12);border-color:var(--gold-dim);color:var(--gold);}
 .sg-upload-btn{background:var(--gold);color:#060402;border:none;padding:8px 16px;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;border-radius:2px;font-family:var(--font-ui);transition:background .15s;}
 .sg-upload-btn:hover{background:var(--gold-lt);}
 .sg-info{font-size:11px;color:var(--text-dim);padding:14px 18px;line-height:1.6;border-top:1px solid var(--border);}
@@ -261,12 +265,12 @@ hr.divider{border-top-color:var(--border);}
 .ff-toggle input{opacity:0;width:0;height:0;}
 .ff-slider{position:absolute;cursor:pointer;inset:0;background:var(--border2);border-radius:12px;transition:.2s;}
 .ff-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:var(--text-dim);border-radius:50%;transition:.2s;}
-.ff-toggle input:checked+.ff-slider{background:rgba(212,174,82,.3);}
+.ff-toggle input:checked+.ff-slider{background:rgba(232,193,74,.3);}
 .ff-toggle input:checked+.ff-slider::before{background:var(--gold);transform:translateX(18px);}
 .ff-tag{font-size:8px;padding:2px 7px;border-radius:2px;letter-spacing:.1em;text-transform:uppercase;}
 .ff-tag-all{background:rgba(74,148,96,.1);color:var(--green);border:1px solid rgba(74,148,96,.2);}
 .ff-tag-pro{background:rgba(100,140,220,.1);color:#7AADDA;border:1px solid rgba(100,140,220,.2);}
-.ff-tag-col{background:rgba(212,174,82,.1);color:var(--gold);border:1px solid rgba(212,174,82,.2);}
+.ff-tag-col{background:rgba(232,193,74,.1);color:var(--gold);border:1px solid rgba(232,193,74,.2);}
 .ff-tag-disc{background:rgba(200,160,40,.08);color:#C8A028;border:1px solid rgba(200,160,40,.15);}
 
 /* EVENT LOG */
@@ -330,15 +334,15 @@ hr.divider{border-top-color:var(--border);}
 .um-table tr:hover td{background:var(--surface2);}
 .um-tier{display:inline-block;font-size:8px;padding:2px 8px;border-radius:2px;letter-spacing:.08em;text-transform:uppercase;}
 .um-tier.pro{background:rgba(100,140,220,.1);color:#7AADDA;border:1px solid rgba(100,140,220,.2);}
-.um-tier.col{background:rgba(212,174,82,.1);color:var(--gold);border:1px solid rgba(212,174,82,.2);}
+.um-tier.col{background:rgba(232,193,74,.1);color:var(--gold);border:1px solid rgba(232,193,74,.2);}
 .um-tier.disc{background:rgba(200,160,40,.08);color:#C8A028;border:1px solid rgba(200,160,40,.15);}
 .um-status{font-size:8px;padding:2px 7px;border-radius:2px;letter-spacing:.08em;}
 .um-status.active{background:rgba(74,148,96,.1);color:var(--green);border:1px solid rgba(74,148,96,.2);}
-.um-status.inactive{background:rgba(196,72,72,.08);color:var(--red);border:1px solid rgba(196,72,72,.15);}
+.um-status.inactive{background:rgba(192,57,43,.08);color:var(--red);border:1px solid rgba(192,57,43,.15);}
 
 /* AI SACRED GEOMETRY ENHANCEMENT */
 .sg-ai-btn{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#060402;border:none;padding:8px 16px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;font-family:var(--font-ui);transition:all .2s;}
-.sg-ai-btn:hover{box-shadow:0 0 16px rgba(212,174,82,0.3);}
+.sg-ai-btn:hover{box-shadow:0 0 16px rgba(232,193,74,0.3);}
 .sg-ai-btn:disabled{opacity:.4;cursor:not-allowed;}
 .sg-analysis{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px;margin-top:12px;font-size:12px;line-height:1.7;color:var(--text-mid);}
 .sg-analysis strong{color:var(--gold);}
@@ -488,6 +492,9 @@ hr.divider{border-top-color:var(--border);}
 /* Missing utilities */
 .text-green-lt { color:var(--green-lt); }
 .text-gold-dim { color:var(--gold-dim); }
+
+@keyframes typingDots{0%,20%{opacity:0;}50%{opacity:1;}80%,100%{opacity:0;}}
+.typing-dots{animation:typingDots 1.4s infinite;}
 </style>
 </head>
 <body>
@@ -501,7 +508,7 @@ hr.divider{border-top-color:var(--border);}
     <input class="lock-input" id="lock-input" type="password"
            placeholder="••••••••" autocomplete="off"
            data-hq-key="unlock">
-    <button class="lock-btn" data-hq="unlock">Enter HQ</button>
+    <button class="lock-btn" data-hq="unlock"><span>Enter HQ</span></button>
     <div class="lock-error" id="lock-error"></div>
   </div>
   <!-- Inline set-password form (shown when no password exists) -->
@@ -517,7 +524,7 @@ hr.divider{border-top-color:var(--border);}
       <input class="lock-input" id="set-pw2" type="password" placeholder="••••••••"
              data-hq-key="submitSetPassword">
       <button class="lock-btn" data-hq="submitSetPassword" class="mt-14">
-        Set Password &amp; Enter
+        <span>Set Password &amp; Enter</span>
       </button>
       <div id="set-pw-error" class="lock-error"></div>
     </div>
@@ -554,6 +561,9 @@ hr.divider{border-top-color:var(--border);}
         <button class="nav-btn" data-hq="show" data-hq-arg="analytics">
           <span class="nav-icon">◉</span> Analytics
         </button></div>
+          <button class="nav-btn" data-hq="show" data-hq-arg="chat" title="AI Chat (Ctrl+Shift+C)">
+            <span>💬</span> AI Chat
+          </button>
       <div class="nav-section">
         <div class="nav-label">App Files</div>
         <button class="nav-btn" data-hq="show" data-hq-arg="files">
@@ -613,6 +623,24 @@ hr.divider{border-top-color:var(--border);}
         <button class="nav-btn" data-hq="show" data-hq-arg="abtesting">
           <span class="nav-icon">↯</span> A/B Testing
         </button>
+          <button class="nav-btn" data-hq="show" data-hq-arg="forensic" title="Forensic Analysis Pipeline">
+            <span>🔬</span> Forensic
+          </button>
+          <button class="nav-btn" data-hq="show" data-hq-arg="databases" title="External Database Query">
+            <span>🌍</span> Databases
+          </button>
+          <button class="nav-btn" data-hq="show" data-hq-arg="fingerprint" title="Digital Fingerprinting">
+            <span>🖥</span> Fingerprint
+          </button>
+          <button class="nav-btn" data-hq="show" data-hq-arg="expert" title="Expert Consultation">
+            <span>🧑‍🏫</span> Experts
+          </button>
+          <button class="nav-btn" data-hq="show" data-hq-arg="pipeline" title="Analysis Pipeline Status">
+            <span>⚡</span> Pipeline
+          </button>
+          <button class="nav-btn" data-hq="show" data-hq-arg="blockchain" title="Blockchain Provenance Registry">
+            <span>⛓</span> Blockchain
+          </button>
       </div>
     </div>
 
@@ -948,7 +976,39 @@ hr.divider{border-top-color:var(--border);}
       </div>
 
       <!-- SACRED GEOMETRY -->
-      <div class="panel" id="panel-sacredgeo">
+      
+<!-- AI CHAT -->
+<div class="panel" id="panel-chat">
+  <div class="panel-title" style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:20px;">💬</span>
+    <span>AI Chat</span>
+    <span class="text-dim-sm" style="margin-left:auto;font-size:10px;">Ctrl+Shift+C</span>
+  </div>
+  <div class="panel-sub">Ask follow-up questions about your last analysis</div>
+  <div style="margin-top:16px;">
+    <div id="chat-messages" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;min-height:300px;max-height:500px;overflow-y:auto;padding:12px;margin-bottom:12px;">
+      <div class="text-dim-sm" style="text-align:center;padding:40px 20px;" id="chat-empty">
+        Run an analysis first, then ask follow-up questions here.
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="chat-input" placeholder="Ask a follow-up question..." 
+             style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:10px 12px;color:var(--text);font-size:12px;font-family:var(--font-ui);outline:none;">
+      <button id="chat-send" style="background:var(--gold);color:#060402;border:none;border-radius:3px;padding:10px 16px;font-family:var(--font-ui);font-size:10px;font-weight:700;cursor:pointer;">Send</button>
+      <button id="chat-clear" style="background:var(--bg2);color:var(--text-dim);border:1px solid var(--border);border-radius:3px;padding:10px 12px;font-family:var(--font-ui);font-size:9px;cursor:pointer;">Clear</button>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+      <button class="chat-q" data-q="Is the signature consistent?" style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:6px 10px;color:var(--text-dim);font-size:9px;cursor:pointer;">Check signature</button>
+      <button class="chat-q" data-q="What period does this date from?" style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:6px 10px;color:var(--text-dim);font-size:9px;cursor:pointer;">Estimate period</button>
+      <button class="chat-q" data-q="Estimated market value?" style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:6px 10px;color:var(--text-dim);font-size:9px;cursor:pointer;">Value estimate</button>
+      <button class="chat-q" data-q="Any red flags in provenance?" style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:6px 10px;color:var(--text-dim);font-size:9px;cursor:pointer;">Red flags</button>
+    </div>
+    <div id="chat-context" class="text-dim-sm" style="margin-top:10px;font-size:9px;text-align:center;display:none;">
+      Context: <span id="chat-context-label">Last analysis</span>
+    </div>
+  </div>
+</div>
+<div class="panel" id="panel-sacredgeo">
         <div class="panel-title">Sacred Geometry</div>
         <div class="panel-sub">Composition analysis with golden ratio overlays</div>
 
@@ -990,7 +1050,133 @@ hr.divider{border-top-color:var(--border);}
       </div>
 
       <!-- EVENT LOG -->
-      <div class="panel" id="panel-eventlog">
+      
+<!-- FORENSIC ANALYSIS PANEL -->
+<div class="panel" id="panel-forensic">
+  <div class="panel-title">🔬 Forensic Analysis Pipeline</div>
+  <div class="panel-sub">Multi-stage scientific analysis suite for Old Master artworks</div>
+  <div style="margin-top:12px;font-size:11px;color:var(--text-dim);line-height:1.8;">
+    <p>The forensic analysis pipeline runs 7 stages of examination on the current artwork:</p>
+    <ol style="margin:8px 0;padding-left:20px;line-height:1.8;">
+      <li>Macro Visual Analysis — Composition, brushwork, light treatment</li>
+      <li>Pigment Spectroscopy — Period-appropriate pigment identification</li>
+      <li>Dendrochronology — Panel/canvas dating estimation</li>
+      <li>Craquelure Pattern Analysis — Age and drying crack patterns</li>
+      <li>Infrared Reflectography — Underdrawing and pentimenti detection</li>
+      <li>XRF Spectral Correlation — Elemental composition analysis</li>
+      <li>UV Fluorescence — Varnish and restoration mapping</li>
+    </ol>
+    <button data-hq="runForensic" style="background:var(--gold);color:#060402;border:none;border-radius:3px;padding:10px 16px;font-family:var(--font-ui);font-size:10px;font-weight:700;cursor:pointer;">Run Forensic Analysis</button>
+    <div id="forensic-results" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<!-- DATABASES PANEL -->
+<div class="panel" id="panel-databases">
+  <div class="panel-title">🌍 External Database Query</div>
+  <div class="panel-sub">Query Getty, INTERPOL, Art Loss Register, and RKD databases</div>
+  <div style="margin-top:12px;">
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <select id="db-select" style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:8px;color:var(--text);font-size:10px;font-family:var(--font-ui);">
+        <option value="getty_ulan">Getty ULAN (Artists)</option>
+        <option value="getty_aat">Getty AAT (Artwork Types)</option>
+        <option value="getty_tgn">Getty TGN (Places)</option>
+        <option value="interpol">INTERPOL Stolen Works</option>
+        <option value="artloss">Art Loss Register</option>
+        <option value="rkd">RKD Artists</option>
+      </select>
+      <input type="text" id="db-query" placeholder="Search query..." style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;color:var(--text);font-size:10px;font-family:var(--font-ui);outline:none;">
+      <button data-hq="searchDatabase" style="background:var(--gold);color:#060402;border:none;border-radius:3px;padding:8px 12px;font-family:var(--font-ui);font-size:10px;font-weight:700;cursor:pointer;">Search</button>
+    </div>
+    <div style="font-size:10px;color:var(--text-dim);line-height:1.7;">
+      <p><strong>Getty:</strong> SPARQL queries against Getty Vocabularies (ULAN artists, AAT concepts, TGN places)</p>
+      <p><strong>INTERPOL:</strong> Redirect to INTERPOL Stolen Works Database (no public API)</p>
+      <p><strong>Art Loss Register:</strong> Redirect to ALR search (subscription required)</p>
+      <p><strong>RKD:</strong> Redirect to RKD artist research pages</p>
+    </div>
+  </div>
+</div>
+
+<!-- FINGERPRINT PANEL -->
+<div class="panel" id="panel-fingerprint">
+  <div class="panel-title">🖥 Digital Fingerprinting</div>
+  <div class="panel-sub">Artwork fingerprinting, similarity matching, and stolen database verification</div>
+  <div style="margin-top:12px;font-size:11px;color:var(--text-dim);line-height:1.8;">
+    <p>Digital fingerprinting uses perceptual hashing to create a unique identifier for artwork images. This enables:</p>
+    <ul style="margin:8px 0;padding-left:20px;line-height:1.8;">
+      <li><strong>Similarity Matching</strong> — Find visually similar works in the database</li>
+      <li><strong>Stolen Art Verification</strong> — Cross-reference against stolen art databases</li>
+      <li><strong>Provenance Chain Hashing</strong> — Cryptographic hash of the ownership chain</li>
+    </ul>
+    <button data-hq="runFingerprint" style="background:var(--gold);color:#060402;border:none;border-radius:3px;padding:10px 16px;font-family:var(--font-ui);font-size:10px;font-weight:700;cursor:pointer;">Generate Fingerprint</button>
+    <pre id="fp-result" style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:12px;margin-top:10px;font-size:9px;color:var(--text-dim);overflow:auto;max-height:300px;"></pre>
+  </div>
+</div>
+
+        <!-- BLOCKCHAIN PROVENANCE PANEL -->
+        <div class="panel" id="panel-blockchain">
+          <div class="panel-title">⛓ Blockchain Provenance Registry</div>
+          <div class="panel-sub">Immutable provenance records on-chain</div>
+          <div style="margin-top:12px;font-size:11px;color:var(--text-dim);line-height:1.7;">
+            Register artwork provenance as an immutable blockchain record.
+            Supports Ethereum, Polygon, Optimism, and Sepolia test networks.
+          </div>
+          <div style="margin:12px 0;">
+            <label style="font-size:10px;color:var(--text-mid);">Network:</label>
+            <select id="blockchain-network" data-hq-change="blockchainNetwork" style="margin-left:6px;">
+              <option value="ethereum">Ethereum</option>
+              <option value="polygon">Polygon</option>
+              <option value="optimism">Optimism</option>
+              <option value="sepolia" selected>Sepolia (test)</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:12px;">
+            <button class="action-btn" data-hq="registerBlockchain">Register Provenance</button>
+            <button class="action-btn" data-hq="verifyBlockchain">Verify Provenance</button>
+          </div>
+          <div id="blockchain-result" style="font-size:11px;color:var(--text-mid);line-height:1.6;">
+            Select an artwork and register or verify blockchain provenance.
+          </div>
+        </div>
+<!-- EXPERT PANEL -->
+<div class="panel" id="panel-expert">
+  <div class="panel-title">🧑‍🏫 Expert Consultation</div>
+  <div class="panel-sub">Connect with specialist experts for professional consultation</div>
+  <div style="margin-top:12px;font-size:11px;color:var(--text-dim);line-height:1.8;">
+    <p>Our curated network of specialists can assist with:</p>
+    <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap;">
+      <span style="background:rgba(232,193,74,0.1);border:1px solid rgba(232,193,74,0.2);border-radius:2px;padding:4px 8px;font-size:9px;color:var(--gold);">Old Master Paintings</span>
+      <span style="background:rgba(232,193,74,0.1);border:1px solid rgba(232,193,74,0.2);border-radius:2px;padding:4px 8px;font-size:9px;color:var(--gold);">Provenance Research</span>
+      <span style="background:rgba(232,193,74,0.1);border:1px solid rgba(232,193,74,0.2);border-radius:2px;padding:4px 8px;font-size:9px;color:var(--gold);">Conservation</span>
+      <span style="background:rgba(232,193,74,0.1);border:1px solid rgba(232,193,74,0.2);border-radius:2px;padding:4px 8px;font-size:9px;color:var(--gold);">Forensic Analysis</span>
+      <span style="background:rgba(232,193,74,0.1);border:1px solid rgba(232,193,74,0.2);border-radius:2px;padding:4px 8px;font-size:9px;color:var(--gold);">Valuation</span>
+      <span style="background:rgba(232,193,74,0.1);border:1px solid rgba(232,193,74,0.2);border-radius:2px;padding:4px 8px;font-size:9px;color:var(--gold);">Art Law</span>
+    </div>
+    <button data-hq="runExpert" style="background:var(--gold);color:#060402;border:none;border-radius:3px;padding:10px 16px;font-family:var(--font-ui);font-size:10px;font-weight:700;cursor:pointer;">Find Matching Experts</button>
+    <div id="expert-results" style="margin-top:12px;"></div>
+  </div>
+</div>
+        <!-- ANALYSIS PIPELINE PANEL -->
+        <div class="panel" id="panel-pipeline">
+          <div class="panel-title">⚡ Analysis Pipeline</div>
+          <div class="panel-sub">Automated pipeline status — runs after each AI analysis</div>
+          <div style="margin-top:12px;font-size:11px;color:var(--text-dim);line-height:1.7;">
+            The Analysis Pipeline automatically executes forensic examination and fingerprint generation
+            after each AI composition analysis. Results are chained — fingerprint hashes incorporate
+            forensic provenance data for stronger verification.
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin:12px 0;">
+            <label style="font-size:10px;color:var(--text-mid);cursor:pointer;display:flex;align-items:center;gap:6px;">
+              <input type="checkbox" id="pipeline-toggle" data-hq-change="togglePipeline" checked>
+              Auto-run pipeline after AI analysis
+            </label>
+            <button class="action-btn" data-hq="runPipelineNow" style="margin-left:auto;">Run Pipeline Now</button>
+          </div>
+          <div id="pipeline-summary" style="font-size:11px;color:var(--text-mid);line-height:1.6;">
+            Pipeline status: waiting for first analysis...
+          </div>
+        </div>
+        <div class="panel" id="panel-eventlog">
         <div class="panel-title">Event Log</div>
         <div class="panel-sub">Live server events monitoring</div>
 
@@ -1819,7 +2005,7 @@ function sgLoadImage(input) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var img = new Image();
-    img.onload = function() {
+    img.addEventListener('load', function() {
       sgImage = img;
       var canvas = document.getElementById('sg-canvas');
       var ph = document.getElementById('sg-placeholder');
@@ -1868,7 +2054,7 @@ function sgDrawGoldenRatio() {
   if (!sgCtx || !sgImage) return;
   var w = sgImage.naturalWidth, h = sgImage.naturalHeight;
   var ctx = sgCtx;
-  ctx.strokeStyle = 'rgba(212,174,82,0.7)';
+  ctx.strokeStyle = 'rgba(232,193,74,0.7)';
   ctx.lineWidth = 1.5;
   ctx.setLineDash([6,4]);
   var phi = 1.618;
@@ -1879,10 +2065,10 @@ function sgDrawGoldenRatio() {
   ctx.beginPath(); ctx.moveTo(0, y1); ctx.lineTo(w, y1); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(0, y2); ctx.lineTo(w, y2); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = 'rgba(212,174,82,0.6)';
+  ctx.fillStyle = 'rgba(232,193,74,0.6)';
   var pts = [[x1,y1],[x1,y2],[x2,y1],[x2,y2]];
   for (var i = 0; i < pts.length; i++) { ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], 4, 0, Math.PI*2); ctx.fill(); }
-  ctx.fillStyle = 'rgba(212,174,82,0.85)';
+  ctx.fillStyle = 'rgba(232,193,74,0.85)';
   ctx.font = '11px system-ui, sans-serif';
   ctx.fillText(String.fromCharCode(966) + ' = 1.618', 10, 18);
   ctx.setLineDash([]);
@@ -2052,7 +2238,7 @@ function refreshAnalytics() {
       var barW = (w - pad * 2) / 7;
       var maxVal = Math.max(scans, chats, 1);
       [
-        { label: 'Scans', val: scans, color: 'rgba(212,174,82,0.7)' },
+        { label: 'Scans', val: scans, color: 'rgba(232,193,74,0.7)' },
         { label: 'Chats', val: chats, color: 'rgba(138,173,234,0.7)' },
         { label: 'Errors', val: errors, color: 'rgba(196,72,72,0.5)' }
       ].forEach(function(series, si) {
@@ -2610,7 +2796,80 @@ function sgAnalyzeWithAI() {
   
   if (btn) btn.disabled = false;
   showToast('AI composition analysis complete');
-}
+
+    // == Enhanced Auto-Run Pipeline ==
+  // Check if pipeline is enabled (toggle via localStorage)
+  var pipelineEnabled = true;
+  try { pipelineEnabled = localStorage.getItem("trace_pipeline_enabled") !== "false"; } catch(e) {}
+
+  if (pipelineEnabled) {
+    var pipelineResults = {};
+
+    // --- Step 1: Forensic Analysis ---
+    try {
+      if (window.TRACE && window.TRACE.Forensic && window._lastResult) {
+        var ctx = window._lastResult;
+        window._lastForensic = window.TRACE.Forensic.analyze(
+          ctx.image_url || null,
+          ctx.artist || "Unknown",
+          ctx.media_type || "canvas",
+          ctx.period || null
+        );
+        pipelineResults.forensic = Object.keys(window._lastForensic).length + "/7 stages ready";
+        var forensicEl = document.getElementById("forensic-results");
+        if (forensicEl) {
+          forensicEl.innerHTML = window.TRACE.Forensic.generateReport(window._lastForensic);
+        }
+        showToast("Forensic analysis complete");
+      }
+    } catch (e) {
+      console.warn("Auto-forensic failed:", e.message);
+    }
+
+    // --- Step 2: Fingerprint Generation (uses forensic data if available) ---
+    try {
+      if (window.TRACE && window.TRACE.Fingerprint && window._lastResult) {
+        var fpInput = Object.assign({}, window._lastResult);
+        // Chain: enrich fingerprint input with forensic provenance data
+        if (window._lastForensic) {
+          fpInput._forensicResults = {
+            macro_status: window._lastForensic.macro ? window._lastForensic.macro.status : null,
+            pigment_count: window._lastForensic.pigment ? (window._lastForensic.pigment.pigments_expected || []).length : 0,
+            authenticity_index: window._lastForensic.craquelure ? window._lastForensic.craquelure.authenticity_index : null
+          };
+        }
+        window.TRACE.Fingerprint.generate(fpInput).then(function(fp) {
+          window._lastFingerprint = fp;
+          pipelineResults.fingerprint = fp.fingerprint_id;
+          var fpEl = document.getElementById("fp-result");
+          if (fpEl) {
+            fpEl.textContent = JSON.stringify(fp, null, 2);
+          }
+          showToast("Fingerprint generated");
+        }).catch(function(err) {
+          console.warn("Auto-fingerprint failed:", err.message);
+          showToast("Fingerprint failed: " + err.message);
+        });
+      }
+    } catch (e) {
+      console.warn("Auto-fingerprint failed:", e.message);
+    }
+
+    // --- Pipeline Summary ---
+    var summary = [];
+    if (pipelineResults.forensic) summary.push("Forensic: " + pipelineResults.forensic);
+    if (pipelineResults.fingerprint) summary.push("FP: " + pipelineResults.fingerprint.slice(0, 12) + "...");
+    if (summary.length) {
+      showToast("Pipeline: " + summary.join(" | "));
+      // Update pipeline panel if visible
+      var pipeEl = document.getElementById("pipeline-summary");
+      if (pipeEl) {
+        pipeEl.innerHTML = "<div style=\"padding:8px;background:rgba(212,174,82,0.08);border-radius:4px;font-size:11px;color:#C0B090;\">" +
+          "<div style=\"color:#D4AE52;font-weight:700;margin-bottom:4px;\">\u2728 Pipeline Complete</div>" +
+          "<div>" + summary.join("</div><div>") + "</div></div>";
+      }
+    }
+  }
 
 // OVERRIDE show() hook for new panels
 (function() {
@@ -2902,8 +3161,6 @@ function showAgentAlert(type, message) {
 
   var alert = document.createElement('div');
   alert.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:6px;border-radius:3px;background:' + c.bg + ';border-left:3px solid ' + c.border + ';cursor:pointer;transition:all .3s;animation:fadeInAlert .3s ease-out;';
-  alert.onmouseover = function() { this.style.opacity = '.85'; };
-  alert.onmouseout = function() { this.style.opacity = '1'; };
   alert.addEventListener('click', function() { dismissAlert(this); });
 
   alert.innerHTML = '<span style="font-size:14px;">' + c.icon + '</span>' +
@@ -3011,7 +3268,7 @@ function connectSSE() {
         }
       } catch(e2) { TRACE_WATCHDOG?.warn('SSE', e2); }
     };
-    sseSource.onerror = function() {
+    sseSource.addEventListener('error', function() {
       // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 32s max
       sseConnected = false;
       sseSource.close();
@@ -3540,12 +3797,12 @@ function abRenderChart() {
     var x = pad + idx * chartW / experiments.length;
     var cH = ((e.controlConversions || 0) / maxVal) * chartH;
     var vH = ((e.variantConversions || 0) / maxVal) * chartH;
-    ctx.fillStyle = 'rgba(212,174,82,0.6)'; ctx.fillRect(x, h - pad - cH, barW, cH);
+    ctx.fillStyle = 'rgba(232,193,74,0.6)'; ctx.fillRect(x, h - pad - cH, barW, cH);
     ctx.fillStyle = 'rgba(138,173,234,0.6)'; ctx.fillRect(x + barW + 4, h - pad - vH, barW, vH);
     ctx.fillStyle = '#665840'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center';
     var label = e.name.length > 12 ? e.name.slice(0, 10) + '...' : e.name;
     ctx.fillText(label, x + barW + 2, h - 10);
-    if (e.controlConversions > 0) { ctx.fillStyle = 'rgba(212,174,82,0.8)'; ctx.font = '7px monospace'; ctx.fillText(e.controlConversions, x + barW/2, h - pad - cH - 4); }
+    if (e.controlConversions > 0) { ctx.fillStyle = 'rgba(232,193,74,0.8)'; ctx.font = '7px monospace'; ctx.fillText(e.controlConversions, x + barW/2, h - pad - cH - 4); }
     if (e.variantConversions > 0) { ctx.fillStyle = 'rgba(138,173,234,0.8)'; ctx.font = '7px monospace'; ctx.fillText(e.variantConversions, x + barW*1.5 + 4, h - pad - vH - 4); }
   });
 }
@@ -4019,4 +4276,326 @@ function abRenderChart() {
 
   console.log('[TRACE Monitor Dashboard] Loaded');
 })();
+
+// TIER 1: AI Chat + Keyboard Shortcuts + Gap Detection
+var chatHistory = JSON.parse(localStorage.getItem('trace_chat_history') || '[]');
+window.__setChatContext = function(ctx) {
+  var el = document.getElementById('chat-context');
+  var label = document.getElementById('chat-context-label');
+  if (el && label) { el.style.display = 'block'; label.textContent = ctx || 'Last analysis'; }
+  var empty = document.getElementById('chat-empty');
+  if (empty) empty.style.display = 'none';
+};
+function sendChatMessage() {
+  var input = document.getElementById('chat-input');
+  if (!input || !input.value.trim()) return;
+  var text = input.value.trim();
+  input.value = '';
+  addChatMessage('user', text);
+  showChatTyping();
+  var ctxText = '';
+  if (window._lastResult) { try { ctxText = JSON.stringify(window._lastResult, null, 2).slice(0, 3000); } catch(e) {} }
+  var history = chatHistory.slice(-10).map(function(m) { return m.role + ': ' + m.content; }).join('\n');
+  var apiKey = localStorage.getItem('trace_anthropic_key') || '';
+  var prompt = 'You are a forensic art historian. Answer follow-up based on context.\n\n=== CONTEXT ===\n' + (ctxText || 'None') + '\n\n=== HISTORY ===\n' + (history || 'None') + '\n\n=== QUESTION ===\n' + text;
+  if (apiKey) {
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+    }).then(function(r) { return r.json(); }).then(function(data) {
+      removeChatTyping();
+      var reply = data.content && data.content[0] && data.content[0].text ? data.content[0].text : (data.error ? 'Error: ' + data.error.message : 'No response.');
+      finishChat(text, reply);
+    }).catch(function(err) {
+      removeChatTyping();
+      addChatMessage('assistant', 'Error: ' + err.message);
+    });
+  } else {
+    setTimeout(function() {
+      removeChatTyping();
+      finishChat(text, localChatResponse(text));
+    }, 1200);
+  }
+}
+function finishChat(userText, reply) {
+  addChatMessage('assistant', reply);
+  chatHistory.push({ role: 'user', content: userText, ts: Date.now() }, { role: 'assistant', content: reply, ts: Date.now() });
+  if (chatHistory.length > 100) chatHistory = chatHistory.slice(-100);
+  localStorage.setItem('trace_chat_history', JSON.stringify(chatHistory));
+  var count = (parseInt(localStorage.getItem('trace_chat_count') || '0') + 1);
+  localStorage.setItem('trace_chat_count', count);
+  var anEl = document.getElementById('an-chats');
+  if (anEl) anEl.textContent = count;
+}
+function localChatResponse(q) {
+  q = q.toLowerCase();
+  var ctx = window._lastResult || {};
+  var artist = ctx.artist || 'the artist';
+  var media = ctx.media_type || 'artwork';
+  if (q.includes('signature')) return 'Signature verification against known autograph works by ' + artist + ' requires close comparison. Workshop assistants often applied signatures. Recommend RKD database cross-reference.';
+  if (q.includes('period') || q.includes('date')) return 'Stylistic elements consistent with the peak period of ' + artist + '. Composition, figure types, and light handling are hallmarks of their mature style.';
+  if (q.includes('value') || q.includes('worth') || q.includes('price')) return 'A ' + media + ' by ' + artist + ' typically ranges from mid-five to low-six figures. Autograph works command premiums.';
+  if (q.includes('provenance') || q.includes('red flag')) return 'Critical periods include Napoleonic era and WWII. Cross-reference Lost Art Database recommended.';
+  if (q.includes('condition') || q.includes('restoration')) return 'Common issues: craquelure, old restorations, discoloured varnish. Full conservation report advisable.';
+  return 'Further specialist examination recommended for this ' + media + ' by ' + artist + '.';
+}
+function addChatMessage(role, text) {
+  var c = document.getElementById('chat-messages');
+  if (!c) return;
+  var msg = document.createElement('div');
+  msg.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;animation:fadeInAlert .3s ease-out;';
+  var av = document.createElement('div');
+  av.style.cssText = 'width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;font-weight:600;';
+  av.style.background = role === 'user' ? 'var(--gold)' : 'var(--bg2)';
+  av.style.border = role === 'user' ? 'none' : '1px solid var(--border)';
+  av.style.color = role === 'user' ? '#060402' : 'var(--text)';
+  av.textContent = role === 'user' ? 'U' : 'AI';
+  var b = document.createElement('div');
+  b.style.cssText = 'flex:1;font-size:11px;line-height:1.6;color:var(--text);padding:8px 12px;border-radius:3px;white-space:pre-wrap;';
+  b.style.background = role === 'user' ? 'rgba(232,193,74,0.08)' : 'var(--bg)';
+  b.style.border = role === 'user' ? '1px solid rgba(232,193,74,0.15)' : '1px solid var(--border)';
+  b.textContent = text;
+  msg.appendChild(av); msg.appendChild(b);
+  c.appendChild(msg);
+  c.scrollTop = c.scrollHeight;
+  var empty = document.getElementById('chat-empty');
+  if (empty) empty.style.display = 'none';
+}
+function showChatTyping() {
+  removeChatTyping();
+  var c = document.getElementById('chat-messages');
+  if (!c) return;
+  var t = document.createElement('div');
+  t.id = 'chat-typing';
+  t.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;animation:fadeInAlert .3s ease-out;';
+  t.innerHTML = '<div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;font-weight:600;background:var(--bg2);border:1px solid var(--border);color:var(--text);">AI</div><div style="flex:1;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:11px;color:var(--text-dim);">Thinking<span class="typing-dots">...</span></div>';
+  c.appendChild(t);
+  c.scrollTop = c.scrollHeight;
+}
+function removeChatTyping() { var t = document.getElementById('chat-typing'); if (t) t.remove(); }
+function clearChat() {
+  chatHistory = [];
+  localStorage.setItem('trace_chat_history', '[]');
+  var c = document.getElementById('chat-messages');
+  if (c) c.innerHTML = '<div class="text-dim-sm" style="text-align:center;padding:40px 20px;" id="chat-empty">Run an analysis, then ask follow-up questions.</div>';
+}
+function askQuick(q) { var i = document.getElementById('chat-input'); if (i) { i.value = q; sendChatMessage(); } }
+(function() {
+  var c = document.getElementById('chat-messages');
+  if (c && chatHistory.length) {
+    var empty = document.getElementById('chat-empty');
+    if (empty) empty.style.display = 'none';
+    chatHistory.slice(-20).forEach(function(m) { addChatMessage(m.role, m.content); });
+  }
+})();
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
+    e.preventDefault(); if (window.show) window.show('chat');
+    setTimeout(function() { var i = document.getElementById('chat-input'); if (i) i.focus(); }, 100);
+  }
+  if (e.ctrlKey && e.key === 'k' && !e.shiftKey) { e.preventDefault(); if (window.toggleSidebar) window.toggleSidebar(); }
+  if (e.ctrlKey && e.key === 'e' && !e.shiftKey) { e.preventDefault(); if (window.exportPDF) window.exportPDF(); }
+  if (e.ctrlKey && e.key === '/') { e.preventDefault(); showShortcutsHelp(); }
+  if (e.ctrlKey && e.key === 'd' && !e.shiftKey) { e.preventDefault(); if (window.show) window.show('dashboard'); }
+  if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) { e.preventDefault(); if (window.show) window.show('analytics'); }
+  if (e.key === 'Escape') { document.querySelectorAll('.overlay, .modal').forEach(function(el) { el.style.display = 'none'; }); }
+});
+function showShortcutsHelp() {
+  var h = document.createElement('div');
+  h.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;background:var(--surface);border:1px solid var(--border-strong);border-radius:4px;padding:16px 20px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:fadeInAlert .2s ease-out;';
+  h.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:10px;letter-spacing:.1em;text-transform:uppercase;">Keyboard Shortcuts</div>' +
+    '<div style="font-size:10px;line-height:2;color:var(--text);">' +
+    '<div><span style="background:var(--bg2);padding:2px 6px;border-radius:2px;font-family:var(--font-mono);font-size:9px;">Ctrl+K</span> Toggle sidebar</div>' +
+    '<div><span style="background:var(--bg2);padding:2px 6px;border-radius:2px;font-family:var(--font-mono);font-size:9px;">Ctrl+D</span> Dashboard</div>' +
+    '<div><span style="background:var(--bg2);padding:2px 6px;border-radius:2px;font-family:var(--font-mono);font-size:9px;">Ctrl+E</span> Export report</div>' +
+    '<div><span style="background:var(--bg2);padding:2px 6px;border-radius:2px;font-family:var(--font-mono);font-size:9px;">Ctrl+Shift+C</span> AI Chat</div>' +
+    '<div><span style="background:var(--bg2);padding:2px 6px;border-radius:2px;font-family:var(--font-mono);font-size:9px;">Ctrl+Shift+A</span> Analytics</div>' +
+    '<div><span style="background:var(--bg2);padding:2px 6px;border-radius:2px;font-family:var(--font-mono);font-size:9px;">Esc</span> Close overlays</div>' +
+    '<div><span style="background:var(--bg2);padding:2px 6px;border-radius:2px;font-family:var(--font-mono);font-size:9px;">Ctrl+/</span> This help</div></div>' +
+    '<button onclick="this.parentElement.remove()" style="margin-top:10px;width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);padding:6px;font-family:var(--font-ui);font-size:9px;cursor:pointer;border-radius:3px;">Close</button>';
+  document.body.appendChild(h);
+}
+function detectProvenanceGaps(timeline) {
+  if (!timeline || !timeline.length) return [];
+  var gaps = [];
+  var knownPeriods = [
+    { name: 'Napoleonic Era', start: 1794, end: 1815, severity: 'moderate', note: 'French occupation artworks confiscated' },
+    { name: 'WWII Nazi Era', start: 1933, end: 1945, severity: 'critical', note: 'Systematic looting highest scrutiny' },
+    { name: 'Post-WWII', start: 1945, end: 1950, severity: 'moderate', note: 'Displaced artworks incomplete records' }
+  ];
+  var sorted = timeline.slice().sort(function(a, b) { return (a.year || 0) - (b.year || 0); });
+  knownPeriods.forEach(function(p) {
+    var covered = sorted.some(function(e) { return (e.year || 0) >= p.start && (e.year || 0) <= p.end; });
+    if (!covered) gaps.push({ period: p.name, severity: p.severity, note: p.note, needs_attention: p.severity === 'critical' });
+  });
+  for (var i = 1; i < sorted.length; i++) {
+    var g = sorted[i].year - sorted[i-1].year;
+    if (g > 30) gaps.push({ period: sorted[i-1].year + '-' + sorted[i].year, severity: g > 80 ? 'critical' : (g > 50 ? 'moderate' : 'minor'), note: 'Unaccounted ' + g + ' years', needs_attention: g > 80 });
+  }
+  return gaps;
+}
+window.__runGapDetection = function() {
+  var td = window._lastResult && window._lastResult.provenance_timeline;
+  if (!td) { if (window.showAgentAlert) showAgentAlert('warning', 'No provenance timeline. Run analysis first.'); return; }
+  var gaps = detectProvenanceGaps(td);
+  if (!gaps.length) { if (window.showAgentAlert) showAgentAlert('success', 'No significant gaps detected.'); return; }
+  var crit = gaps.filter(function(g) { return g.severity === 'critical'; }).length;
+  if (window.showAgentAlert) {
+    showAgentAlert('warning', 'Provenance gaps: ' + crit + ' critical, ' + gaps.filter(function(g) { return g.severity === 'moderate'; }).length + ' moderate');
+  }
+};
+window.sendChatMessage = sendChatMessage;
+window.clearChat = clearChat;
+window.askQuick = askQuick;
+window.detectProvenanceGaps = detectProvenanceGaps;
+
+
+
+// Wire up chat buttons
+setTimeout(function() {
+  var sendBtn = document.getElementById('chat-send');
+  var clearBtn = document.getElementById('chat-clear');
+  if (sendBtn) sendBtn.addEventListener('click', function() { sendChatMessage(); });
+  if (clearBtn) clearBtn.addEventListener('click', function() { clearChat(); });
+  // Quick question buttons
+  document.querySelectorAll('.chat-q').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var q = this.getAttribute('data-q');
+      if (q) askQuick(q);
+    });
+  });
+}, 100);
+
+// ── data-hq handler: Run Forensic Analysis ──
+window.runForensic = function() {
+  if (window.TRACE && window.TRACE.Forensic) {
+    var r = window.TRACE.Forensic.analyze(null, (window._lastResult || {}).artist || "Unknown");
+    var el = document.getElementById("forensic-results");
+    if (el) el.innerHTML = window.TRACE.Forensic.generateReport(r);
+  } else {
+    alert("Forensic module not loaded");
+  }
+};
+
+// ── data-hq handler: Search External Database ──
+window.searchDatabase = function() {
+  var db = document.getElementById("db-select").value;
+  var q = document.getElementById("db-query").value;
+  if (!q) { alert("Enter a search query"); return; }
+  window.open("/api/databases?db=" + encodeURIComponent(db) + "&q=" + encodeURIComponent(q), "_blank");
+};
+
+// ── data-hq handler: Generate Fingerprint ──
+window.runFingerprint = function() {
+  if (window.TRACE && window.TRACE.Fingerprint) {
+    window.TRACE.Fingerprint.generate(window._lastResult).then(function(r) {
+      var el = document.getElementById("fp-result");
+      if (el) el.textContent = JSON.stringify(r, null, 2);
+    }).catch(function(err) {
+      console.error("Fingerprint gen failed:", err);
+      var el = document.getElementById("fp-result");
+      if (el) el.textContent = "Error: " + err.message;
+    });
+  } else {
+    alert("Fingerprint module not loaded");
+  }
+};
+
+// ── data-hq handler: Find Matching Experts ──
+window.runExpert = function() {
+  var ctx = window._lastResult || {};
+  if (window.TRACE && window.TRACE.Expert) {
+    var matches = window.TRACE.Expert.findMatches(ctx);
+    var el = document.getElementById("expert-results");
+    if (el) el.innerHTML = window.TRACE.Expert.renderMatches(matches);
+  } else {
+    alert("Expert module not loaded");
+  }
+};
+
+
+// ── data-hq handler: Blockchain Register ──
+window.registerBlockchain = function() {
+  if (window.TRACE && window.TRACE.Blockchain) {
+    var ctx = window._lastResult || {};
+    var result = window.TRACE.Blockchain.registerProvenance(ctx, "sepolia");
+    var el = document.getElementById("blockchain-result");
+    if (el) {
+      if (result.success) {
+        el.innerHTML = "<div style=\"padding:10px;background:rgba(90,170,120,0.1);border:1px solid rgba(90,170,120,0.3);border-radius:4px;\">" +
+          "<div style=\"color:#5AAA78;font-weight:700;margin-bottom:4px;\">\u2713 " + result.message + "</div>" +
+          "<div style=\"font-family:monospace;font-size:10px;color:#8AADEA;\">TX: " + result.registration.tx_hash + "</div>" +
+          "<div style=\"font-size:10px;color:#8A7A60;\">Network: " + result.registration.network_name + " | Block #" + result.registration.block_number + "</div>" +
+          "</div>";
+      } else {
+        el.innerHTML = "<div style=\"color:#EF4444;\">Error: " + result.error + "</div>";
+      }
+    }
+  } else {
+    alert("Blockchain module not loaded");
+  }
+};
+
+// ── data-hq handler: Blockchain Verify ──
+window.verifyBlockchain = function() {
+  if (window.TRACE && window.TRACE.Blockchain) {
+    var ctx = window._lastResult || {};
+    var result = window.TRACE.Blockchain.verifyProvenance(ctx);
+    var el = document.getElementById("blockchain-result");
+    if (el) {
+      el.innerHTML = "<div style=\"padding:10px;background:rgba(138,173,234,0.1);border:1px solid rgba(138,173,234,0.3);border-radius:4px;\">" +
+        "<div style=\"color:#8AADEA;font-weight:700;margin-bottom:4px;\">" + result.message + "</div>" +
+        "<div style=\"font-family:monospace;font-size:10px;color:#D4AE52;\">Hash: " + result.calculated_hash.slice(0, 20) + "...</div>" +
+        "<div style=\"font-size:10px;color:#8A7A60;\">TX: " + result.onchain_tx.slice(0, 16) + "...</div>" +
+        "</div>";
+    }
+  } else {
+    alert("Blockchain module not loaded");
+  }
+};
+
+
+// data-hq handler: Toggle pipeline
+window.togglePipeline = function() {
+  var cb = document.getElementById("pipeline-toggle");
+  if (cb) {
+    try { localStorage.setItem("trace_pipeline_enabled", cb.checked ? "true" : "false"); } catch(e) {}
+    showToast(cb.checked ? "Pipeline enabled" : "Pipeline disabled");
+  }
+};
+
+// data-hq handler: Run pipeline now
+window.runPipelineNow = function() {
+  if (window.TRACE && window.TRACE.Forensic && window._lastResult) {
+    showToast("Running pipeline...");
+    var ctx = window._lastResult;
+    window._lastForensic = window.TRACE.Forensic.analyze(
+      ctx.image_url || null,
+      ctx.artist || "Unknown",
+      ctx.media_type || "canvas",
+      ctx.period || null
+    );
+    var forensicEl = document.getElementById("forensic-results");
+    if (forensicEl) forensicEl.innerHTML = window.TRACE.Forensic.generateReport(window._lastForensic);
+
+    if (window.TRACE && window.TRACE.Fingerprint) {
+      window._lastFingerprint = window.TRACE.Fingerprint.generate(ctx);
+      var fpEl = document.getElementById("fp-result");
+      if (fpEl) fpEl.textContent = JSON.stringify(window._lastFingerprint, null, 2);
+    }
+    showToast("Pipeline complete");
+  } else {
+    alert("No analysis data available. Run an AI analysis first.");
+  }
+};
+
+  // == Initialize Pipeline Toggle State ==
+  try {
+    var pt = document.getElementById("pipeline-toggle");
+    if (pt) {
+      var val = localStorage.getItem("trace_pipeline_enabled");
+      if (val === "false") pt.checked = false;
+    }
+  } catch(e) {}
 </script></body></html>

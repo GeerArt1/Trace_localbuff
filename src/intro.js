@@ -21,7 +21,7 @@
     ofc.height = H;
     var o = ofc.getContext('2d');
     var fSize = Math.round(W * 0.185);
-    o.font = '400 ' + fSize + 'px \'Cormorant Garamond\',\'Playfair Display\',Georgia,serif';
+    o.font = '400 ' + fSize + 'px \'Cormorant Garamond\',serif';
     o.textAlign = 'center';
     o.textBaseline = 'middle';
     o.fillStyle = '#fff';
@@ -58,7 +58,7 @@
     ofc.width = W;
     ofc.height = H;
     var o = ofc.getContext('2d');
-    o.font = '400 ' + fSize + 'px \'Cormorant Garamond\',\'Playfair Display\',Georgia,serif';
+    o.font = '400 ' + fSize + 'px \'Cormorant Garamond\',serif';
     var metrics = o.measureText('TRACE');
     var tw = metrics.width;
     var left = (W - tw) / 2;

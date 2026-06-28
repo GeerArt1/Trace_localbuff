@@ -1,0 +1,112 @@
+# TRACK CI/CD Pipeline
+#
+# Runs on every push and pull request:
+#   1. Lint — ESLint + Prettier
+#   2. Test — Vitest (270+ tests)
+#   3. Deploy — Wrangler to Cloudflare Workers (main branch only)
+#
+# Prerequisites:
+#   - CLOUDFLARE_API_TOKEN secret (with Workers permissions)
+#   - CLOUDFLARE_ACCOUNT_ID secret
+
+name: TRACK CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'track-worker/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'track-worker/**'
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  # ── Lint & Format Check ─────────────────────────────────────────────────────
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./track-worker
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ./track-worker/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npx eslint src/ tests/
+        continue-on-error: true
+
+      - name: Prettier check
+        run: npx prettier --check 'src/**/*.js' 'tests/**/*.js'
+        continue-on-error: true
+
+  # ── Test ────────────────────────────────────────────────────────────────────
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./track-worker
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ./track-worker/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Vitest
+        run: npm run test:worker
+
+  # ── Deploy to Cloudflare Workers ────────────────────────────────────────────
+  deploy:
+    name: Deploy Worker
+    needs: [lint, test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./track-worker
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ./track-worker/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate wrangler config
+        run: npx wrangler --version
+
+      - name: Deploy to Cloudflare Workers
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

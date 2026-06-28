@@ -1,0 +1,2541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACK · Picturia Intelligence</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@400;500;600&family=Courier+Prime:wght@400;700&family=Lora:ital,wght@0,400;1,400&display=swap');
+
+:root {
+  --navy:#080E26; --navy-mid:#0d1535; --gold:#E8C14A; --gold-dim:#C4A040;
+  --gold-rule:rgba(232,193,74,0.5); --gold-faint:rgba(210,172,52,0.06);
+  --parchment:#FFFFFF; --pdim:#d8d4cc; --muted:#8a8aaa; --surface:rgba(6,10,30,0.96);
+  --red:#c0392b; --amber:#e67e22; --green:#27ae60;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--navy);color:var(--parchment);font-family:'Cormorant Garamond',serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 15% 8%,rgba(210,172,52,0.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 80px;}
+
+/* HEADER */
+header{padding:48px 0 40px;text-align:center;}
+.suite-lbl{font-family:'Montserrat',sans-serif;font-size:0.5rem;font-weight:500;letter-spacing:0.3em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:24px;opacity:.7;}
+
+/* Loupe logo */
+.logo-row{font-family:'Cormorant Garamond',serif;font-size:clamp(44px,10vw,68px);font-weight:600;letter-spacing:.3em;padding-right:.3em;display:inline-flex;align-items:center;line-height:1;position:relative;}
+.lw{color:#FFFFFF;display:inline-block;text-shadow:0 0 20px rgba(0,0,0,0.8),0 2px 8px rgba(0,0,0,0.9);opacity:0.92;}
+.la-wrap{position:relative;display:inline-block;}
+.la{color:#E8C14A;text-shadow:0 0 32px rgba(232,193,74,0.9),0 0 64px rgba(232,193,74,0.4),0 2px 4px rgba(0,0,0,0.6);display:inline-block;position:relative;z-index:1;}
+.loupe-svg{position:absolute;top:50%;left:50%;z-index:3;pointer-events:none;animation:loupedrop .9s cubic-bezier(.22,1,.36,1) forwards;width:1.8em;height:1.39em;}
+@keyframes loupedrop{
+  0%  {transform:translate(-45.5%,-245.5%);opacity:0;}
+  8%  {opacity:1;}
+  100%{transform:translate(-45.5%,-45.5%);opacity:1;}
+}
+.rules{display:flex;flex-direction:column;gap:5px;margin:14px auto 10px;width:180px;}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.55;}
+.rule.t{opacity:.2;}
+.track-sub{font-family:'Montserrat',sans-serif;font-size:.58rem;font-weight:400;letter-spacing:.32em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:4px;}
+.track-tag{font-family:'Lora',serif;font-style:italic;font-size:0.865rem;color:var(--pdim);margin-top:18px;margin-bottom:6px;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:8px;}
+.stat{background:var(--surface);border:1px solid var(--gold-rule);padding:14px 10px;text-align:center;backdrop-filter:blur(10px);}
+.snum{font-family:'Courier Prime',monospace;font-size:1.4rem;font-weight:700;color:#E8C14A;text-shadow:0 0 12px rgba(232,193,74,0.4);display:block;line-height:1;margin-bottom:5px;}
+.slbl{font-family:'Montserrat',sans-serif;font-size:.4rem;font-weight:500;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--gold-rule);padding:26px 28px 22px;margin-bottom:8px;backdrop-filter:blur(14px);}
+.flbl{font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:500;letter-spacing:.2em;color:#C4A040;text-transform:uppercase;display:block;margin-bottom:8px;}
+.url-input{width:100%;background:rgba(5,10,28,.65);border:1px solid rgba(210,172,52,.2);padding:12px 16px;color:var(--parchment);font-family:'Montserrat',sans-serif;font-size:.68rem;outline:none;transition:border-color .25s,box-shadow .25s;margin-bottom:18px;}
+.url-input:focus{border-color:rgba(210,172,52,.5);box-shadow:0 0 0 3px rgba(210,172,52,.05);}
+.url-input::placeholder{color:var(--muted);font-style:italic;}
+#geminiKey::placeholder,#orKey::placeholder{color:#8a8aaa;letter-spacing:.05em;}
+.div{height:1px;background:var(--gold-rule);margin:18px 0;opacity:.35;}
+
+/* Mode tabs */
+.mode-tabs{display:flex;gap:4px;margin-bottom:18px;}
+.mtab{flex:1;background:rgba(5,10,28,.4);border:1px solid rgba(210,172,52,.14);padding:9px 8px;cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:500;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;text-align:center;}
+.mtab:hover{border-color:rgba(210,172,52,.35);color:var(--pdim);}
+.mtab.active{border-color:var(--gold);background:var(--gold-faint);color:var(--gold);}
+
+/* Source checkboxes */
+.sources{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px;}
+.src{background:rgba(5,10,28,.4);border:1px solid rgba(210,172,52,.13);padding:6px 12px;cursor:pointer;font-family:'Lora',serif;font-size:0.735rem;color:var(--pdim);transition:all .18s;user-select:none;}
+.src:hover{border-color:rgba(210,172,52,.35);}
+.src.on{border-color:var(--gold);background:var(--gold-faint);color:var(--gold);}
+.src.soon{opacity:.3;cursor:not-allowed;}
+
+/* Artist tiles */
+.artist-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:20px;}
+.atile{background:rgba(5,10,28,.4);border:1px solid rgba(210,172,52,.13);padding:7px 14px;cursor:pointer;transition:all .2s;font-family:'Lora',serif;font-size:0.735rem;color:var(--pdim);}
+.atile:hover{border-color:rgba(210,172,52,.35);}
+.atile.active{border-color:var(--gold);background:var(--gold-faint);color:var(--gold);}
+.atile.soon{opacity:.3;cursor:not-allowed;font-style:italic;}
+
+/* Scan button */
+.scan-btn{width:100%;background:transparent;border:1px solid var(--gold);padding:16px;color:var(--gold);font-family:'Montserrat',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:color .3s;}
+.scan-btn::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateX(-100%);transition:transform .32s ease;}
+.scan-btn:hover::before{transform:translateX(0);}
+.scan-btn:hover{color:var(--navy);}
+.scan-btn span{position:relative;z-index:1;}
+.scan-btn:disabled{opacity:.3;cursor:not-allowed;}
+.scan-btn:disabled::before{display:none;}
+
+/* Seeds */
+.seeds-row{margin-top:18px;padding-top:16px;border-top:1px solid rgba(210,172,52,.1);}
+.seeds-lbl{font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:500;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:9px;}
+.seeds{display:flex;flex-wrap:wrap;gap:5px;}
+.seed{background:var(--gold-faint);border:1px solid rgba(210,172,52,.12);padding:5px 11px;font-family:'Lora',serif;font-size:0.735rem;font-style:italic;color:var(--pdim);cursor:pointer;transition:all .18s;}
+.seed:hover{background:rgba(210,172,52,.1);border-color:rgba(210,172,52,.32);color:var(--parchment);}
+
+/* STATUS */
+.status{display:none;align-items:center;gap:14px;padding:12px 20px;background:rgba(210,172,52,.04);border:1px solid var(--gold-rule);margin-bottom:8px;font-family:'Montserrat',sans-serif;font-size:.54rem;font-weight:500;letter-spacing:.12em;color:var(--gold-dim);text-transform:uppercase;}
+.status.on{display:flex;}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:breathe 1.4s ease-in-out infinite;}
+@keyframes breathe{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.2;transform:scale(.55);}}
+
+/* RESULTS */
+.results{display:flex;flex-direction:column;gap:3px;}
+.rblock{background:var(--surface);border:1px solid rgba(210,172,52,.13);overflow:hidden;animation:rise .35s ease both;backdrop-filter:blur(10px);}
+@keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.rbanner{padding:11px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(210,172,52,.1);}
+.rbanner.CRITICAL{background:rgba(192,57,43,.12);border-bottom:1px solid rgba(192,57,43,.3);}
+.rbanner.PRIORITY{background:rgba(210,172,52,.06);border-bottom:1px solid rgba(210,172,52,.2);}
+.rbanner.WATCH{background:rgba(230,126,34,.07);}
+.rbanner.CLEAR{background:rgba(39,174,96,.07);}
+.rlevel{font-family:'Montserrat',sans-serif;font-size:.5rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:4px 9px;border:1px solid;flex-shrink:0;}
+.rlevel.CRITICAL{color:#FFFFFF;border-color:#c0392b;background:#c0392b;font-weight:900;letter-spacing:.2em;}
+.rlevel.PRIORITY{color:#080E26;border-color:#E8C14A;background:#E8C14A;font-weight:900;letter-spacing:.2em;}
+.rlevel.WATCH{color:var(--amber);border-color:rgba(230,126,34,.45);background:rgba(230,126,34,.08);}
+.rlevel.CLEAR{color:var(--green);border-color:rgba(39,174,96,.45);background:rgba(39,174,96,.08);}
+.rtitle{font-family:'Lora',serif;font-size:0.822rem;font-weight:400;color:var(--pdim);flex:1;}
+.rsource{font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:500;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;flex-shrink:0;}
+.cpybtn{background:none;border:1px solid rgba(210,172,52,.16);padding:3px 8px;font-family:'Montserrat',sans-serif;font-size:.42rem;font-weight:500;letter-spacing:.1em;color:var(--muted);cursor:pointer;text-transform:uppercase;transition:all .18s;flex-shrink:0;}
+.cpybtn:hover{color:var(--gold);border-color:rgba(210,172,52,.4);}
+.rbody{padding:20px 20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;}
+.rfield{display:flex;flex-direction:column;gap:5px;}
+.rfield.full{grid-column:1/-1;}
+.rflbl{font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:600;letter-spacing:.2em;color:var(--gold-dim);text-transform:uppercase;border-bottom:1px solid rgba(210,172,52,.13);padding-bottom:4px;}
+.rfval{font-family:'Montserrat',sans-serif;font-weight:400;font-size:.74rem;color:var(--pdim);line-height:1.65;white-space:pre-wrap;letter-spacing:.01em;}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px;}
+.pill{font-family:'Montserrat',sans-serif;font-size:.42rem;font-weight:500;letter-spacing:.08em;padding:3px 8px;text-transform:uppercase;}
+.pill.found{background:rgba(192,57,43,.09);border:1px solid rgba(192,57,43,.32);color:#e74c3c;}
+.pill.absent{background:rgba(90,90,122,.08);border:1px solid rgba(90,90,122,.2);color:var(--muted);text-decoration:line-through;opacity:.6;}
+.portrait-ref{display:flex;align-items:flex-start;gap:16px;padding:16px 20px;background:rgba(210,172,52,.03);border-top:1px solid rgba(210,172,52,.1);}
+.pimg{width:64px;height:78px;flex-shrink:0;border:1px solid rgba(210,172,52,.22);overflow:hidden;background:var(--navy-mid);}
+.pimg img{width:100%;height:100%;object-fit:cover;filter:sepia(.15) contrast(1.08);}
+.plbl{font-family:'Montserrat',sans-serif;font-size:.4rem;font-weight:500;letter-spacing:.2em;color:var(--gold-dim);text-transform:uppercase;display:block;margin-bottom:4px;}
+.ptitle{font-family:'Lora',serif;font-size:0.744rem;font-weight:400;color:var(--parchment);margin-bottom:2px;}
+.ploc{font-family:'Lora',serif;font-style:normal;font-size:0.692rem;color:var(--pdim);margin-bottom:6px;}
+.pmrk{font-family:'Lora',serif;font-size:0.675rem;color:var(--muted);line-height:1.6;}
+
+/* Live scan result card */
+.live-card{background:rgba(5,10,28,.5);border:1px solid rgba(210,172,52,.1);padding:14px 16px;margin-bottom:3px;}
+.lc-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.lc-src{font-family:'Montserrat',sans-serif;font-size:.42rem;font-weight:600;letter-spacing:.14em;color:var(--gold-dim);text-transform:uppercase;}
+.lc-title{font-family:'Lora',serif;font-size:0.795rem;font-weight:400;color:var(--parchment);flex:1;}
+.lc-price{font-family:'Courier Prime',monospace;font-size:.8rem;color:var(--gold);flex-shrink:0;}
+.lc-desc{font-family:'Lora',serif;font-style:normal;font-size:0.735rem;color:var(--muted);line-height:1.6;margin-bottom:8px;}
+.lc-url{font-family:'Montserrat',sans-serif;font-size:.42rem;letter-spacing:.08em;color:rgba(210,172,52,.5);word-break:break-all;}
+
+/* LOST WORKS */
+.lwrap{background:var(--surface);border:1px solid rgba(210,172,52,.13);overflow:hidden;margin-top:3px;backdrop-filter:blur(10px);}
+.lwhead{padding:12px 20px;background:rgba(210,172,52,.04);border-bottom:1px solid rgba(210,172,52,.1);display:flex;align-items:center;gap:12px;}
+.lwtag{font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:600;letter-spacing:.16em;color:var(--gold);border:1px solid rgba(210,172,52,.28);padding:3px 8px;text-transform:uppercase;}
+.lwtitle{font-family:'Lora',serif;font-size:0.778rem;font-weight:400;color:var(--pdim);flex:1;}
+.lwbody{padding:14px 20px;display:flex;flex-direction:column;gap:8px;}
+.lwcard{background:rgba(5,10,28,.35);border:1px solid rgba(210,172,52,.09);padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:5px 14px;align-items:start;}
+.lwt{font-family:'Lora',serif;font-size:0.744rem;font-weight:400;color:var(--parchment);}
+.lwm{font-family:'Lora',serif;font-style:normal;font-size:0.692rem;color:var(--muted);line-height:1.5;}
+.lwa{grid-row:1/3;align-self:center;}
+
+/* FOOTER */
+footer{text-align:center;padding-top:48px;}
+.frule{width:90px;height:1px;background:linear-gradient(90deg,transparent,rgba(210,172,52,.25),transparent);margin:0 auto 12px;}
+.ftxt{font-family:'Montserrat',sans-serif;font-size:.42rem;font-weight:400;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;line-height:2.2;}
+.ftxt em{color:var(--gold-dim);font-style:normal;}
+
+/* Photo comparison panel */
+.photo-compare{display:flex;border-top:1px solid rgba(210,172,52,.1);}
+.photo-col{flex:1;display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:rgba(210,172,52,.03);min-width:0;}
+.photo-col-listing{border-right:1px solid rgba(210,172,52,.1);}
+
+@media(max-width:560px){
+  .stats{grid-template-columns:1fr 1fr;}
+  .rbody{grid-template-columns:1fr;}
+  .rfield.full{grid-column:1;}
+  .panel{padding:18px 16px;}
+  .mode-tabs{flex-direction:column;}
+
+  /* Stack photo comparison vertically, drop the divider line */
+  .photo-compare{flex-direction:column;}
+  .photo-col-listing{border-right:none;border-bottom:1px solid rgba(210,172,52,.1);}
+
+  /* Watchlist: tighten date/thumbnail on narrow screens, let title wrap freely */
+  .wl-date-big{width:38px;font-size:1.1rem;}
+  .wl-thumb{width:36px;height:36px;}
+  .wl-row{gap:10px;padding:12px;}
+
+  /* Seed chips: slightly smaller padding so more fit per row without crowding */
+  .seed{padding:5px 9px;font-size:.8rem;}
+
+  /* Source/artist tiles: same tightening for narrow rows */
+  .src,.atile{padding:6px 10px;font-size:.8rem;}
+
+  /* Result banner: allow title to wrap below level+watchlist button on very narrow screens */
+  .rbanner{flex-wrap:wrap;row-gap:6px;}
+  .rtitle{flex-basis:100%;order:3;}
+}
+
+/* Watchlist — compact agenda-style row */
+.wl-row{
+  background:rgba(5,10,28,.5);border:1px solid rgba(210,172,52,.15);
+  padding:14px 16px;backdrop-filter:blur(8px);animation:rise .3s ease both;
+  display:flex;align-items:flex-start;gap:14px;
+}
+.wl-date-big{
+  font-family:'Lora',serif;font-weight:400;font-style:italic;
+  font-size:1.3rem;color:var(--gold-dim);line-height:1;
+  flex-shrink:0;width:48px;padding-top:2px;
+}
+.wl-thumb{
+  width:44px;height:44px;flex-shrink:0;
+  border:1px solid rgba(210,172,52,.25);
+  background:rgba(192,57,43,.06);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.wl-thumb img{width:100%;height:100%;object-fit:cover;}
+.wl-main{flex:1;min-width:0;}
+.wl-row-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.wl-level{font-family:'Montserrat',sans-serif;font-size:.46rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border:1px solid;flex-shrink:0;}
+.wl-level.CRITICAL{color:var(--red);border-color:rgba(192,57,43,.45);background:rgba(192,57,43,.1);}
+.wl-level.PRIORITY{color:var(--gold);border-color:rgba(210,172,52,.45);background:rgba(210,172,52,.08);}
+.wl-level.WATCH{color:var(--amber);border-color:rgba(230,126,34,.45);background:rgba(230,126,34,.08);}
+.wl-level.CLEAR{color:var(--green);border-color:rgba(39,174,96,.45);background:rgba(39,174,96,.08);}
+.wl-title-compact{font-family:'Lora',serif;font-size:0.822rem;font-weight:400;color:var(--parchment);}
+.wl-status{display:inline-block;font-family:'Montserrat',sans-serif;font-size:.46rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;margin-bottom:8px;}
+.wl-status.open{color:#e67e22;background:rgba(230,126,34,.1);border:1px solid rgba(230,126,34,.3);}
+.wl-status.investigating{color:#3498db;background:rgba(52,152,219,.1);border:1px solid rgba(52,152,219,.3);}
+.wl-status.cleared{color:var(--green);background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.3);}
+.wl-status.rejected{color:var(--muted);background:rgba(90,90,122,.1);border:1px solid rgba(90,90,122,.25);text-decoration:line-through;}
+.wl-provenance{font-family:'Lora',serif;font-size:0.7rem;color:var(--pdim);line-height:1.6;margin-bottom:10px;}
+.wl-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.wl-btn{background:none;border:1px solid rgba(210,172,52,.25);padding:6px 12px;font-family:'Montserrat',sans-serif;font-size:.46rem;font-weight:500;letter-spacing:.1em;color:var(--pdim);cursor:pointer;text-transform:uppercase;transition:all .18s;}
+.wl-btn:hover{border-color:var(--gold);color:var(--gold);}
+.wl-btn.danger:hover{border-color:var(--red);color:#e74c3c;}
+.add-watch-btn{background:transparent;border:1px solid rgba(39,174,96,.4);color:#27ae60;padding:7px 14px;font-family:'Montserrat',sans-serif;font-size:.46rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .18s;}
+.add-watch-btn:hover{background:rgba(39,174,96,.08);border-color:#27ae60;}
+.add-watch-btn:disabled{opacity:.4;cursor:default;}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<header>
+  <div class="suite-lbl">Picturia · Intelligence Suite · Vol. III</div>
+
+  <!-- LOGO — loupe drops over A once, then static -->
+  <div class="logo-row">
+    <span class="lw">T</span>
+    <span class="lw">R</span>
+    <span class="la-wrap">
+      <span class="la">A</span>
+      <svg class="loupe-svg" width="122" height="94" viewBox="0 0 122 94">
+        <defs>
+          <radialGradient id="lg" cx="45%" cy="40%" r="55%">
+            <stop offset="0%" stop-color="#F5F3F0" stop-opacity=".06"/>
+            <stop offset="100%" stop-color="#080E26" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="45" cy="45" r="32" fill="url(#lg)"/>
+        <circle cx="45" cy="45" r="33.5" fill="none" stroke="#D2AC34" stroke-width="2.2" opacity=".93"/>
+        <circle cx="45" cy="45" r="30" fill="none" stroke="#D2AC34" stroke-width=".4" opacity=".28"/>
+        <path d="M24 22 Q32 14 45 13" fill="none" stroke="#F5F3F0" stroke-width="1.1" stroke-linecap="round" opacity=".22"/>
+        <!-- Handle: angle 120°, shorter, stays above text line -->
+        <line x1="74.0" y1="61.8" x2="113.0" y2="84.2" stroke="#5a4510" stroke-width="8" stroke-linecap="round" opacity=".28"/>
+        <line x1="74.0" y1="61.8" x2="113.0" y2="84.2" stroke="#D2AC34" stroke-width="5" stroke-linecap="round"/>
+        <line x1="72.8" y1="60.7" x2="111.8" y2="83.1" stroke="#F5F3F0" stroke-width="1.2" stroke-linecap="round" opacity=".2"/>
+        <line x1="89.7" y1="66.2" x2="85.7" y2="73.1" stroke="#A88A30" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+        <line x1="102.5" y1="73.6" x2="98.5" y2="80.5" stroke="#A88A30" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+      </svg>
+    </span>
+    <span class="lw">C</span>
+    <span class="lw">K</span>
+  </div>
+
+  <div class="rules"><div class="rule"></div><div class="rule t"></div></div>
+  <div class="track-sub">Lost Works · Hunt · Recover</div>
+  <div class="track-tag">Every great painting leaves a trace.<br>TRACK finds it before anyone else does.</div>
+</header>
+
+<!-- SEASONAL BANNER -->
+<div id="seasonalBanner" style="display:none;background:rgba(210,172,52,.07);border:1px solid rgba(210,172,52,.35);padding:10px 20px;margin-bottom:4px;text-align:center;">
+  <span id="seasonalBannerTxt" style="font-family:'Montserrat',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;"></span>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><span class="snum" id="sScanned">0</span><span class="slbl">Scanned</span></div>
+  <div class="stat"><span class="snum" id="sAlerts">0</span><span class="slbl">Alerts</span></div>
+  <div class="stat"><span class="snum" id="sPriority">0</span><span class="slbl">Priority</span></div>
+  <div class="stat"><span class="snum" id="sSources">0</span><span class="slbl">Sources Live</span></div>
+</div>
+
+<!-- PANEL -->
+<div class="panel">
+
+  <!-- Mode -->
+  <div id="onboardingHint" style="background:rgba(232,193,74,.06);border:1px solid rgba(232,193,74,.25);padding:14px 16px;margin-bottom:18px;">
+    <span style="font-family:'Lora',serif;font-style:normal;font-size:0.761rem;color:var(--pdim);line-height:1.6;">
+      TRACK analyses listings against known artist markers. Paste a real listing description, add a photo, and scan — or try one of the quick tests below.
+    </span>
+  </div>
+  <span class="flbl">Mode</span>
+  <div class="mode-tabs">
+    <div class="mtab active" data-mode="manual">Manual · Paste Text</div>
+    <div class="mtab" data-mode="live">Live Scan · Public Sources</div>
+    <div class="mtab" data-mode="watchlist">Watchlist <span id="watchlistCount" style="opacity:.7;">(0)</span></div>
+    <div class="mtab" data-mode="saves">Saved Finds <span id="savesCount" style="opacity:.7;">(0)</span></div>
+    <div class="mtab" data-mode="oeuvre">Oeuvre</div>
+    <div class="mtab" data-mode="alerts">Alerts</div>
+  </div>
+
+  <!-- Manual input -->
+  <div id="manualSection">
+    <label class="flbl" for="urlInput">Auction Listing · Inventory · Catalogue Description</label>
+    <input class="url-input" id="urlInput" placeholder="Paste listing text or description…" autocomplete="off"/>
+
+    <span class="flbl">Listing Photo <span style="color:#c0392b;font-weight:600;">(required)</span></span>
+    <div id="uploadZone" style="
+      border:1px dashed rgba(210,172,52,.3);
+      padding:16px;text-align:center;cursor:pointer;
+      margin-bottom:18px;transition:all .2s;
+      background:rgba(5,10,28,.3);
+    ">
+      <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)"/>
+      <div id="uploadPrompt" style="font-family:'Lora',serif;font-style:normal;font-size:0.778rem;color:var(--muted);" onclick="document.getElementById('imageInput').click()">
+        ⬡ Tap to add a photo of the listing
+      </div>
+      <div id="uploadPreview" style="display:none;align-items:center;gap:12px;">
+        <img id="previewImg" style="width:56px;height:70px;object-fit:cover;border:1px solid rgba(210,172,52,.3);"/>
+        <span style="font-family:'Montserrat',sans-serif;font-size:.6rem;color:var(--pdim);flex:1;text-align:left;">Photo attached</span>
+        <button onclick="clearImageUpload(event)" style="background:none;border:1px solid rgba(192,57,43,.4);color:#e74c3c;padding:5px 10px;font-family:'Montserrat',sans-serif;font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live scan sources -->
+  <div id="liveSection" style="display:none;">
+    <span class="flbl">Sources to Scan</span>
+    <div class="sources" id="srcRow">
+      <div class="src on" data-src="eBay">⬡ eBay · Live</div>
+      <div class="src on" data-src="2dehands">⬡ 2dehands · Live</div>
+      <div class="src on" data-src="marktplaats">⬡ Marktplaats · Live</div>
+      <div class="src soon" title="WAF-blocked from Cloudflare edge" style="font-size:.55rem;padding:4px 8px;">Catawiki — blocked</div>
+      <div class="src soon" title="WAF-blocked from Cloudflare edge" style="font-size:.55rem;padding:4px 8px;">LeBonCoin.fr — blocked</div>
+      <div class="src soon" title="WAF-blocked from Cloudflare edge" style="font-size:.55rem;padding:4px 8px;">Dorotheum — blocked</div>
+    </div>
+
+    <span class="flbl" style="margin-top:4px;">Media Type Filter</span>
+    <div class="sources" id="mediaFilterRow">
+      <div class="src on" data-media="painting">Paintings</div>
+      <div class="src on" data-media="sketch">Sketches · Modelli</div>
+      <div class="src on" data-media="drawing">Drawings</div>
+      <div class="src on" data-media="print">Prints</div>
+      <div class="src on" data-media="plate">Plates</div>
+    </div>
+
+    <span class="flbl" style="margin-top:4px;">Search Languages</span>
+    <div class="sources" id="langRow">
+      <div class="src on" data-lang="en">EN</div>
+      <div class="src on" data-lang="nl">NL</div>
+      <div class="src soon" data-lang="fr">FR</div>
+      <div class="src soon" data-lang="de">DE</div>
+      <div class="src soon" data-lang="it">IT</div>
+    </div>
+
+    <span class="flbl" style="margin-top:4px;">Search Terms</span>
+    <input class="url-input" id="searchInput" placeholder="Optional — leave empty to search by selected artist profile" autocomplete="off" style="margin-bottom:0;"/>
+
+    <!-- Background Scanning / Watchlist Settings Panel -->
+    <div style="margin-top:18px;border-top:1px solid rgba(210,172,52,.12);padding-top:14px;">
+      <div id="bgScanToggle" style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;" onclick="toggleBgPanel()">
+        <span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:600;letter-spacing:.2em;color:#C4A040;text-transform:uppercase;">Background Scanning</span>
+        <span id="bgScanArrow" style="font-family:'Montserrat',sans-serif;font-size:.5rem;color:var(--muted);transition:transform .2s;">▸</span>
+      </div>
+      <div id="bgScanPanel" style="display:none;margin-top:14px;background:rgba(5,10,28,.4);border:1px solid rgba(210,172,52,.12);padding:18px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-bottom:14px;">
+          <div>
+            <span class="flbl">Alert Threshold</span>
+            <div class="sources" style="margin-bottom:0;">
+              <div class="src on" data-thresh="critical">CRITICAL only</div>
+              <div class="src" data-thresh="priority">+ PRIORITY</div>
+            </div>
+          </div>
+          <div>
+            <span class="flbl">Frequency</span>
+            <div class="sources" style="margin-bottom:0;">
+              <div class="src on" data-freq="daily">Daily</div>
+              <div class="src" data-freq="weekly">Weekly</div>
+            </div>
+          </div>
+        </div>
+        <span class="flbl">Telegram Chat ID</span>
+        <input class="url-input" id="bgTelegramId" placeholder="e.g. 123456789 — from @userinfobot" style="margin-bottom:14px;" autocomplete="off"/>
+        <span class="flbl">Email</span>
+        <input class="url-input" id="bgEmail" placeholder="alerts@example.com" type="email" style="margin-bottom:18px;" autocomplete="off"/>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="saveBgScanSettings()" class="scan-btn" style="flex:1;padding:10px;font-size:.56rem;"><span>Save Watchlist</span></button>
+          <button onclick="testNotify()" style="background:transparent;border:1px solid rgba(210,172,52,.4);padding:10px 16px;font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim);cursor:pointer;transition:all .18s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(210,172,52,.4)'">Test Notify</button>
+        </div>
+        <div id="bgScanStatus" style="font-family:'Montserrat',sans-serif;font-size:.44rem;color:var(--muted);margin-top:10px;min-height:16px;letter-spacing:.08em;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert History section -->
+  <div id="alertsSection" style="display:none;">
+    <span class="flbl">Background Scan Alerts</span>
+    <div id="alertsContent" style="font-family:'Lora',serif;font-style:normal;font-size:0.822rem;color:var(--muted);padding:24px 4px;text-align:center;">
+      Loading…
+    </div>
+  </div>
+
+  <!-- Saved Finds section -->
+  <div id="savedFindsSection" style="display:none;">
+    <span class="flbl">Saved Finds</span>
+    <div id="savedFindsContent" style="font-family:'Lora',serif;font-style:normal;font-size:0.822rem;color:var(--muted);padding:24px 4px;text-align:center;">Loading…</div>
+  </div>
+
+  <!-- Oeuvre section -->
+  <div id="oeuvreSection" style="display:none;">
+    <span class="flbl">Oeuvre Intelligence</span>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;" id="oeuvreArtistRow">
+      <button onclick="loadOeuvre('rubens')" style="font-family:'Montserrat',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:rgba(210,172,52,.1);border:1px solid rgba(210,172,52,.5);color:var(--gold);padding:6px 14px;cursor:pointer;">Rubens</button>
+      <button onclick="loadOeuvre('van dyck')" style="font-family:'Montserrat',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:transparent;border:1px solid rgba(210,172,52,.25);color:var(--muted);padding:6px 14px;cursor:pointer;">Van Dyck</button>
+      <button onclick="loadOeuvre('jordaens')" style="font-family:'Montserrat',sans-serif;font-size:.5rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:transparent;border:1px solid rgba(210,172,52,.25);color:var(--muted);padding:6px 14px;cursor:pointer;">Jordaens</button>
+    </div>
+    <div id="oeuvreContent" style="font-family:'Lora',serif;font-style:normal;font-size:0.822rem;color:var(--muted);padding:24px 4px;text-align:center;">Select an artist to load oeuvre data.</div>
+  </div>
+
+  <!-- Watchlist section -->
+  <div id="watchlistSection" style="display:none;">
+    <span class="flbl">Items Under Investigation</span>
+    <div id="watchlistEmpty" style="font-family:'Lora',serif;font-style:normal;font-size:0.822rem;color:var(--muted);padding:24px 4px;text-align:center;">
+      No items yet. Scan a listing and tap "Add to Watchlist" to track it here.
+    </div>
+    <div id="watchlistItems" style="display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+
+  <div class="div"></div>
+
+  <!-- Artist -->
+  <span class="flbl">Artist Profile</span>
+  <div class="artist-grid">
+    <div class="atile active" data-artist="rubens">Rubens</div>
+    <div class="atile" data-artist="vandyck">Van Dyck</div>
+    <div class="atile" data-artist="jordaens">Jordaens</div>
+    <div class="atile soon">Rembrandt</div>
+    <div class="atile soon">Vermeer</div>
+    <div class="atile soon">Caravaggio</div>
+    <div class="atile soon">Leonardo</div>
+    <div class="atile soon">Van Eyck</div>
+  </div>
+
+  <div id="scanControls">
+    <button class="scan-btn" id="scanBtn"><span id="scanTxt">⬡ &nbsp; Initiate Scan</span></button>
+    <div style="text-align:center;margin-top:8px;">
+      <span id="engineBadge" style="font-family:'Montserrat',sans-serif;font-size:.44rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;cursor:pointer;" onclick="preCheck()">⬡ Tap to check AI connection</span>
+    </div>
+
+    <div class="seeds-row">
+      <span class="seeds-lbl">Quick tests</span>
+      <div class="seeds">
+        <span class="seed" data-seed="Flemish School, 17th century. Oil on oak panel, 87 x 112 cm. Private collection, Belgium. Estimate €8,000–12,000. Religious subject, multiple figures, dramatic lighting, warm flesh tones.">Flemish School · panel</span>
+        <span class="seed" data-seed="Circle of Rubens. The Massacre of the Innocents. Oil on canvas, 210 x 290 cm. Private European collection since circa 1920. No exhibition history. Estimate on request.">Circle of Rubens · canvas</span>
+        <span class="seed" data-seed="Antwerp School, early 17th century. Portrait of a noblewoman in Genoese dress. Oil on oak panel, 72 x 58 cm. Private collection. No provenance before 1945.">Antwerp School · portrait</span>
+        <span class="seed" data-seed="Studio of Rubens. The Hunt. Oil on canvas, 180 x 260 cm. Church collection, Ghent. Transferred to private ownership 1790. No further documentation.">Studio of Rubens · hunt</span>
+        <span class="seed" data-seed="Old painting inherited from grandparents. Oil on wooden panel, approximately 80 x 60 cm. Religious scene with multiple figures. Dark background, warm colors. No signature visible. Asking €200.">Inherited panel · €200</span>
+        <span class="seed" data-seed="Circle of Rubens. The Holy Family with Elizabeth and the Boy John. Technique: Oil on wood. Parquetted. Measurement: 30 x 43 cm. Provenance: Private ownership, Germany. Van Ham Kunstauktionen, May 2026. Baroque, Flemish School, 17th century.">⬡ Van Ham · live listing</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS -->
+<div class="status" id="statusBar">
+  <div class="pulse"></div>
+  <span id="statusTxt">Scanning…</span>
+</div>
+
+<!-- RESULTS -->
+<div class="results" id="resultsWrap"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="frule"></div>
+  <div class="ftxt"><em>TRACK</em> · Picturia Intelligence Suite<br>TR[ART]CE · CODEX · TRACK · <em>Where Art Lives</em></div>
+</footer>
+</div>
+
+<script>
+const PROFILES = {
+rubens: {
+  name:'Peter Paul Rubens', dates:'1577–1640', location:'Antwerp',
+  portrait:{
+    title:'Zelfportret · ca. 1623–1630',
+    location:'Rubenshuis · Antwerpen · CC0',
+    url:'data:image/jpeg;base64,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',
+    markers:'Warm amber light from left · translucent flesh · direct open gaze · black doublet · broad-brimmed hat · Rubenshuis Antwerp ca. 1623–1630 · publiek domein CC0'
+  },
+  triggers:['Flemish School','Circle of Rubens','After Rubens','Studio of Rubens','Follower of Rubens','Antwerp School','Baroque Flemish','manner of Rubens','Workshop of Rubens','attributed to Rubens','school of Rubens'],
+  lostWorks:[
+    {title:'The Massacre of the Innocents — second version',meta:'Last documented: private collection, early 20th c. · Est. €50–100M · Large canvas 200×300cm+',level:'CRITICAL'},
+    {title:'Portrait of Marchesa Brigida Spinola Doria — oil sketch',meta:'Last documented: 17th c. inventory · Est. €5–20M · Approx. 30×40cm · Oak panel',level:'PRIORITY'},
+    {title:'Hunt series — missing panels',meta:'Various 17th c. inventories · Est. €20–50M per work · Large canvas · diagonal composition',level:'PRIORITY'},
+    {title:'Ceiling paintings — Antwerp churches',meta:'Pre-French Revolution church records · Fragments may survive unidentified',level:'WATCH'}
+  ]
+}
+};
+
+// Sources for live scan simulation
+const LIVE_SOURCES = {
+  'eBay':       { url:'https://www.ebay.com/sch/i.html?_nkw=', label:'eBay' },
+  '2dehands':   { url:'https://www.2dehands.be/q/', label:'2dehands.be' },
+  'Marktplaats':{ url:'https://www.marktplaats.nl/q/', label:'Marktplaats.nl' },
+  'Catawiki':   { url:'https://www.catawiki.com/en/l?q=', label:'Catawiki' },
+  'LeBonCoin':  { url:'https://www.leboncoin.fr/recherche?text=', label:'LeBonCoin.fr' },
+  'Kleinanzeigen':{ url:'https://www.kleinanzeigen.de/s/', label:'Kleinanzeigen.de' }
+};
+
+let activeArtist = 'rubens';
+let activeMode = 'manual';
+let uploadedImageData = null; // base64 data URI of attached listing photo
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('Please select an image file.'); return; }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      // Resize to keep storage small, same approach as the reference portraits
+      const canvas = document.createElement('canvas');
+      const maxDim = 500;
+      let { width, height } = img;
+      if (width > height && width > maxDim) { height = height * (maxDim / width); width = maxDim; }
+      else if (height > maxDim) { width = width * (maxDim / height); height = maxDim; }
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      uploadedImageData = canvas.toDataURL('image/jpeg', 0.82);
+
+      document.getElementById('previewImg').src = uploadedImageData;
+      document.getElementById('uploadPrompt').style.display = 'none';
+      document.getElementById('uploadPreview').style.display = 'flex';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImageUpload(event) {
+  if (event) event.stopPropagation();
+  uploadedImageData = null;
+  document.getElementById('imageInput').value = '';
+  document.getElementById('uploadPrompt').style.display = '';
+  document.getElementById('uploadPreview').style.display = 'none';
+}
+let activeSources = new Set(['eBay', '2dehands', 'marktplaats']);
+let activeMediaTypes = new Set(['painting','sketch','drawing','print','plate']);
+let activeLangs = new Set(['en','nl']);
+let running = false;
+let stats = {scanned:0, alerts:0, priority:0};
+
+// Van Dyck + Jordaens minimal profiles (triggers only, no portrait)
+PROFILES.vandyck = {
+  name:'Anthony van Dyck', dates:'1599–1641', location:'Antwerp / London',
+  portrait:{ title:'Self-portrait — ca. 1640', location:'Alte Pinakothek · Munich', url:'' },
+  triggers:['van dyck','vandyck','van dijck','circle of van dyck','after van dyck','studio van dyck','school of van dyck','attributed to van dyck','follower of van dyck','antwerp court painter'],
+  lostWorks:[
+    {title:'Equestrian Portrait of Charles I — lost version',meta:'Last documented: 17th c. British royal collection · Est. €20–50M · Large canvas',level:'CRITICAL'},
+    {title:'Portrait of Maria de Medici — oil sketch',meta:'Several inventories, 17th c. · Approx. 30×40cm · Panel',level:'PRIORITY'}
+  ]
+};
+PROFILES.jordaens = {
+  name:'Jacob Jordaens', dates:'1593–1678', location:'Antwerp',
+  portrait:{ title:'Self-portrait with Family — ca. 1621', location:'Prado · Madrid', url:'' },
+  triggers:['jordaens','jacob jordaens','circle of jordaens','after jordaens','studio of jordaens','school of jordaens','follower of jordaens','attributed to jordaens','antwerp baroque'],
+  lostWorks:[
+    {title:'Allegory of Fertility — large canvas',meta:'Multiple 17th c. inventories · Est. €5–15M · Large format',level:'PRIORITY'},
+    {title:'Portrait series — Antwerp guild commissions',meta:'Church and guild records · Fragment may survive',level:'WATCH'}
+  ]
+};
+
+// Live scan filter state
+let _liveListings    = [];
+let _liveProfile     = null;
+let _liveSources     = {};  // { ebay: { count, error }, ... } from last worker response
+let _lastSearchTerm  = '';  // kept for manual-search links in blocked-source pills
+const _LEVEL_ORDER = { CRITICAL:0, PRIORITY:1, WATCH:2, CLEAR:3 };
+const _TYPE_ORDER  = { original:0, print:1, book:2 };
+let _filterTypes  = new Set(['original','print','book']);
+let _filterSort   = 'alert';
+let _filterPrice  = 'any';
+let _filterLoc    = '';
+
+// Mode tabs
+
+document.querySelectorAll('.mtab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.mtab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    activeMode = t.dataset.mode;
+    document.getElementById('manualSection').style.display      = activeMode === 'manual'    ? '' : 'none';
+    document.getElementById('liveSection').style.display        = activeMode === 'live'      ? '' : 'none';
+    document.getElementById('watchlistSection').style.display   = activeMode === 'watchlist' ? '' : 'none';
+    document.getElementById('alertsSection').style.display      = activeMode === 'alerts'    ? '' : 'none';
+    document.getElementById('savedFindsSection').style.display  = activeMode === 'saves'     ? '' : 'none';
+    document.getElementById('oeuvreSection').style.display      = activeMode === 'oeuvre'    ? '' : 'none';
+    const hideControls = ['watchlist','alerts','saves','oeuvre'].includes(activeMode);
+    document.getElementById('scanControls').style.display = hideControls ? 'none' : '';
+    document.getElementById('resultsWrap').innerHTML = '';
+    document.getElementById('engineBadge').style.display = activeMode === 'live' ? 'none' : '';
+    if (activeMode === 'watchlist') renderWatchlist();
+    if (activeMode === 'alerts')    loadAlertHistory();
+    if (activeMode === 'saves')     loadSavedFinds();
+    if (activeMode === 'oeuvre')    loadOeuvre('rubens');
+    updateSourceCount();
+  });
+});
+
+// Source toggles
+document.querySelectorAll('#srcRow .src:not(.soon)').forEach(s => {
+  s.addEventListener('click', () => {
+    s.classList.toggle('on');
+    const src = s.dataset.src;
+    if (s.classList.contains('on')) activeSources.add(src);
+    else activeSources.delete(src);
+    updateSourceCount();
+  });
+});
+
+// Media type filter toggles
+document.querySelectorAll('#mediaFilterRow .src:not(.soon)').forEach(s => {
+  s.addEventListener('click', () => {
+    s.classList.toggle('on');
+    const mt = s.dataset.media;
+    if (s.classList.contains('on')) activeMediaTypes.add(mt);
+    else activeMediaTypes.delete(mt);
+  });
+});
+
+// Language toggles
+document.querySelectorAll('#langRow .src:not(.soon)').forEach(s => {
+  s.addEventListener('click', () => {
+    s.classList.toggle('on');
+    const lang = s.dataset.lang;
+    if (s.classList.contains('on')) activeLangs.add(lang);
+    else activeLangs.delete(lang);
+  });
+});
+
+function updateSourceCount() {
+  document.getElementById('sSources').textContent = activeSources.size;
+}
+updateSourceCount();
+
+// Seasonal banner
+(function() {
+  const m = new Date().getMonth() + 1;
+  const banner = document.getElementById('seasonalBanner');
+  const txt = document.getElementById('seasonalBannerTxt');
+  if (!banner || !txt) return;
+  if (m === 1 || m === 2) {
+    txt.textContent = '📦 Estate season — increased scan frequency';
+    banner.style.display = '';
+  } else if (m === 3 || m === 4) {
+    txt.textContent = '🏛 Spring auction season — doubled scan frequency';
+    banner.style.display = '';
+  } else if (m === 10 || m === 11) {
+    txt.textContent = '🏛 Autumn auction season — doubled scan frequency';
+    banner.style.display = '';
+  }
+})();
+
+// Background scan panel toggle
+function toggleBgPanel() {
+  const panel = document.getElementById('bgScanPanel');
+  const arrow = document.getElementById('bgScanArrow');
+  const open = panel.style.display === 'none';
+  panel.style.display = open ? '' : 'none';
+  arrow.textContent = open ? '▾' : '▸';
+}
+
+// Background scan threshold/freq toggles
+document.querySelectorAll('[data-thresh]').forEach(s => {
+  s.addEventListener('click', () => {
+    document.querySelectorAll('[data-thresh]').forEach(x => x.classList.remove('on'));
+    s.classList.add('on');
+  });
+});
+document.querySelectorAll('[data-freq]').forEach(s => {
+  s.addEventListener('click', () => {
+    document.querySelectorAll('[data-freq]').forEach(x => x.classList.remove('on'));
+    s.classList.add('on');
+  });
+});
+
+async function saveBgScanSettings() {
+  const chatId = document.getElementById('bgTelegramId')?.value?.trim();
+  const email  = document.getElementById('bgEmail')?.value?.trim();
+  const threshold = document.querySelector('[data-thresh].on')?.dataset?.thresh || 'critical';
+  const freq  = document.querySelector('[data-freq].on')?.dataset?.freq || 'daily';
+  const artists = [activeArtist];
+  const status = document.getElementById('bgScanStatus');
+  status.textContent = 'Saving…';
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/watchlist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ artists, sources:[...activeSources], media:[...activeMediaTypes], threshold, freq, telegramChatId: chatId, email })
+    });
+    const d = await res.json();
+    status.textContent = d.ok ? '✓ Saved — background scanning active' : 'Error: ' + (d.error || res.status);
+    status.style.color = d.ok ? '#27ae60' : '#c0392b';
+  } catch(e) {
+    status.textContent = 'Error: ' + e.message;
+    status.style.color = '#c0392b';
+  }
+}
+
+async function testNotify() {
+  const chatId = document.getElementById('bgTelegramId')?.value?.trim();
+  const status = document.getElementById('bgScanStatus');
+  if (!chatId) { status.textContent = 'Enter a Telegram chat ID first'; status.style.color = '#e67e22'; return; }
+  status.textContent = 'Sending test notification…';
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/test-notify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chatId })
+    });
+    const d = await res.json();
+    status.textContent = d.ok ? '✓ Test notification sent' : 'Error: ' + (d.error || res.status);
+    status.style.color = d.ok ? '#27ae60' : '#c0392b';
+  } catch(e) {
+    status.textContent = 'Error: ' + e.message;
+    status.style.color = '#c0392b';
+  }
+}
+
+async function loadAlertHistory() {
+  const el = document.getElementById('alertsContent');
+  if (!el) return;
+  el.textContent = 'Loading…';
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/alerts`);
+    const d = await res.json();
+    const items = d.alerts || [];
+    if (!items.length) {
+      el.innerHTML = `<span style="font-family:'Lora',serif;font-style:italic;color:var(--muted);">No alerts yet — background scanning will notify you when new finds are detected.</span>`;
+      return;
+    }
+    el.innerHTML = items.map(a => `
+      <div style="background:rgba(5,10,28,.5);border:1px solid rgba(210,172,52,.13);padding:14px 16px;margin-bottom:3px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="rlevel ${a.level||'WATCH'}" style="font-size:.5rem;">${a.level||'WATCH'}</span>
+          <span style="font-family:'Lora',serif;font-size:0.82rem;color:var(--parchment);flex:1;">${esc(a.title||'Alert')}</span>
+          <span style="font-family:'Montserrat',sans-serif;font-size:.42rem;color:var(--muted);">${esc(a.ts||a.date||'')}</span>
+        </div>
+        ${a.reason ? `<div style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;color:var(--pdim);line-height:1.6;">${esc(a.reason)}</div>` : ''}
+        ${a.url ? `<a href="${esc(a.url)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-family:'Montserrat',sans-serif;font-size:.44rem;letter-spacing:.1em;color:var(--gold);border:1px solid rgba(210,172,52,.3);padding:5px 12px;text-decoration:none;text-transform:uppercase;">View listing →</a>` : ''}
+      </div>`).join('');
+  } catch(e) {
+    el.textContent = 'Error loading alerts: ' + e.message;
+  }
+}
+
+// Artist tiles
+document.querySelectorAll('.atile:not(.soon)').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.atile').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    activeArtist = t.dataset.artist;
+  });
+});
+
+// Seeds
+document.querySelectorAll('.seed').forEach(s => {
+  s.addEventListener('click', () => {
+    // Highlight selected seed
+    document.querySelectorAll('.seed').forEach(x => x.style.borderColor = '');
+    s.style.borderColor = '#E8C14A';
+
+    activeMode = 'manual';
+    document.querySelectorAll('.mtab').forEach(t => t.classList.toggle('active', t.dataset.mode === 'manual'));
+    document.getElementById('manualSection').style.display = '';
+    document.getElementById('liveSection').style.display = 'none';
+    const val = s.dataset.seed || '';
+    document.getElementById('urlInput').value = val;
+
+    // Show confirmation, point to upload zone if no image yet
+    const badge = document.getElementById('engineBadge');
+    if(!uploadedImageData) {
+      badge.textContent = '✓ Text loaded — add a photo';
+      badge.style.color = '#E8C14A';
+      const zone = document.getElementById('uploadZone');
+      zone.style.borderColor = '#E8C14A';
+      zone.style.background = 'rgba(232,193,74,.06)';
+      setTimeout(() => {
+        zone.style.borderColor = 'rgba(210,172,52,.3)';
+        zone.style.background = 'rgba(5,10,28,.3)';
+      }, 2000);
+      zone.scrollIntoView({behavior:'smooth',block:'center'});
+    } else {
+      badge.textContent = '✓ Listing loaded — click Initiate Scan';
+      badge.style.color = '#E8C14A';
+      document.getElementById('scanBtn').scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  });
+});
+
+document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key==='Enter'&&!running) scan(); });
+document.getElementById('scanBtn').addEventListener('click', () => { if (!running) scan(); });
+
+// Status
+const MSGS_MANUAL = ['Parsing listing…','Cross-referencing profile…','Scanning trigger phrases…','Analysing provenance…','Checking dimensions…','Evaluating price signals…','Matching lost works database…','Generating alert…'];
+const MSGS_LIVE   = ['Connecting to eBay…','Fetching listings…','Retrieving item details…','Classifying listing types…','Matching artist triggers…','Scoring alert levels…','Building assessments…','Sorting results…'];
+let stimer;
+function startStatus(msgs=MSGS_MANUAL){ let i=0; document.getElementById('statusTxt').textContent=msgs[0]; stimer=setInterval(()=>{i=(i+1)%msgs.length;document.getElementById('statusTxt').textContent=msgs[i];},1800);}
+function stopStatus(){ clearInterval(stimer); document.getElementById('statusBar').classList.remove('on'); }
+
+function buildPrompt(text, profile) {
+  return `You are TRACK — Picturia's lost masterpiece intelligence engine. Respond ONLY in English. Analyse this listing against the ${profile.name} (${profile.dates}, ${profile.location}) artist profile.
+
+LISTING: "${text}"
+
+RUBENS VISUAL MARKERS: warm amber light from left · flesh glows from within with pink-red underlayer · large expressive hands with visible knuckles · diagonal composition energy · figures mid-action.
+TECHNICAL: pre-1610 oak panel, post-1610 canvas, oil sketches always small panel. Pigments: lead white, vermilion, red lake, smalt, yellow ochre, bone black.
+TRIGGERS: ${profile.triggers.join(' · ')}
+PRICE FLAGS: panel <€50k = investigate · sketch <€20k = priority · large canvas <€100k = watch · inherited/estate sale <€500 = CRITICAL investigation
+PROVENANCE FLAGS: no country on "private collection" = WATCH · no history pre-1940 = PRIORITY · church source = PRIORITY · inherited/estate = PRIORITY
+
+Return ONLY valid JSON, no markdown:
+{"alert_level":"CRITICAL|PRIORITY|WATCH|CLEAR","file_name":"brief title","triggers_found":[],"triggers_absent":[],"provenance_assessment":"","price_assessment":"","dimension_assessment":"","style_consistency":"","investigation_priority":"","recommended_action":"","confidence":"HIGH|MEDIUM|LOW","codex_story_potential":""}`;
+}
+
+function buildLivePrompt(searchTerm, sources, profile) {
+  return `You are TRACK — Picturia's lost masterpiece intelligence engine. Respond ONLY in English.
+
+A live scan has been requested across these public platforms: ${[...sources].join(', ')}
+Search terms: "${searchTerm}"
+Artist profile: ${profile.name} (${profile.dates})
+
+You cannot actually access these sites, but simulate what TRACK would find based on realistic auction listings that exist on these platforms for Flemish/Old Master works.
+
+Generate 3 realistic fictional-but-plausible listings that TRACK might find, each from a different source. Make them realistic — mix of clear misattributions, inherited works with no provenance, and one possible genuine find.
+
+Return ONLY valid JSON array, no markdown:
+[
+  {
+    "source": "platform name",
+    "title": "listing title",
+    "price": "€XXX or price on request",
+    "description": "realistic listing description 2-3 sentences",
+    "url": "realistic fake URL",
+    "alert_level": "CRITICAL|PRIORITY|WATCH|CLEAR",
+    "alert_reason": "one sentence why TRACK flagged this"
+  }
+]`;
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderManualResult(data, profile) {
+  const wrap = document.getElementById('resultsWrap');
+  wrap.innerHTML = '';
+  const level = data.alert_level||'CLEAR';
+  stats.scanned++; stats.alerts++;
+  if(level==='PRIORITY'||level==='CRITICAL') stats.priority++;
+  updateStats();
+  const hint = document.getElementById('onboardingHint');
+  if(hint) hint.style.display = 'none';
+  localStorage.setItem('trackHasScanned', '1');
+
+  const sourceText = document.getElementById('urlInput')?.value?.trim() || '';
+
+  const triggersHTML = [
+    ...(data.triggers_found||[]).map(t=>`<span class="pill found">${esc(t)}</span>`),
+    ...(data.triggers_absent||[]).map(t=>`<span class="pill absent">${esc(t)}</span>`)
+  ].join('');
+
+  // Stash this result so the watchlist button can retrieve it without re-escaping issues
+  window._lastScanResult = { data, profileName: profile.name, sourceText, listingImage: uploadedImageData };
+
+  const b = document.createElement('div');
+  b.className = 'rblock';
+  b.innerHTML = `
+    <div class="rbanner ${level}">
+      <span class="rlevel ${level}">${level}</span>
+      <span class="rtitle">${esc(data.file_name||'Listing')}</span>
+      <button class="add-watch-btn" id="addWatchBtn" onclick="addLastResultToWatchlist()">+ Watchlist</button>
+      <button class="cpybtn" onclick="cpyBlock('rbody0')">Copy</button>
+    </div>
+    <div class="rbody" id="rbody0">
+      <div class="rfield full"><span class="rflbl">Triggers</span><div class="pills">${triggersHTML||'<span class="rfval">None</span>'}</div></div>
+      <div class="rfield"><span class="rflbl">Provenance</span><span class="rfval">${esc(data.provenance_assessment||'—')}</span></div>
+      <div class="rfield"><span class="rflbl">Price Signal</span><span class="rfval">${esc(data.price_assessment||'—')}</span></div>
+      <div class="rfield"><span class="rflbl">Dimensions</span><span class="rfval">${esc(data.dimension_assessment||'—')}</span></div>
+      <div class="rfield"><span class="rflbl">Style · ${esc(profile.name)}</span><span class="rfval">${esc(data.style_consistency||'—')}</span></div>
+      <div class="rfield"><span class="rflbl">Investigation Priority</span><span class="rfval">${esc(data.investigation_priority||'—')}</span></div>
+      <div class="rfield"><span class="rflbl">Recommended Action</span><span class="rfval">${esc(data.recommended_action||'—')}</span></div>
+      <div class="rfield"><span class="rflbl">Confidence · ${esc(data.confidence||'—')}</span><span class="rfval">${esc(data.codex_story_potential||'—')}</span></div>
+    </div>
+    <div class="photo-compare">
+      <div class="photo-col photo-col-listing">
+        ${uploadedImageData ? `
+          <div class="pimg" style="width:56px;height:70px;"><img src="${uploadedImageData}" alt="Listing photo" style="width:100%;height:100%;object-fit:cover;"/></div>
+          <div>
+            <span class="plbl">Listing Photo</span>
+            <div class="ptitle" style="font-size:.82rem;">As submitted by source</div>
+          </div>
+        ` : `
+          <div class="pimg" style="width:56px;height:70px;display:flex;align-items:center;justify-content:center;background:rgba(192,57,43,.06);border-color:rgba(192,57,43,.3);">
+            <span style="font-size:1.2rem;color:rgba(192,57,43,.6);">⬡</span>
+          </div>
+          <div>
+            <span class="plbl" style="color:#c0392b;">No Listing Photo</span>
+            <div class="ptitle" style="font-size:.78rem;color:var(--muted);font-style:normal;">Add a photo before sending to investigation</div>
+          </div>
+        `}
+      </div>
+      <div class="photo-col photo-col-reference">
+        <div class="pimg"><img src="${profile.portrait.url}" alt="Reference" onerror="this.style.display='none'"/></div>
+        <div>
+          <span class="plbl">Visual Reference</span>
+          <div class="ptitle">${esc(profile.portrait.title)}</div>
+          <div class="ploc">${esc(profile.portrait.location)}</div>
+        </div>
+      </div>
+    </div>`;
+  wrap.appendChild(b);
+
+  // Lost works panel
+  if(profile.lostWorks?.length){
+    const lw = document.createElement('div');
+    lw.className = 'lwrap';
+    lw.innerHTML = `
+      <div class="lwhead"><span class="lwtag">Lost Works</span><span class="lwtitle">${esc(profile.name)} · Documented Missing Works</span></div>
+      <div class="lwbody">${profile.lostWorks.map(w=>`
+        <div class="lwcard">
+          <div class="lwt">${esc(w.title)}</div>
+          <div class="lwm">${esc(w.meta)}</div>
+          <div class="lwa"><span class="rlevel ${w.level}">${w.level}</span></div>
+        </div>`).join('')}
+      </div>`;
+    wrap.appendChild(lw);
+  }
+  setTimeout(()=>wrap.scrollIntoView({behavior:'smooth',block:'start'}),120);
+}
+
+const SOURCE_MANUAL_URL = {
+  ebay:        'https://www.ebay.com/sch/i.html?_nkw=',
+  '2dehands':  'https://www.2dehands.be/q/',
+  marktplaats: 'https://www.marktplaats.nl/q/',
+  leboncoin:   'https://www.leboncoin.fr/recherche?text=',
+  catawiki:    'https://www.catawiki.com/en/l?q=',
+  dorotheum:   'https://www.dorotheum.com/en/search/?q=',
+};
+
+function buildSourcePills(srcMeta, searchTerm) {
+  if (!srcMeta || !Object.keys(srcMeta).length) return '';
+  const LBL = `font-family:'Montserrat',sans-serif;font-size:.40rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;`;
+  return Object.entries(srcMeta).map(([src, { count, error }]) => {
+    const cfg  = SOURCE_CFG[src] || { label: src, dot: '#8a8aaa', dotBg: 'rgba(90,90,122,.1)' };
+    const ok   = !error && count > 0;
+    const dot  = ok ? cfg.dot : error ? '#c0392b' : '#8a8aaa';
+    const bg   = ok ? cfg.dotBg : error ? 'rgba(192,57,43,.08)' : 'rgba(90,90,122,.07)';
+    const bord = ok ? `${cfg.dot}44` : error ? 'rgba(192,57,43,.3)' : 'rgba(90,90,122,.18)';
+
+    const badge = ok
+      ? `<span style="${LBL}color:${cfg.dot};">${count}</span>`
+      : error
+        ? `<span style="${LBL}color:#c0392b;">✗</span>`
+        : `<span style="${LBL}color:#8a8aaa;">0</span>`;
+
+    const manualUrl = SOURCE_MANUAL_URL[src];
+    const link = (!ok && manualUrl)
+      ? ` <a href="${manualUrl}${encodeURIComponent(searchTerm)}" target="_blank" rel="noopener"
+             style="font-family:'Montserrat',sans-serif;font-size:.38rem;letter-spacing:.06em;color:#7eb3d8;text-decoration:none;white-space:nowrap;">Search →</a>`
+      : '';
+
+    return `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;background:${bg};border:1px solid ${bord};">
+      <span style="width:5px;height:5px;border-radius:50%;background:${dot};flex-shrink:0;"></span>
+      <span style="${LBL}color:${dot};">${cfg.label}</span>
+      ${badge}${link}
+    </span>`;
+  }).join('');
+}
+
+function renderLiveResults(listings, profile, isReal, refilter=false) {
+  const wrap = document.getElementById('resultsWrap');
+
+  if (!refilter) {
+    // Stats — count full set only on fresh scan, not on filter change
+    stats.scanned += listings.length;
+    listings.forEach(l => {
+      if (l.type !== 'book' && l.alert_level !== 'CLEAR') stats.alerts++;
+      if (l.alert_level === 'PRIORITY' || l.alert_level === 'CRITICAL') stats.priority++;
+    });
+    updateStats();
+
+    // Reset filter state for new scan
+    _filterTypes = new Set(['original','print','book']);
+    _filterSort  = 'alert';
+    _filterPrice = 'any';
+    _filterLoc   = '';
+
+    // Summary bar
+    const nOrig  = listings.filter(l => l.type === 'original').length;
+    const nPrint = listings.filter(l => l.type === 'print').length;
+    const nBook  = listings.filter(l => l.type === 'book').length;
+    const mkCount = (n, label, color) => n
+      ? `<span style="font-family:'Montserrat',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.1em;color:${color};">${n} ${label}</span>`
+      : '';
+    const breakdown = [
+      mkCount(nOrig,  'original' + (nOrig>1?'s':''),  '#E8C14A'),
+      mkCount(nPrint, 'print' + (nPrint>1?'s':''),    '#7eb3d8'),
+      mkCount(nBook,  'book' + (nBook>1?'s':''),      '#8a8aaa'),
+    ].filter(Boolean).join(`<span style="color:rgba(210,172,52,.3);padding:0 8px;">·</span>`);
+
+    const srcPills = buildSourcePills(_liveSources, _lastSearchTerm);
+    wrap.innerHTML = isReal
+      ? `<div style="background:rgba(39,174,96,.04);border:1px solid rgba(39,174,96,.22);padding:10px 18px;margin-bottom:3px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+           <span style="font-family:'Montserrat',sans-serif;font-size:.42rem;font-weight:700;letter-spacing:.2em;color:#27ae60;text-transform:uppercase;flex-shrink:0;">⬡ Live</span>
+           <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">${srcPills}</div>
+           <div style="display:flex;align-items:center;gap:0;margin-left:auto;">${breakdown}</div>
+         </div>
+         <div id="liveFilterBar"></div>
+         <div id="liveCards"></div>`
+      : `<div style="background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.3);padding:10px 18px;margin-bottom:8px;">
+           <span style="font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:600;letter-spacing:.16em;color:#e74c3c;text-transform:uppercase;">⬡ Simulated Data</span>
+         </div>
+         <div id="liveCards"></div>`;
+
+    if (isReal) renderFilterBar(listings);
+    setTimeout(()=>wrap.scrollIntoView({behavior:'smooth',block:'start'}),120);
+  }
+
+  const container = document.getElementById('liveCards') || wrap;
+  container.innerHTML = '';
+
+  if (!listings.length) {
+    container.innerHTML = `<div style="background:rgba(5,10,28,.4);border:1px solid rgba(210,172,52,.1);padding:24px;text-align:center;font-family:'Lora',serif;font-size:0.822rem;color:var(--muted);font-style:italic;">No listings match current filters.</div>`;
+    return;
+  }
+
+  // Segment definitions (display order)
+  const TYPE_CFG = {
+    original: { label:'Original Work',   color:'#E8C14A', border:'rgba(210,172,52,.4)',  bg:'rgba(210,172,52,.07)' },
+    print:    { label:'Print · Litho',   color:'#7eb3d8', border:'rgba(126,179,216,.4)', bg:'rgba(126,179,216,.07)' },
+    book:     { label:'Book · Catalogue',color:'#8a8aaa', border:'rgba(90,90,122,.28)',  bg:'rgba(90,90,122,.06)' },
+  };
+  const LEVEL_COLOR = { CRITICAL:'#c0392b', PRIORITY:'#E8C14A', WATCH:'#e67e22', CLEAR:'#8a8aaa' };
+  const SEGMENTS = [
+    { label:'Critical finds',           color:'#c0392b', items: listings.filter(l=>l.type==='original'&&l.alert_level==='CRITICAL'&&l.media_type!=='book') },
+    { label:'Priority · investigate',   color:'#E8C14A', items: listings.filter(l=>l.type==='original'&&l.alert_level==='PRIORITY'&&l.media_type!=='book') },
+    { label:'Watch',                    color:'#e67e22', items: listings.filter(l=>l.type==='original'&&l.alert_level==='WATCH'&&l.media_type!=='book') },
+    { label:'No alert · original works',color:'#8a8aaa', items: listings.filter(l=>l.type==='original'&&l.alert_level==='CLEAR'&&l.media_type!=='book') },
+    { label:'Prints & reproductions',   color:'#7eb3d8', items: listings.filter(l=>l.type==='print') },
+    { label:'Books & catalogues',       color:'#8a8aaa', items: listings.filter(l=>l.type==='book'||l.media_type==='book') },
+  ].filter(s => s.items.length);
+
+  let cardIdx = 0;
+
+  SEGMENTS.forEach(seg => {
+    // ── Segment divider ──────────────────────────────────────────────
+    const div = document.createElement('div');
+    div.style.cssText = `display:flex;align-items:center;gap:14px;padding:${cardIdx===0?'4px':'20px'} 0 12px;`;
+    div.innerHTML = `
+      <div style="height:1px;flex:1;background:linear-gradient(90deg,${seg.color}55,transparent);"></div>
+      <span style="font-family:'Montserrat',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.22em;color:${seg.color};text-transform:uppercase;white-space:nowrap;">${seg.label}&ensp;·&ensp;${seg.items.length}</span>
+      <div style="height:1px;flex:1;background:linear-gradient(90deg,transparent,${seg.color}55);"></div>`;
+    container.appendChild(div);
+
+    seg.items.forEach(l => {
+      const tc      = TYPE_CFG[l.type] || TYPE_CFG.original;
+      const isBook  = l.type === 'book';
+      const level   = l.alert_level || 'CLEAR';
+      const lvlCol  = LEVEL_COLOR[level] || '#8a8aaa';
+
+      const imgW = isBook ? '160px' : '120px';
+      const imgH = isBook ? '220px' : '160px';
+      const imageHTML = l.image
+        ? `<a href="${esc(l.url||'#')}" target="_blank" rel="noopener"
+             style="flex-shrink:0;width:${imgW};min-width:80px;overflow:hidden;border-right:1px solid rgba(210,172,52,.1);background:#080E26;display:flex;align-items:flex-start;">
+             <img src="${esc(l.image)}" alt=""
+               style="width:${imgW};height:${imgH};object-fit:contain;object-position:center top;display:block;filter:sepia(.1) contrast(1.06);${isBook?'opacity:.85;':''}"/></a>`
+        : '';
+
+      const c = document.createElement('div');
+      c.className = 'rblock';
+      c.style.cssText = `animation-delay:${cardIdx * 0.06}s;${isBook?'opacity:.68;':''}margin-bottom:3px;`;
+      const srcCfg = SOURCE_CFG[l.source] || { label: l.source||'Live', dot:'#8a8aaa', dotBg:'rgba(90,90,122,.12)' };
+      const mediaBadge = MEDIA_BADGE[l.media_type] || null;
+      c.innerHTML = `
+        <div class="rbanner ${level}" style="gap:10px;padding:10px 16px;">
+          <span class="rlevel ${level}" style="font-size:.62rem;font-weight:900;letter-spacing:.2em;">${level}</span>
+          <span style="font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:5px 11px;border:1px solid ${tc.border};background:${tc.bg};color:${tc.color};flex-shrink:0;white-space:nowrap;">${tc.label}</span>
+          ${mediaBadge ? `<span style="font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:5px 11px;border:1px solid ${mediaBadge.border};background:${mediaBadge.bg};color:${mediaBadge.color};flex-shrink:0;white-space:nowrap;">${mediaBadge.icon} ${mediaBadge.label}</span>` : ''}
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;">
+            <span style="font-family:'Lora',serif;font-size:0.88rem;font-weight:400;color:var(--pdim);line-height:1.35;text-transform:none;">${esc(l.title)}</span>
+            ${(() => { const artist = (l.aspects||[]).find(a => a.name==='Artist Name'||a.name==='Artist'); if (!artist) return ''; const v = artist.value || ''; if (/indistinct|unknown|unsigned|n\/a/i.test(v)) return ''; return `<span style="font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:600;letter-spacing:.14em;color:#E8C14A;text-transform:uppercase;">${esc(v)}</span>`; })()}
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:${srcCfg.dotBg};border:1px solid rgba(255,255,255,.07);flex-shrink:0;">
+            <span style="width:6px;height:6px;border-radius:50%;background:${srcCfg.dot};flex-shrink:0;"></span>
+            <span style="font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.1em;color:${srcCfg.dot};text-transform:uppercase;">${srcCfg.label}</span>
+          </span>
+          <span style="font-family:'Courier Prime',monospace;font-size:.84rem;color:var(--gold);flex-shrink:0;padding-left:6px;">${esc(l.price||'—')}</span>
+        </div>
+        <div style="display:flex;gap:0;align-items:stretch;flex-wrap:wrap;">
+          ${imageHTML}
+          <div style="flex:1;min-width:0;padding:16px 20px;display:flex;flex-direction:column;gap:14px;">
+            <!-- BLOK 1: SELLER INFO -->
+            <div style="padding-bottom:14px;border-bottom:1px solid rgba(90,110,150,.2);">
+              <span style="font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.18em;color:#7eb3d8;text-transform:uppercase;display:block;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(126,179,216,.25);">Seller Info</span>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                ${l.location ? `<span style="display:inline-flex;flex-direction:column;gap:1px;background:rgba(90,110,150,.12);border:1px solid rgba(90,110,150,.28);padding:4px 9px;"><span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#7eb3d8;text-transform:uppercase;">Location</span><span style="font-family:'Lora',serif;font-size:0.76rem;color:var(--pdim);">${esc(l.location)}</span></span>` : ''}
+                ${l.seller ? `<span style="display:inline-flex;flex-direction:column;gap:1px;background:rgba(90,110,150,.12);border:1px solid rgba(90,110,150,.28);padding:4px 9px;"><span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#7eb3d8;text-transform:uppercase;">Seller</span><span style="font-family:'Lora',serif;font-size:0.76rem;color:var(--pdim);">${esc(l.seller)}${l.feedbackScore ? ` · ★ ${l.feedbackScore}` : ''}</span></span>` : ''}
+                ${l.condition ? `<span style="display:inline-flex;flex-direction:column;gap:1px;background:rgba(90,110,150,.12);border:1px solid rgba(90,110,150,.28);padding:4px 9px;"><span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#7eb3d8;text-transform:uppercase;">Condition</span><span style="font-family:'Lora',serif;font-size:0.76rem;color:var(--pdim);">${esc(l.condition)}</span></span>` : ''}
+                ${l.endLabel ? `<span style="display:inline-flex;flex-direction:column;gap:1px;background:rgba(90,110,150,.12);border:1px solid rgba(90,110,150,.28);padding:4px 9px;"><span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#7eb3d8;text-transform:uppercase;">${l.isAuction ? 'Auction Ends' : 'Listed'}</span><span style="font-family:'Lora',serif;font-size:0.76rem;color:${l.endLabel.startsWith('Ends in')?'#e67e22':'var(--pdim)'};">${esc(l.endLabel)}</span></span>` : ''}
+                ${(() => { const listedBy = (l.aspects||[]).find(a=>a.name==='Listed By'); return listedBy ? `<span style="display:inline-flex;flex-direction:column;gap:1px;background:rgba(90,110,150,.12);border:1px solid rgba(90,110,150,.28);padding:4px 9px;"><span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#7eb3d8;text-transform:uppercase;">Listed By</span><span style="font-family:'Lora',serif;font-size:0.76rem;color:var(--pdim);">${esc(listedBy.value)}</span></span>` : ''; })()}
+                ${(() => { const uos = (l.aspects||[]).find(a=>a.name==='Unit of Sale'); return uos ? `<span style="display:inline-flex;flex-direction:column;gap:1px;background:rgba(90,110,150,.12);border:1px solid rgba(90,110,150,.28);padding:4px 9px;"><span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#7eb3d8;text-transform:uppercase;">Unit of Sale</span><span style="font-family:'Lora',serif;font-size:0.76rem;color:var(--pdim);">${esc(uos.value)}</span></span>` : ''; })()}
+                ${(() => { const origin = (l.aspects||[]).find(a=>a.name==='Country of Origin'||a.name==='Country/Region of Origin'); return origin ? `<span style="display:inline-flex;flex-direction:column;gap:1px;background:rgba(90,110,150,.12);border:1px solid rgba(90,110,150,.28);padding:4px 9px;"><span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#7eb3d8;text-transform:uppercase;">Ships From</span><span style="font-family:'Lora',serif;font-size:0.76rem;color:var(--pdim);">${esc(origin.value)}</span></span>` : ''; })()}
+              </div>
+            </div>
+
+            <!-- BLOK 2: KERNIDENTIFICATIE PILLS -->
+            ${(() => {
+              const aspects = (l.aspects || []).filter(a => a.name !== 'Artist Name' && a.name !== 'Artist' && a.name !== 'Type' && a.name !== 'Features' && a.name !== 'Unit Quantity' && a.name !== 'Title' && a.name !== 'Listed By' && a.name !== 'Unit of Sale' && a.name !== 'Country of Origin' && a.name !== 'Country/Region of Origin' && a.name !== 'Region of Origin' && a.name !== 'Culture' && a.name !== 'Origin');
+              if (!aspects.length) return '';
+
+              const BLOCK2_FIELDS = ['Signed','Time Period Produced','Theme','Subject'];
+              const BLOCK3_FIELDS = ['Time Period Produced','Time Period','Period','Date of Creation','Date','Year of Production','Production Technique','Medium','Support','Size','Dimensions','Canvas Size','Item Length','Item Width','Item Height','Style','Framing','Original/Licensed Reproduction','Originality','Handmade','Material','Certificate of Authenticity (COA)'];
+
+              const ALL_KNOWN = [...BLOCK2_FIELDS, ...BLOCK3_FIELDS];
+              const block2 = BLOCK2_FIELDS.map(k => aspects.find(a => a.name === k)).filter(Boolean);
+              const block3 = [
+                ...BLOCK3_FIELDS.map(k => aspects.find(a => a.name === k)).filter(Boolean),
+                ...aspects.filter(a => !ALL_KNOWN.includes(a.name))
+              ].filter((a,i,arr) => arr.findIndex(x=>x.name===a.name)===i);
+
+              const convertUnits = (value) => {
+                // Één gecombineerde regex — geen cascading conversies
+                return value.replace(
+                  /(\d+\.?\d*)\s*(inches|inch|mm|cm|kg|lbs?|pounds?|")/gi,
+                  (m, n, unit) => {
+                    const u = unit.toLowerCase();
+                    const num = parseFloat(n);
+                    if (u === 'inches' || u === 'inch' || u === '"') {
+                      return `${n}" · ${Math.round(num * 2.54)} cm`;
+                    }
+                    if (u === 'cm') {
+                      return `${n} cm · ${(num / 2.54).toFixed(1)}"`;
+                    }
+                    if (u === 'mm') {
+                      return `${n} mm · ${(num / 10).toFixed(1)} cm`;
+                    }
+                    if (u === 'lbs' || u === 'lb' || u === 'pounds' || u === 'pound') {
+                      return `${n} lbs · ${(num * 0.453592).toFixed(2)} kg`;
+                    }
+                    if (u === 'kg') {
+                      return `${n} kg · ${(num * 2.20462).toFixed(1)} lbs`;
+                    }
+                    return m;
+                  }
+                );
+              };
+              const METRIC_FIELDS = ['Item Length','Item Width','Item Height','Canvas Size','Size','Dimensions','Width','Height','Depth','Weight','Frame Size'];
+              const sellerIsImperial = /^(GB|US|UK|CA|AU)$/i.test((l.location||'').trim());
+              const makePillAttr = (a) => {
+                const label = a.name
+                  .replace('Time Period Produced','Period')
+                  .replace('Country of Origin','Origin')
+                  .replace('Country/Region of Origin','Origin')
+                  .replace('Original/Licensed Reproduction','Original/Repro');
+                let val = METRIC_FIELDS.includes(a.name) ? convertUnits(a.value) : a.value;
+                if (LIST_FIELDS.includes(a.name)) val = truncateList(val, 3);
+                return `<span style="display:inline-flex;flex-direction:column;gap:1px;background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.25);padding:4px 9px;">
+                  <span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#27ae60;text-transform:uppercase;">${esc(label)}</span>
+                  <span style="font-family:'Lora',serif;font-size:0.76rem;color:var(--pdim);">${esc(val)}</span>
+                </span>`;
+              };
+              const truncateList = (val, max=3) => {
+                if (!val.includes(',')) return val;
+                const parts = val.split(',').map(s => s.trim()).filter(Boolean);
+                return parts.slice(0, max).join(', ') + (parts.length > max ? ` +${parts.length - max}` : '');
+              };
+              const LIST_FIELDS = ['Theme','Subject','Style','Subject Type'];
+              const makePillArt = (a) => {
+                const isSigned = a.name === 'Signed';
+                let bg = 'rgba(232,160,48,.08)'; let col = 'var(--pdim)'; let border = 'rgba(232,160,48,.22)';
+                if (isSigned && /yes|signed/i.test(a.value))  { bg='rgba(39,174,96,.1)';  col='#2ecc71'; border='rgba(39,174,96,.35)'; }
+                if (isSigned && /no|unsigned/i.test(a.value)) { bg='rgba(192,57,43,.1)';  col='#e74c3c'; border='rgba(192,57,43,.35)'; }
+                const label = a.name
+                  .replace('Time Period Produced','Period')
+                  .replace('Country of Origin','Origin')
+                  .replace('Country/Region of Origin','Origin')
+                  .replace('Original/Licensed Reproduction','Original/Repro');
+                const displayVal = LIST_FIELDS.includes(a.name) ? truncateList(a.value, 3) : a.value;
+                return `<span style="display:inline-flex;flex-direction:column;gap:1px;background:${bg};border:1px solid ${border};padding:4px 9px;max-width:280px;">
+                  <span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#e8a030;text-transform:uppercase;">${esc(label)}</span>
+                  <span style="font-family:'Lora',serif;font-size:0.76rem;color:${col};font-weight:${isSigned?'700':'400'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(displayVal)}</span>
+                </span>`;
+              };
+              const b2pills = block2.map(a => makePillArt(a)).join('');
+
+              // Artwork Attributes — gegroepeerd per logische relatie
+              const GROUPS = [
+                { label: 'Timeline',       fields: ['Time Period Produced','Time Period','Period','Date of Creation','Date','Year of Production','Style'] },
+                { label: 'Technique',      fields: ['Production Technique','Medium','Material','Support','Handmade'] },
+                { label: 'Dimensions',     fields: ['Size','Canvas Size','Dimensions','Item Length','Item Width','Item Height','Frame Size','Depth','Weight'] },
+                { label: 'Condition',      fields: ['Framing','Originality','Original/Licensed Reproduction','Certificate of Authenticity (COA)'] },
+
+              ];
+
+              const usedNames = new Set();
+              const groupedHTML = GROUPS.map(g => {
+                const pills = g.fields
+                  .map(k => block3.find(a => a.name === k))
+                  .filter(Boolean)
+                  .filter(a => { if (usedNames.has(a.name)) return false; usedNames.add(a.name); return true; })
+                  .map(a => makePillAttr(a)).join('');
+                if (!pills) return '';
+                return `<div style="display:flex;flex-direction:column;gap:5px;">
+                  <span style="font-family:'Montserrat',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.18em;color:rgba(39,174,96,.85);text-transform:uppercase;">${g.label}</span>
+                  <div style="display:flex;flex-wrap:wrap;gap:5px;">${pills}</div>
+                </div>`;
+              }).filter(Boolean).join('');
+
+              // Resterende velden die niet in groepen vallen
+              const remainingPills = block3
+                .filter(a => !usedNames.has(a.name))
+                .map(a => makePillAttr(a)).join('');
+
+              return `
+                ${b2pills ? `<div style="padding-bottom:20px;border-bottom:1px solid rgba(210,172,52,.12);">
+                  <span style="font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.18em;color:#e8a030;text-transform:uppercase;display:block;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(232,160,48,.3);">Identification</span>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;">${b2pills}</div>
+                </div>` : ''}
+                ${groupedHTML ? `<div style="padding-bottom:16px;border-bottom:1px solid rgba(210,172,52,.12);">
+                  <span style="font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.18em;color:#27ae60;text-transform:uppercase;display:block;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(39,174,96,.3);">Artwork Attributes</span>
+                  <div style="display:flex;flex-direction:column;gap:12px;">${groupedHTML}${remainingPills ? `<div style="display:flex;flex-wrap:wrap;gap:5px;">${remainingPills}</div>` : ''}</div>
+                </div>` : ''}
+              `;
+            })()}
+
+            <!-- BLOK 4: TRACK ASSESSMENT -->
+            <div style="background:rgba(${lvlCol === '#c0392b' ? '192,57,43' : lvlCol === '#E8C14A' ? '210,172,52' : '90,90,122'},.06);border-left:3px solid ${lvlCol};padding:10px 14px;">
+              <span style="font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.18em;color:${lvlCol};text-transform:uppercase;display:block;margin-bottom:6px;">Track Assessment</span>
+              <span style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--pdim);line-height:1.65;">${esc(l.alert_reason)}</span>
+              ${l.description ? `<span style="font-family:'Lora',serif;font-style:italic;font-size:0.68rem;color:var(--muted);line-height:1.6;display:block;margin-top:8px;padding-top:8px;border-top:1px solid rgba(210,172,52,.1);">"${esc(l.description.length > 240 ? l.description.slice(0,240)+'…' : l.description)}"</span>` : ''}
+            </div>
+            ${(l.danger_periods && l.danger_periods.length) ? `
+            <div style="background:rgba(230,126,34,.06);border:1px solid rgba(230,126,34,.35);border-left:3px solid #e67e22;padding:10px 14px;">
+              <span style="font-family:'Montserrat',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.18em;color:#e67e22;text-transform:uppercase;display:block;margin-bottom:8px;">⚠ Provenance Risk</span>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                ${l.danger_periods.map(dp => {
+                  const riskCol = dp.risk === 'HIGH' ? '#c0392b' : dp.risk === 'MEDIUM' ? '#e67e22' : '#8a8aaa';
+                  const riskBg  = dp.risk === 'HIGH' ? 'rgba(192,57,43,.1)' : dp.risk === 'MEDIUM' ? 'rgba(230,126,34,.08)' : 'rgba(90,90,122,.08)';
+                  return `<span style="display:inline-flex;flex-direction:column;gap:2px;background:${riskBg};border:1px solid ${riskCol}55;padding:4px 10px;">
+                    <span style="font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:700;letter-spacing:.14em;color:${riskCol};text-transform:uppercase;">${esc(dp.period)} · ${esc(dp.risk||'')}</span>
+                    ${dp.note ? `<span style="font-family:'Lora',serif;font-size:0.69rem;color:var(--pdim);">${esc(dp.note)}</span>` : ''}
+                  </span>`;
+                }).join('')}
+              </div>
+            </div>` : ''}
+            ${l.image && (level === 'CRITICAL' || level === 'PRIORITY' || level === 'APEX') ? `<div id="vs_${esc(l.id)}" style="font-family:'Montserrat',sans-serif;font-size:.44rem;letter-spacing:.1em;color:var(--muted);padding:6px 0;">👁 Visual screening…</div>` : ''}
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                ${!isBook && l.id ? `<button onclick="addLiveToWatchlist(this)" data-ebayid="${esc(l.id)}"
+                  style="font-family:'Montserrat',sans-serif;font-size:.46rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;background:transparent;border:1px solid rgba(39,174,96,.4);color:#27ae60;padding:7px 14px;cursor:pointer;transition:all .18s;"
+                  onmouseover="if(!this.disabled)this.style.background='rgba(39,174,96,.08)'" onmouseout="this.style.background='transparent'">+ Watch</button>` : '<span></span>'}
+                ${(level === 'CRITICAL' || level === 'PRIORITY' || level === 'APEX') ? `<button onclick="saveListing('${esc(l.id)}')"
+                  id="save_${esc(l.id)}"
+                  style="font-family:'Montserrat',sans-serif;font-size:.46rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;background:transparent;border:1px solid rgba(210,172,52,.4);color:var(--gold);padding:7px 14px;cursor:pointer;transition:all .18s;"
+                  onmouseover="if(!this.disabled)this.style.background='rgba(210,172,52,.08)'" onmouseout="this.style.background='transparent'">★ Save</button>` : ''}
+                ${l.image && (level === 'CRITICAL' || level === 'PRIORITY' || level === 'APEX') ? `<button onclick="analyseStyle('${esc(l.image)}','${esc(_liveProfile?.name||'')}','${esc(l.media_type||'')}',null,this)"
+                  style="font-family:'Montserrat',sans-serif;font-size:.46rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;background:transparent;border:1px solid rgba(126,179,216,.4);color:#7eb3d8;padding:7px 14px;cursor:pointer;transition:all .18s;"
+                  onmouseover="if(!this.disabled)this.style.background='rgba(126,179,216,.08)'" onmouseout="this.style.background='transparent'">🔍 Analyse stijl</button>` : ''}
+              </div>
+              ${l.url ? `<a href="${esc(l.url)}" target="_blank" rel="noopener"
+                style="display:inline-block;font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(210,172,52,.35);padding:8px 20px;text-decoration:none;">View on ${srcCfg.label} →</a>` : ''}
+            </div>
+            <div id="analyse_${esc(l.id)}" style="display:none;"></div>
+          </div>
+        </div>`;
+      container.appendChild(c);
+      cardIdx++;
+    });
+  });
+}
+
+function renderFilterBar(allListings, shownCount) {
+  const bar = document.getElementById('liveFilterBar');
+  if (!bar) return;
+
+  const cnt = { original:0, print:0, book:0 };
+  allListings.forEach(l => { if (cnt[l.type] !== undefined) cnt[l.type]++; });
+  const locs = [...new Set(allListings.map(l => l.location).filter(Boolean))].sort();
+
+  const total  = allListings.length;
+  const shown  = shownCount !== undefined ? shownCount : total;
+  const isFiltered = shown < total || _filterPrice !== 'any' || _filterLoc || _filterTypes.size < 3;
+
+  const S  = `font-family:'Montserrat',sans-serif;font-size:.54rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 12px;cursor:pointer;border:1px solid;`;
+  const ON  = `background:rgba(210,172,52,.1);border-color:rgba(210,172,52,.5);color:var(--gold);`;
+  const OFF = `background:rgba(5,10,28,.4);border-color:rgba(210,172,52,.12);color:var(--muted);`;
+  const SON = `background:rgba(126,179,216,.1);border-color:rgba(126,179,216,.4);color:#7eb3d8;`;
+  const PON = `background:rgba(39,174,96,.1);border-color:rgba(39,174,96,.4);color:#27ae60;`;
+
+  const typeBtn  = (t, lbl) => `<button onclick="toggleFilterType('${t}')" style="${S}${_filterTypes.has(t)?ON:OFF}">${lbl}${cnt[t]?` · ${cnt[t]}`:''}</button>`;
+  const sortBtn  = (v, lbl) => `<button onclick="setFilterSort('${v}')" style="font-family:'Montserrat',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.1em;padding:6px 16px;border:1px solid;cursor:pointer;transition:all .18s;${_filterSort===v?'background:var(--gold);color:var(--navy);border-color:var(--gold);':'background:transparent;color:var(--muted);border-color:rgba(210,172,52,.2);'}">${lbl}</button>`;
+  const priceBtn = (v, lbl) => `<button onclick="setFilterPrice('${v}')" style="${S}${_filterPrice===v?PON:OFF}">${lbl}</button>`;
+  const LBL = s => `<span style="font-family:'Montserrat',sans-serif;font-size:.38rem;font-weight:600;letter-spacing:.18em;color:rgba(210,172,52,.4);text-transform:uppercase;flex-shrink:0;">${s}</span>`;
+
+  bar.innerHTML = `
+    <div style="background:rgba(5,10,28,.5);border:1px solid rgba(210,172,52,.12);padding:10px 16px;margin-bottom:3px;display:flex;flex-direction:column;gap:7px;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        ${LBL('Type')}
+        <div style="display:flex;gap:3px;">${typeBtn('original','Original')}${typeBtn('print','Print')}${typeBtn('book','Book')}</div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+          ${LBL('Sort')}
+          <div style="display:flex;gap:3px;">${sortBtn('alert','Alert')}${sortBtn('price_asc','€↑')}${sortBtn('price_desc','€↓')}${sortBtn('ending','Ending')}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        ${LBL('Price')}
+        <div style="display:flex;gap:3px;">${priceBtn('any','Any')}${priceBtn('low','<€500')}${priceBtn('mid','€500–5k')}${priceBtn('high','€5k+')}</div>
+        ${locs.length > 1 ? `<div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+          ${LBL('Location')}
+          <select onchange="setFilterLoc(this.value)" style="background:rgba(5,10,28,.7);border:1px solid rgba(210,172,52,.2);color:var(--pdim);font-family:'Montserrat',sans-serif;font-size:.44rem;padding:4px 8px;cursor:pointer;outline:none;">
+            <option value="">All</option>
+            ${locs.map(l=>`<option value="${l}"${_filterLoc===l?' selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>` : ''}
+      </div>
+      ${isFiltered ? `<div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-family:'Montserrat',sans-serif;font-size:.44rem;color:rgba(210,172,52,.6);">Showing ${shown} of ${total}</span>
+        <button onclick="clearAllFilters()" style="${S}background:rgba(192,57,43,.08);border-color:rgba(192,57,43,.3);color:#e74c3c;">Clear filters ×</button>
+      </div>` : `<div style="font-family:'Montserrat',sans-serif;font-size:.44rem;color:rgba(210,172,52,.35);">Showing all ${total} listings</div>`}
+    </div>`;
+}
+
+function clearAllFilters() {
+  _filterTypes = new Set(['original','print','book']);
+  _filterSort  = 'alert';
+  _filterPrice = 'any';
+  _filterLoc   = '';
+  applyFilters();
+}
+
+function toggleFilterType(type) {
+  if (_filterTypes.has(type) && _filterTypes.size > 1) _filterTypes.delete(type);
+  else _filterTypes.add(type);
+  applyFilters();
+}
+function setFilterSort(v)  { _filterSort  = v; applyFilters(); }
+function setFilterPrice(v) { _filterPrice = v; applyFilters(); }
+function setFilterLoc(v)   { _filterLoc   = v; applyFilters(); }
+
+// Parse a listing's price to a number for sorting.
+// Prefers the pre-computed _priceNum; falls back to the display string so that
+// "€1.234,56" (German locale, dot = thousands, comma = decimal) is handled correctly.
+function parseSortPrice(l) {
+  if (l._priceNum != null) return l._priceNum;
+  const s = String(l.price || '').replace(/[^0-9.,]/g, ''); // strip €, spaces, etc.
+  if (!s) return null;
+  const n = parseFloat(s.replace(/\./g, '').replace(',', '.')); // remove thousands dots, normalise decimal
+  return isNaN(n) ? null : n;
+}
+
+const PAGE_SIZE = 20;
+let _currentPage      = 1;
+let _filteredListings = [];
+
+function renderPagination() {
+  const container = document.getElementById('liveCards');
+  if (!container) return;
+  const total      = _filteredListings.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  if (totalPages <= 1) return;
+
+  const S   = `font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:transparent;border:1px solid;padding:8px 18px;cursor:pointer;transition:all .18s;`;
+  const on  = `border-color:rgba(210,172,52,.4);color:var(--gold);`;
+  const off = `border-color:rgba(210,172,52,.1);color:var(--muted);cursor:default;`;
+
+  const bar = document.createElement('div');
+  bar.style.cssText = `padding:20px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;`;
+  bar.innerHTML = `
+    <button onclick="changePage(-1)" style="${S}${_currentPage === 1 ? off : on}" ${_currentPage === 1 ? 'disabled' : ''}>← Prev</button>
+    <span style="font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:600;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;">Page ${_currentPage} of ${totalPages} · ${total} results</span>
+    <button onclick="changePage(1)" style="${S}${_currentPage === totalPages ? off : on}" ${_currentPage === totalPages ? 'disabled' : ''}>Next →</button>
+  `;
+  container.appendChild(bar);
+}
+
+function changePage(delta) {
+  const totalPages = Math.ceil(_filteredListings.length / PAGE_SIZE);
+  _currentPage = Math.max(1, Math.min(totalPages, _currentPage + delta));
+  const start = (_currentPage - 1) * PAGE_SIZE;
+  renderLiveResults(_filteredListings.slice(start, start + PAGE_SIZE), _liveProfile, true, true);
+  renderPagination();
+  document.getElementById('liveCards')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function applyFilters() {
+  let f = _liveListings.filter(l => _filterTypes.has(l.type));
+
+  if (_filterPrice === 'low')  f = f.filter(l => l._priceNum !== null && l._priceNum < 500);
+  if (_filterPrice === 'mid')  f = f.filter(l => l._priceNum !== null && l._priceNum >= 500 && l._priceNum < 5000);
+  if (_filterPrice === 'high') f = f.filter(l => l._priceNum !== null && l._priceNum >= 5000);
+  if (_filterLoc)              f = f.filter(l => l.location === _filterLoc);
+
+  if      (_filterSort === 'price_asc')  f.sort((a,b) => (parseSortPrice(a) ?? Infinity) - (parseSortPrice(b) ?? Infinity));
+  else if (_filterSort === 'price_desc') f.sort((a,b) => (parseSortPrice(b) ?? 0) - (parseSortPrice(a) ?? 0));
+  else if (_filterSort === 'ending')     f.sort((a,b) => (a._endMs ?? Infinity) - (b._endMs ?? Infinity));
+  else f.sort((a,b) => { const t = _TYPE_ORDER[a.type] - _TYPE_ORDER[b.type]; return t !== 0 ? t : _LEVEL_ORDER[a.alert_level] - _LEVEL_ORDER[b.alert_level]; });
+
+  _filteredListings = f;
+  _currentPage = 1;
+  renderFilterBar(_liveListings, f.length);
+  renderLiveResults(f.slice(0, PAGE_SIZE), _liveProfile, true, true);
+  renderPagination();
+}
+
+function renderError(msg) {
+  document.getElementById('resultsWrap').innerHTML = `
+    <div class="rblock">
+      <div class="rbanner WATCH"><span class="rlevel WATCH">Error</span><span class="rtitle">Scan Failed</span></div>
+      <div class="rbody"><div class="rfield full"><span class="rflbl">Detail</span><span class="rfval">${esc(msg)}</span></div></div>
+    </div>`;
+}
+
+function updateStats() {
+  document.getElementById('sScanned').textContent = stats.scanned;
+  document.getElementById('sAlerts').textContent = stats.alerts;
+  document.getElementById('sPriority').textContent = stats.priority;
+}
+
+function cpyBlock(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  navigator.clipboard.writeText(el.innerText).then(()=>{
+    const btn = el.previousElementSibling?.querySelector('.cpybtn');
+    if(btn){const o=btn.textContent;btn.textContent='Copied';setTimeout(()=>btn.textContent=o,1500);}
+  });
+}
+
+async function preCheck() {
+  const badge = document.getElementById('engineBadge');
+  badge.textContent = 'Checking…';
+  const gk = localStorage.getItem('geminiKey');
+  const ok = localStorage.getItem('openrouterKey');
+  if(gk) {
+    try {
+      const r = await callGemini('Reply with only the word OK');
+      if(r) { badge.textContent = '⬡ Gemini · Active (free)'; badge.style.color = '#27ae60'; return; }
+    } catch(e) { /* fall through to OpenRouter */ }
+  }
+  if(ok) {
+    try {
+      const r = await callOpenRouter('Reply with only the word OK');
+      if(r) { badge.textContent = '⬡ OpenRouter · Active'; badge.style.color = '#E8C14A'; return; }
+    } catch(e) { /* fall through to error */ }
+  }
+  badge.textContent = '⬡ No AI connection — tap to set up';
+  badge.style.color = '#c0392b';
+  badge.onclick = () => { document.getElementById('setupOverlay').style.display = 'flex'; };
+}
+
+async function scan() {
+  const profile = PROFILES[activeArtist];
+  if(!profile) return;
+
+  if(activeMode === 'manual') {
+    const input = document.getElementById('urlInput').value.trim();
+    if(!input){ document.getElementById('urlInput').focus(); return; }
+    if(!uploadedImageData) {
+      const zone = document.getElementById('uploadZone');
+      zone.style.borderColor = '#c0392b';
+      zone.style.background = 'rgba(192,57,43,.08)';
+      zone.scrollIntoView({behavior:'smooth',block:'center'});
+      const badge = document.getElementById('engineBadge');
+      badge.textContent = '⬡ Photo required — TRACK is a visual tool';
+      badge.style.color = '#c0392b';
+      setTimeout(() => {
+        zone.style.borderColor = 'rgba(210,172,52,.3)';
+        zone.style.background = 'rgba(5,10,28,.3)';
+      }, 2200);
+      return;
+    }
+    await runScan(buildPrompt(input, profile), 'manual', profile);
+  } else {
+    const userTerm = document.getElementById('searchInput').value.trim();
+    const artistLastName = profile ? profile.name.split(' ').pop() : '';
+    const term = userTerm || artistLastName || 'Flemish School painting';
+    if(!activeSources.size){ alert('Select at least one source.'); return; }
+    await runLiveScan(term, activeSources, profile);
+  }
+}
+
+// ── EBAY WORKER INTEGRATION ──
+const TRACK_WORKER_URL = 'https://track-ebay-proxy.geerart.workers.dev';
+
+function detectListingType(title, categories) {
+  const titleLow = (title || '').toLowerCase();
+  const catsLow  = (categories || []).join(' ').toLowerCase();
+
+  // Category name is the most reliable signal
+  if (/\b(bücher|livres|boeken|libros|libri|zeitschriften|magazines|comics)\b/.test(catsLow) ||
+      /\b(books?)\b/.test(catsLow)) return 'book';
+
+  // Title keywords
+  if (/\b(book|books|catalogue raisonn[eé]?|catalog|monograph|volume|vol\.|paperback|hardcover|softcover|reprint|publication|bibliography|auction\s+catalog|sale\s+catalog)\b/.test(titleLow))
+    return 'book';
+
+  if (/\b(print|lithograph|lithographie|litho|engraving|etching|gravure|woodcut|mezzotint|aquatint|screen\s*print|silkscreen|serigraph|reproduction|poster|postcard|facsimile|gicl[eé]e|offset\s+print|photogravure|chromolithograph)\b/.test(titleLow))
+    return 'print';
+
+  // Postkaart formaten — continental (6x4), standard (6x4), greeting card sizes
+  if (/\b(continental|postcard\s*size|greeting\s*card|6\s*x\s*4|4\s*x\s*6|\d+\s*x\s*\d+\s*in)\b/.test(titleLow))
+    return 'print';
+
+  // Creative Commons / licensed reproduction in titel
+  if (/\b(creative\s*commons|cc\s*by|licensed|copyright|©|photo\s*print|art\s*print|fine\s*art\s*print|canvas\s*print|wall\s*art)\b/.test(titleLow))
+    return 'print';
+
+  return 'original';
+}
+
+function buildAssessment(type, level, matchedTriggers, price, aspects, location, description, profileName) {
+  if (type === 'book') return 'Book or catalogue — excluded from alert scoring.';
+
+  if (type === 'print') {
+    const reprAspect = aspects.find(a => a.name === 'Original/Licensed Reproduction' || a.name === 'Originality');
+    const reprNote = reprAspect ? ` Listed as: ${reprAspect.value}.` : '';
+    if (matchedTriggers.length) {
+      return `Trigger phrase "${matchedTriggers[0]}" present in title.${reprNote} Classified as print or reproduction — verify classification before dismissing.`;
+    }
+    return reprAspect
+      ? `No trigger phrases · listed as: ${reprAspect.value}. Print or reproduction — not flagged.`
+      : 'No trigger phrases — classified as print or reproduction, not flagged.';
+  }
+
+  // Original work — build rich narrative from available data
+  const parts = [];
+
+  if (matchedTriggers.length) {
+    const extra = matchedTriggers.length > 1 ? ` (+${matchedTriggers.length - 1})` : '';
+    parts.push(`Trigger: "${matchedTriggers[0]}"${extra}.`);
+  } else {
+    parts.push(`No ${profileName || 'artist'}-profile trigger phrases found in title.`);
+  }
+
+  const signed = aspects.find(a => a.name === 'Signed');
+  if (signed) {
+    if (/yes|signed/i.test(signed.value))       parts.push('Signed: yes — verify authenticity of signature.');
+    else if (/no|unsigned/i.test(signed.value)) parts.push('Unsigned — consistent with studio works and later attributions.');
+    else                                         parts.push(`Signed: ${signed.value}.`);
+  }
+
+  const period = aspects.find(a => ['Time Period Produced','Time Period','Period'].includes(a.name));
+  const medium = aspects.find(a => ['Production Technique','Medium'].includes(a.name));
+  const support = aspects.find(a => a.name === 'Support');
+  if (period)              parts.push(`Period: ${period.value}.`);
+  if (medium && support)   parts.push(`${medium.value} on ${support.value}.`);
+  else if (medium)         parts.push(`Technique: ${medium.value}.`);
+  else if (support)        parts.push(`Support: ${support.value}.`);
+
+  if (price !== null) {
+    if (price < 500)       parts.push(`€${price.toLocaleString('de-DE')} — estate-sale level, investigate immediately.`);
+    else if (price < 5000) parts.push(`€${price.toLocaleString('de-DE')} — below typical attributed-work range.`);
+    else                   parts.push(`€${price.toLocaleString('de-DE')} — within normal market range for category.`);
+  }
+
+  const FLEMISH = ['BE','NL','DE','FR','LU','AT','CH'];
+  const loc = (location || '').toUpperCase().trim();
+  if (loc && FLEMISH.includes(loc)) {
+    parts.push(`Continental seller (${loc}) — consistent with Flemish provenance.`);
+  }
+
+  const coa = aspects.find(a => a.name === 'Certificate of Authenticity (COA)');
+  if (coa && /yes|included|available/i.test(coa.value)) {
+    parts.push(`COA claimed (${coa.value}) — verify documentation independently.`);
+  }
+
+  return parts.filter(Boolean).join(' ');
+}
+
+// Source display config
+const SOURCE_CFG = {
+  ebay:        { label:'eBay',        dot:'#3d7ebd', dotBg:'rgba(61,126,189,.12)' },
+  '2dehands':  { label:'2dehands',    dot:'#27ae60', dotBg:'rgba(39,174,96,.12)'  },
+  marktplaats: { label:'Marktplaats', dot:'#c0392b', dotBg:'rgba(192,57,43,.12)'  },
+  leboncoin:   { label:'LeBonCoin',   dot:'#a855f7', dotBg:'rgba(168,85,247,.12)' },
+  catawiki:    { label:'Catawiki',    dot:'#e67e22', dotBg:'rgba(230,126,34,.12)' },
+  dorotheum:   { label:'Dorotheum',   dot:'#E8C14A', dotBg:'rgba(210,172,52,.12)' },
+};
+
+// Media type badge config
+const MEDIA_BADGE = {
+  painting: null, // no extra badge — default type badge covers it
+  sketch:   { icon:'✏', label:'Modello · Sketch', color:'#E8C14A',  border:'rgba(210,172,52,.4)',  bg:'rgba(210,172,52,.07)' },
+  drawing:  { icon:'✏', label:'Drawing',          color:'#27ae60',  border:'rgba(39,174,96,.4)',   bg:'rgba(39,174,96,.07)'  },
+  print:    { icon:'◼', label:'Print',             color:'#a48ad4',  border:'rgba(164,138,212,.4)', bg:'rgba(164,138,212,.07)'},
+  plate:    { icon:'⚠', label:'Original Plate',   color:'#c0392b',  border:'rgba(192,57,43,.4)',   bg:'rgba(192,57,43,.07)'  },
+  tapestry: { icon:'◈', label:'Tapestry',          color:'#e67e22',  border:'rgba(230,126,34,.4)',  bg:'rgba(230,126,34,.07)' },
+  book:     { icon:'◻', label:'Book',              color:'#8a8aaa',  border:'rgba(90,90,122,.28)',  bg:'rgba(90,90,122,.06)'  },
+};
+
+// Map worker media_type to frontend type bucket
+function mediaToType(mt) {
+  if (mt === 'book') return 'book';
+  if (mt === 'print') return 'print';
+  return 'original';
+}
+
+// Client-side false positive guard — mirrors worker constants
+const UI_FALSE_POSITIVE_PATTERNS = [
+  'barrichello','schumacher','formule 1','formula 1','formula one','f2000','grand prix','coureur','racepak',
+  'fankaart','f1 card','honkbalpet','handtekening foto','handtekening kaart','signed card','helmets',
+  'fornuis','kookplaat','oven','ketel',
+  'pop ','poppen','speelgoed','toy store','barn door',
+  'showroom model','machine onderdeel','apparaat',
+];
+const UI_FALSE_POSITIVE_WORDS = [/\bf1\b/i, /\bpet\b/i, /\bcap\b/i, /\bhelm\b/i, /\bpop\b/i, /\btoy\b/i];
+const UI_ART_CONTEXT_KW = [
+  'schilderij','doek','paneel','olieverf','olio su','canvas','painting','oil on',
+  'artwork','tekening','drawing','ets','engraving','gravure','aquarel',
+  'watercolour','watercolor','pastel','gouache','lithograph','litho',
+  'old master','oud meester','flemish','vlaams','baroque','barok',
+];
+const UI_NON_ART_CONTEXT_KW = [
+  'fornuis','kookplaat','oven','ketel',
+  'pop','poppen','speelgoed','toy','barn',
+  'showroom','machine','apparaat',
+  'merk','brand name','modelnummer','model nr',
+];
+
+async function fetchRealListings(searchTerm, sources, profile) {
+  if (!TRACK_WORKER_URL) return null;
+  const sourceParam = [...sources].map(s => s.toLowerCase()).join(',');
+  // No server-side media filter — let the worker return all media types so that
+  // sources like 2dehands (which classify as 'other') are not silently dropped.
+  // Client-side _filterTypes handles what's displayed.
+  const url = `${TRACK_WORKER_URL}/search?q=${encodeURIComponent(searchTerm)}&sources=${sourceParam}&limit=20`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Worker ${res.status}`);
+  const data = await res.json();
+  const { items, sources: srcMeta } = data;
+  if (!items || !items.length) return { items: [], sources: srcMeta || {} };
+
+  const levelOrder = { CRITICAL:0, PRIORITY:1, WATCH:2, CLEAR:3 };
+  const typeOrder  = { original:0, print:1, book:2 };
+
+  const mapped = items
+    .filter(item => item.media_type !== 'other' || item.has_art_context === true)
+    .map(item => {
+    const _pRaw = parseFloat(item.price?.value);
+    const price = isFinite(_pRaw) ? _pRaw : null;
+    const aspects = item.localizedAspects || [];
+    const isAuction = (item.buyingOptions || []).includes('AUCTION');
+
+    // Use worker's enriched data when available, fall back to local detection
+    const media_type   = item.media_type || 'other';
+    const workerAlert  = item.alert;
+    const type         = mediaToType(media_type);
+
+    let level, alert_reason;
+    if (workerAlert && workerAlert.level) {
+      level = workerAlert.level;
+      alert_reason = (workerAlert.reasons || []).join(' · ') || buildAssessment(
+        type, level, [], price, aspects, item.location,
+        item.shortDescription || item.description || null, profile.name
+      );
+    } else {
+      // Legacy fallback for items without worker enrichment
+      const titleLower = (item.title || '').toLowerCase();
+      const matchedTriggers = profile.triggers.filter(t => titleLower.includes(t.toLowerCase()));
+      const reproAspect = aspects.find(a => a.name === 'Original/Licensed Reproduction' || a.name === 'Originality');
+      const isReproByAspect = reproAspect && /reprint|reproduction|licensed|copy|facsimile/i.test(reproAspect.value);
+      const detectedType = isReproByAspect ? 'print' : detectListingType(item.title, item.categories);
+      level = 'CLEAR';
+      if (detectedType === 'original' && matchedTriggers.length) {
+        level = price !== null && price < 500 ? 'CRITICAL' : price !== null && price < 5000 ? 'PRIORITY' : 'WATCH';
+      } else if (detectedType === 'print' && matchedTriggers.length) level = 'WATCH';
+      alert_reason = buildAssessment(detectedType, level, matchedTriggers, price, aspects, item.location,
+        item.shortDescription || item.description || null, profile.name);
+    }
+
+    // Client-side false positive override — applies after any source of level
+    const titleCheck = (item.title || '').toLowerCase();
+    const descCheck  = (item.shortDescription || item.description || '').toLowerCase();
+    const fullCheck  = `${titleCheck} ${descCheck}`;
+    const hasArtKw   = UI_ART_CONTEXT_KW.some(kw => fullCheck.includes(kw));
+    if (UI_FALSE_POSITIVE_PATTERNS.some(p => titleCheck.includes(p)) ||
+        UI_FALSE_POSITIVE_WORDS.some(r => r.test(titleCheck)) ||
+        (!hasArtKw && UI_NON_ART_CONTEXT_KW.some(kw => titleCheck.includes(kw)))) {
+      level = 'CLEAR';
+      alert_reason = 'False positive — non-art item';
+    }
+
+    let endLabel = null;
+    if (item.endDate) {
+      const d = new Date(item.endDate);
+      const hoursLeft = Math.round((d - Date.now()) / 3600000);
+      endLabel = hoursLeft > 0
+        ? (hoursLeft < 48 ? `Ends in ${hoursLeft}h` : d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}))
+        : 'Ended';
+    }
+
+    return {
+      source: (item.source || 'ebay').toLowerCase(),
+      live: true, type, media_type,
+      danger_periods: item.danger_periods || [],
+      id: item.id || '',
+      title: item.title || 'Untitled listing',
+      price: price !== null ? `€${price.toLocaleString('de-DE')}` : 'Price on request',
+      url: item.url || '',
+      image: item.image || null,
+      condition: item.condition || null,
+      location: item.location || null,
+      endLabel, isAuction,
+      categories: item.categories || [],
+      seller: item.seller || null,
+      feedbackScore: item.feedbackScore || null,
+      alert_level: level, alert_reason,
+      aspects,
+      description: item.shortDescription || item.description || null,
+      _priceNum: price,
+      _endMs: item.endDate ? new Date(item.endDate).getTime() : null,
+    };
+  });
+
+  return {
+    items: mapped.sort((a, b) => {
+      const t = typeOrder[a.type] - typeOrder[b.type];
+      return t !== 0 ? t : levelOrder[a.alert_level] - levelOrder[b.alert_level];
+    }),
+    sources: srcMeta || {},
+  };
+}
+
+async function runLiveScan(term, sources, profile) {
+  running = true;
+  const btn = document.getElementById('scanBtn');
+  const txt = document.getElementById('scanTxt');
+  btn.disabled = true;
+  txt.textContent = '⬡   Scanning…';
+  document.getElementById('statusBar').classList.add('on');
+  startStatus(MSGS_LIVE);
+  document.getElementById('resultsWrap').innerHTML = '';
+
+  try {
+    let realItems = null;
+    if (sources.size > 0) {
+      try {
+        const result = await fetchRealListings(term, sources, profile);
+        if (result !== null) {
+          realItems       = result.items;
+          _liveSources    = result.sources;
+          _lastSearchTerm = term;
+          // Debug: show what each source contributed before and after client mapping
+          const bySource = {};
+          result.items.forEach(i => { bySource[i.source] = (bySource[i.source] || 0) + 1; });
+          console.log('[TRACK] Raw source counts (worker):', result.sources);
+          console.log('[TRACK] Items reaching client per source:', bySource);
+          const byMedia = {};
+          result.items.forEach(i => { byMedia[i.media_type] = (byMedia[i.media_type] || 0) + 1; });
+          console.log('[TRACK] Items by media_type:', byMedia);
+        }
+      }
+      catch (e) { console.warn('Worker unavailable, falling back to simulation:', e.message); }
+    }
+
+    if (realItems !== null) {
+      stopStatus();
+      _liveListings     = realItems;
+      _filteredListings = realItems;
+      _currentPage      = 1;
+      _liveProfile      = profile;
+      // Non-refilter render: builds summary bar + filter bar using the full list for correct counts.
+      // Then immediately replace the card area with page 1 only.
+      renderLiveResults(realItems, profile, true);
+      if (realItems.length > PAGE_SIZE) {
+        renderLiveResults(realItems.slice(0, PAGE_SIZE), profile, true, true);
+        renderPagination();
+      }
+      // Auto-trigger visual screening for high-alert cards (non-blocking)
+      setTimeout(() => runVisualScreensForPage(realItems), 500);
+    } else {
+      // Worker not deployed yet — keep existing AI-simulated behavior unchanged
+      await runScan(buildLivePrompt(term, sources, profile), 'live', profile);
+      return; // runScan handles its own running/btn state
+    }
+  } catch (err) {
+    stopStatus();
+    renderError(err.message);
+  }
+
+  running = false;
+  btn.disabled = false;
+  txt.textContent = '⬡   Initiate Scan';
+}
+
+// GEMINI — primary, free tier, uses official x-goog-api-key header method
+async function callGemini(prompt, imageData) {
+  const key = localStorage.getItem('geminiKey') || '';
+  if(!key) throw new Error('No Gemini key set');
+  const parts = [{ text: prompt }];
+  if (imageData) {
+    const b64 = imageData.includes(',') ? imageData.split(',')[1] : imageData;
+    const mime = imageData.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
+    parts.push({ inline_data: { mime_type: mime, data: b64 } });
+  }
+  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', {
+    method:'POST',
+    headers:{ 'x-goog-api-key': key, 'Content-Type':'application/json' },
+    body:JSON.stringify({
+      contents:[{ parts }],
+      generationConfig:{ temperature:0.2, maxOutputTokens:1200 }
+    })
+  });
+  if(!res.ok){const e=await res.text();throw new Error(`Gemini ${res.status}: ${e.substring(0,120)}`);}
+  const d = await res.json();
+  return d.candidates?.[0]?.content?.parts?.[0]?.text?.trim()||'';
+}
+
+// OPENROUTER — fallback, paid credits, DeepSeek V3.2
+async function callOpenRouter(prompt) {
+  const key = localStorage.getItem('openrouterKey') || '';
+  if(!key) throw new Error('No OpenRouter key set');
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':`Bearer ${key}`,
+      'HTTP-Referer':'https://picturia.art',
+      'X-Title':'TRACK'
+    },
+    body:JSON.stringify({
+      model:'deepseek/deepseek-v3.2',
+      max_tokens:1200,
+      temperature:0.2,
+      messages:[
+        {role:'system',content:'You always respond in English only, regardless of any other language patterns in your training. Never use Chinese, never use any language other than English.'},
+        {role:'user',content:prompt}
+      ]
+    })
+  });
+  if(!res.ok){const e=await res.text();throw new Error(`OpenRouter ${res.status}: ${e.substring(0,120)}`);}
+  const d = await res.json();
+  return d.choices?.[0]?.message?.content?.trim()||'';
+}
+
+// Unified caller — tries Gemini first (free), falls back to OpenRouter
+async function callAI(prompt, imageData) {
+  const gk = localStorage.getItem('geminiKey');
+  const ok = localStorage.getItem('openrouterKey');
+  let lastError = null;
+
+  if(gk) {
+    try {
+      const result = await callGemini(prompt, imageData);
+      if(result) return { text: result, engine: 'Gemini' };
+    } catch(e) { lastError = e; }
+  }
+  if(ok) {
+    try {
+      const result = await callOpenRouter(prompt);
+      if(result) return { text: result, engine: 'OpenRouter' };
+    } catch(e) { lastError = e; }
+  }
+  throw lastError || new Error('No AI provider configured');
+}
+
+async function runScan(prompt, mode, profile) {
+  running = true;
+  const btn = document.getElementById('scanBtn');
+  const txt = document.getElementById('scanTxt');
+  btn.disabled = true;
+  txt.textContent = '⬡   Scanning…';
+  document.getElementById('engineBadge').textContent = '⬡ Scanning…';
+  document.getElementById('engineBadge').style.color = '#E8C14A';
+  document.getElementById('statusBar').classList.add('on');
+  startStatus();
+  document.getElementById('resultsWrap').innerHTML = '';
+
+  try {
+    const imageData = (mode === 'manual') ? uploadedImageData : null;
+    const { text: raw, engine } = await callAI(prompt, imageData);
+    document.getElementById('engineBadge').textContent = `⬡ ${engine} · Active`;
+    document.getElementById('engineBadge').style.color = engine === 'Gemini' ? '#27ae60' : '#E8C14A';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const start = clean.search(/[\[{]/);
+    const jsonStr = start >= 0 ? clean.substring(start) : clean;
+    const parsed = JSON.parse(jsonStr);
+    parsed._engine = engine;
+    stopStatus();
+    if(mode==='manual') renderManualResult(parsed, profile);
+    else renderLiveResults(Array.isArray(parsed)?parsed:[parsed], profile);
+  } catch(err) {
+    stopStatus();
+    renderError(err.message);
+  }
+
+  running = false;
+  btn.disabled = false;
+  txt.textContent = '⬡   Initiate Scan';
+}
+
+// ── WATCHLIST ──
+function getWatchlist() {
+  try { return JSON.parse(localStorage.getItem('trackWatchlist') || '[]'); }
+  catch { return []; }
+}
+
+function saveWatchlist(items) {
+  localStorage.setItem('trackWatchlist', JSON.stringify(items));
+  updateWatchlistCount();
+}
+
+function updateWatchlistCount() {
+  const count = getWatchlist().length;
+  const el = document.getElementById('watchlistCount');
+  if(el) el.textContent = `(${count})`;
+}
+
+function addLiveToWatchlist(btn) {
+  const itemId = btn.dataset.ebayid;
+  const listing = _liveListings.find(l => l.id === itemId);
+  if (!listing) return;
+
+  const items = getWatchlist();
+  if (items.some(i => i.ebayId === itemId)) {
+    btn.textContent = '✓ Already watching';
+    btn.disabled = true;
+    return;
+  }
+
+  items.unshift({
+    id: 'wl_' + Date.now(),
+    ebayId: itemId,
+    title: listing.title,
+    level: listing.alert_level,
+    artist: _liveProfile?.name || '',
+    image: listing.image || null,
+    provenance: listing.alert_reason || '',
+    recommendedAction: listing.url ? `eBay: ${listing.url}` : '',
+    confidence: '',
+    status: 'open',
+    dateAdded: new Date().toISOString().slice(0,10),
+  });
+  saveWatchlist(items);
+  btn.textContent = '✓ Watching';
+  btn.disabled = true;
+}
+
+function addLastResultToWatchlist() {
+  const r = window._lastScanResult;
+  if(!r) return;
+
+  if(!r.listingImage) {
+    const proceed = confirm('No photo attached to this listing.\n\nVisual verification is important for investigation. Add without photo?');
+    if(!proceed) return;
+  }
+
+  const items = getWatchlist();
+  const entry = {
+    id: 'wl_' + Date.now(),
+    title: r.data.file_name || 'Untitled Listing',
+    level: r.data.alert_level || 'CLEAR',
+    artist: r.profileName,
+    sourceText: r.sourceText,
+    image: r.listingImage || null,
+    provenance: r.data.provenance_assessment || '',
+    recommendedAction: r.data.recommended_action || '',
+    confidence: r.data.confidence || '',
+    status: 'open',
+    dateAdded: new Date().toISOString().slice(0,10)
+  };
+  items.unshift(entry);
+  saveWatchlist(items);
+
+  const btn = document.getElementById('addWatchBtn');
+  if(btn) { btn.textContent = '✓ Added'; btn.disabled = true; }
+}
+
+function setWatchlistStatus(id, status) {
+  const items = getWatchlist();
+  const item = items.find(i => i.id === id);
+  if(item) { item.status = status; saveWatchlist(items); renderWatchlist(); }
+}
+
+function removeFromWatchlist(id) {
+  const items = getWatchlist().filter(i => i.id !== id);
+  saveWatchlist(items);
+  renderWatchlist();
+}
+
+function renderWatchlist() {
+  const items = getWatchlist();
+  const empty = document.getElementById('watchlistEmpty');
+  const wrap = document.getElementById('watchlistItems');
+  if(!items.length) {
+    empty.style.display = '';
+    wrap.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const statusLabels = { open:'To investigate', investigating:'Investigating', cleared:'Researched', rejected:'Rejected' };
+
+  // Format date as DD.MM to match the agenda-style reference
+  const fmtDate = (iso) => {
+    const d = new Date(iso);
+    if (isNaN(d)) return iso;
+    return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}`;
+  };
+
+  wrap.innerHTML = items.map(item => `
+    <div class="wl-row">
+      <div class="wl-date-big">${fmtDate(item.dateAdded)}</div>
+      <div class="wl-thumb">
+        ${item.image
+          ? `<img src="${item.image}" alt=""/>`
+          : `<span style="font-size:1rem;color:rgba(192,57,43,.5);">⬡</span>`}
+      </div>
+      <div class="wl-main">
+        <div class="wl-row-head">
+          <span class="wl-level ${item.level}">${item.level}</span>
+          <span class="wl-title-compact">${esc(item.title)}</span>
+        </div>
+        <span class="wl-status ${item.status}">${statusLabels[item.status]||item.status}</span>
+        ${item.provenance ? `<div class="wl-provenance">${esc(item.provenance)}</div>` : ''}
+        <div class="wl-actions">
+          ${item.status !== 'investigating' ? `<button class="wl-btn" onclick="setWatchlistStatus('${item.id}','investigating')">Investigating</button>` : ''}
+          ${item.status !== 'cleared' ? `<button class="wl-btn" onclick="setWatchlistStatus('${item.id}','cleared')">Researched</button>` : ''}
+          ${item.status !== 'rejected' ? `<button class="wl-btn" onclick="setWatchlistStatus('${item.id}','rejected')">Rejected</button>` : ''}
+          <button class="wl-btn danger" onclick="removeFromWatchlist('${item.id}')">Remove</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Saved Finds ──────────────────────────────────────────────────────────────
+
+async function saveListing(itemId) {
+  const l = _liveListings.find(x => x.id === itemId);
+  if (!l) return;
+  const btn = document.getElementById(`save_${l.id}`);
+  if (btn) { btn.textContent = '★ Saving…'; btn.disabled = true; }
+
+  const artist = _liveProfile?.name || '';
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/saves`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: l.url,
+        title: l.title,
+        artist,
+        price: l.price || '',
+        image: l.image || null,
+        source: l.source || '',
+        alert_level: l.alert_level || '',
+        media_type: l.media_type || '',
+        danger_periods: l.danger_periods || [],
+        description: l.description || '',
+        oeuvre_match: l.oeuvre_match || null,
+      }),
+    });
+    const d = await res.json();
+    if (d.ok) {
+      if (btn) { btn.textContent = '★ Saved'; btn.style.borderColor = '#27ae60'; btn.style.color = '#27ae60'; }
+      updateSavesCount();
+      // Auto-trigger visual screen if image present
+      if (l.image) {
+        runVisualScreen(l.id, l.image, d.id);
+      }
+    } else {
+      if (btn) { btn.textContent = '★ Error'; btn.disabled = false; }
+    }
+  } catch(e) {
+    if (btn) { btn.textContent = '★ Error'; btn.disabled = false; }
+  }
+}
+
+async function runVisualScreen(itemId, imageUrl, savedFindId) {
+  const el = document.getElementById(`vs_${itemId}`);
+  if (!el) return;
+  // Marktplaats/2dehands CDN blocks server-side fetches — skip silently
+  if (/marktplaats\.nl|tweedehands\.com|2dehands\.be/i.test(imageUrl || '')) {
+    el.textContent = '👁 Screen not available for this source';
+    return;
+  }
+  el.textContent = '👁 Screening…';
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/visual-screen`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image_url: imageUrl }),
+    });
+    const d = await res.json();
+    if (d.error) { el.textContent = '👁 Screen failed'; return; }
+    if (d.is_artwork === false && d.confidence === 'high') {
+      el.style.color = '#c0392b';
+      el.textContent = '👁 Not an artwork — verify manually';
+    } else if (d.is_artwork === true) {
+      el.style.color = '#27ae60';
+      el.textContent = `👁 ${d.media_type || 'Artwork'} confirmed · ${d.reason || ''}`;
+    } else {
+      el.style.color = '#e67e22';
+      el.textContent = `👁 Inconclusive · ${d.reason || ''}`;
+    }
+    // Update saved find if we have its ID
+    if (savedFindId) {
+      await fetch(`${TRACK_WORKER_URL}/saves/${savedFindId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visual_screen: d }),
+      });
+    }
+  } catch(e) {
+    el.textContent = '👁 Screen unavailable';
+  }
+}
+
+// Run visual screens for all CRITICAL/PRIORITY/APEX cards in parallel (max 10)
+async function runVisualScreensForPage(listings) {
+  const targets = listings
+    .filter(l => l.image && ['CRITICAL','PRIORITY','APEX'].includes(l.alert_level))
+    .slice(0, 10);
+  // Non-blocking parallel
+  targets.forEach(l => runVisualScreen(l.id, l.image, null));
+}
+
+async function analyseStyle(imageUrl, artist, mediaType, savedFindId, btn) {
+  if (!imageUrl) { alert('No image available for style analysis.'); return; }
+  if (btn) { btn.textContent = '🔍 Analysing…'; btn.disabled = true; }
+
+  // Find the analyse block — it's the next sibling with id="analyse_${id}"
+  const cardEl = btn?.closest('.rblock');
+  const outEl = cardEl?.querySelector('[id^="analyse_"]');
+
+  if (outEl) {
+    outEl.style.display = '';
+    outEl.innerHTML = `<div style="padding:14px;background:rgba(126,179,216,.05);border:1px solid rgba(126,179,216,.2);font-family:'Montserrat',sans-serif;font-size:.46rem;color:#7eb3d8;letter-spacing:.1em;">🔍 Forensic style analysis running… (10–30 sec)</div>`;
+  }
+
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/analyse`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image_url: imageUrl, artist, media_type: mediaType, saved_find_id: savedFindId }),
+    });
+    const d = await res.json();
+
+    if (d.error) {
+      if (outEl) outEl.innerHTML = `<div style="padding:14px;color:#c0392b;font-family:'Montserrat',sans-serif;font-size:.5rem;">Error: ${esc(d.error)}</div>`;
+      if (btn) { btn.textContent = '🔍 Error'; btn.disabled = false; }
+      return;
+    }
+
+    const periodColors = { early:'#7eb3d8', peak:'#E8C14A', late:'#e67e22', italian:'#a48ad4', english:'#27ae60', mature:'#E8C14A', unknown:'#8a8aaa' };
+    const pc = periodColors[d.period_estimate] || '#8a8aaa';
+    const attrColor = d.attribution_suggestion === 'autograph' ? '#E8C14A' : d.attribution_suggestion === 'workshop' ? '#e67e22' : '#8a8aaa';
+    const mvHtml = d.market_value ? `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+        <span style="font-family:'Montserrat',sans-serif;font-size:.44rem;padding:3px 9px;background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.3);color:#27ae60;">Workshop €${(d.market_value.atelier_low||0).toLocaleString('de-DE')}–€${(d.market_value.atelier_high||0).toLocaleString('de-DE')}</span>
+        ${d.market_value.autograph_estimate ? `<span style="font-family:'Montserrat',sans-serif;font-size:.44rem;padding:3px 9px;background:rgba(210,172,52,.08);border:1px solid rgba(210,172,52,.3);color:var(--gold);">Autograph €${(d.market_value.autograph_estimate||0).toLocaleString('de-DE')}+</span>` : ''}
+      </div>` : '';
+
+    if (outEl) outEl.innerHTML = `
+      <div style="padding:16px 20px;background:rgba(126,179,216,.04);border:1px solid rgba(126,179,216,.2);border-top:none;">
+        <div style="font-family:'Montserrat',sans-serif;font-size:.64rem;font-weight:700;letter-spacing:.18em;color:#7eb3d8;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(126,179,216,.2);">🔍 Forensic Style Analysis · ${esc(artist)}</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <span style="font-family:'Montserrat',sans-serif;font-size:.46rem;padding:3px 9px;background:${pc}22;border:1px solid ${pc}66;color:${pc};">Period: ${esc(d.period_estimate||'?')} · ${esc(d.confidence||'?')} confidence</span>
+          <span style="font-family:'Montserrat',sans-serif;font-size:.46rem;padding:3px 9px;background:${attrColor}22;border:1px solid ${attrColor}66;color:${attrColor};">Attribution: ${esc(d.attribution_suggestion||'?')}</span>
+        </div>
+        <p style="font-family:'Lora',serif;font-style:italic;font-size:0.76rem;color:var(--pdim);line-height:1.7;margin-bottom:12px;">${esc(d.analysis_text||'')}</p>
+        ${(d.style_matches||[]).length ? `<div style="margin-bottom:8px;"><span style="font-family:'Montserrat',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:.16em;color:#27ae60;text-transform:uppercase;display:block;margin-bottom:4px;">Matches</span><div>${(d.style_matches||[]).map(m=>`<span style="font-family:'Lora',serif;font-size:0.7rem;color:#2ecc71;margin-right:10px;">✓ ${esc(m)}</span>`).join('')}</div></div>` : ''}
+        ${(d.style_deviations||[]).length ? `<div style="margin-bottom:8px;"><span style="font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:700;letter-spacing:.16em;color:#e67e22;text-transform:uppercase;display:block;margin-bottom:4px;">Deviations</span><div>${(d.style_deviations||[]).map(m=>`<span style="font-family:'Lora',serif;font-size:0.7rem;color:#e67e22;margin-right:10px;">≠ ${esc(m)}</span>`).join('')}</div></div>` : ''}
+        ${mvHtml}
+        ${(d.next_steps||[]).length ? `<div style="margin-top:10px;"><span style="font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:700;letter-spacing:.16em;color:var(--gold-dim);text-transform:uppercase;display:block;margin-bottom:4px;">Recommended steps</span><ol style="padding-left:18px;">${(d.next_steps||[]).map(s=>`<li style="font-family:'Lora',serif;font-size:0.72rem;color:var(--pdim);line-height:1.7;">${esc(s)}</li>`).join('')}</ol></div>` : ''}
+      </div>`;
+
+    if (btn) { btn.textContent = '🔍 Analysis complete'; }
+  } catch(e) {
+    if (outEl) outEl.innerHTML = `<div style="padding:14px;color:#c0392b;font-family:'Montserrat',sans-serif;font-size:.5rem;">Error: ${esc(e.message)}</div>`;
+    if (btn) { btn.textContent = '🔍 Analyse style'; btn.disabled = false; }
+  }
+}
+
+async function updateSavesCount() {
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/saves`);
+    const d = await res.json();
+    const el = document.getElementById('savesCount');
+    if (el) el.textContent = `(${d.total || 0})`;
+  } catch(_) {}
+}
+
+async function loadSavedFinds() {
+  const el = document.getElementById('savedFindsContent');
+  if (!el) return;
+  el.innerHTML = '<div style="padding:20px 0;text-align:center;color:var(--muted);font-family:\'Lora\',serif;font-style:italic;">Loading saved finds…</div>';
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/saves`);
+    const d = await res.json();
+    const finds = d.finds || [];
+    if (!finds.length) {
+      el.innerHTML = '<div style="padding:20px 0;text-align:center;color:var(--muted);font-family:\'Lora\',serif;font-style:italic;">No saved finds yet. Star a CRITICAL or PRIORITY listing to save it here.</div>';
+      return;
+    }
+
+    const statusDot = { new:'🔴', analysed:'🟡', report_ready:'🟢', archived:'⚪' };
+    const lvlCol = { APEX:'#D2AC34', CRITICAL:'#c0392b', PRIORITY:'#E8C14A', WATCH:'#e67e22' };
+
+    // Group by artist
+    const byArtist = {};
+    finds.forEach(f => {
+      const a = f.artist || 'Unknown';
+      if (!byArtist[a]) byArtist[a] = [];
+      byArtist[a].push(f);
+    });
+
+    el.innerHTML = Object.entries(byArtist).map(([artist, items]) => `
+      <div style="margin-bottom:24px;">
+        <div style="font-family:'Montserrat',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.24em;color:var(--gold);text-transform:uppercase;padding:8px 0;border-bottom:1px solid rgba(210,172,52,.2);margin-bottom:10px;">${esc(artist)} · ${items.length} saved</div>
+        ${items.map(f => {
+          const lc = lvlCol[f.alert_level] || '#8a8aaa';
+          const dot = statusDot[f.status] || '⚪';
+          const dateStr = f.date_saved ? new Date(f.date_saved).toLocaleDateString('nl-BE',{day:'numeric',month:'short'}) : '';
+          const hasProv = f.provenance_scan;
+          const hasAnalysis = f.style_analysis;
+          return `<div style="background:rgba(5,10,28,.5);border:1px solid rgba(210,172,52,.13);padding:14px 16px;margin-bottom:6px;display:flex;gap:14px;align-items:flex-start;">
+            ${f.image ? `<img src="${esc(f.image)}" style="width:48px;height:60px;object-fit:cover;flex-shrink:0;border:1px solid rgba(210,172,52,.2);"/>` : '<div style="width:48px;height:60px;flex-shrink:0;background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.2);display:flex;align-items:center;justify-content:center;"><span style="color:rgba(192,57,43,.5);">⬡</span></div>'}
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+                <span style="font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${lc};border:1px solid ${lc}55;padding:2px 8px;">${esc(f.alert_level)}</span>
+                <span style="font-family:'Montserrat',sans-serif;font-size:.44rem;color:var(--muted);">${dot} ${esc(f.status)}</span>
+                <span style="font-family:'Montserrat',sans-serif;font-size:.42rem;color:rgba(210,172,52,.5);margin-left:auto;">${esc(dateStr)}</span>
+              </div>
+              <div style="font-family:'Lora',serif;font-size:0.8rem;color:var(--parchment);margin-bottom:4px;">${esc(f.title)}</div>
+              <div style="font-family:'Montserrat',sans-serif;font-size:.44rem;color:var(--muted);">${esc(f.source)} · ${esc(f.price)} · ${esc(f.media_type)}</div>
+              ${f.notes ? `<div style="font-family:'Lora',serif;font-style:italic;font-size:0.7rem;color:var(--pdim);margin-top:6px;">"${esc(f.notes)}"</div>` : ''}
+              ${hasProv ? `<div style="font-family:'Montserrat',sans-serif;font-size:.42rem;color:${hasProv.risk_level==='HIGH'?'#c0392b':hasProv.risk_level==='MEDIUM'?'#e67e22':'#27ae60'};margin-top:4px;">⚠ Provenance: ${esc(hasProv.risk_level)} risk · score ${hasProv.risk_score||0}</div>` : ''}
+              ${hasAnalysis ? `<div style="font-family:'Montserrat',sans-serif;font-size:.42rem;color:#7eb3d8;margin-top:4px;">🔍 ${esc(hasAnalysis.period_estimate)} · ${esc(hasAnalysis.attribution_suggestion)}</div>` : ''}
+              <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+                ${f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener" style="font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(210,172,52,.3);padding:5px 12px;text-decoration:none;">View →</a>` : ''}
+                <button onclick="downloadReport('${esc(f.id)}')" style="font-family:'Montserrat',sans-serif;font-size:.44rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid rgba(210,172,52,.3);color:var(--gold-dim);padding:5px 12px;cursor:pointer;">📄 Report</button>
+                <button onclick="archiveFind('${esc(f.id)}')" style="font-family:'Montserrat',sans-serif;font-size:.42rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid rgba(90,90,122,.25);color:var(--muted);padding:5px 10px;cursor:pointer;">Archive</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML = `<div style="padding:16px;color:#c0392b;font-family:'Montserrat',sans-serif;font-size:.5rem;">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+async function downloadReport(findId) {
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/report`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: findId }),
+    });
+    if (!res.ok) { alert('Report generation failed: ' + res.status); return; }
+    const html = await res.text();
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `TRACK-${findId}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    loadSavedFinds(); // refresh status
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function archiveFind(findId) {
+  try {
+    await fetch(`${TRACK_WORKER_URL}/saves/${findId}`, { method: 'DELETE' });
+    loadSavedFinds();
+    updateSavesCount();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function loadOeuvre(artist) {
+  const el = document.getElementById('oeuvreContent');
+  if (!el) return;
+  // Update active button
+  document.querySelectorAll('#oeuvreArtistRow button').forEach(b => {
+    const isActive = b.textContent.toLowerCase().replace(/\s+/g,'').includes(artist.replace(/\s+/g,''));
+    b.style.background = isActive ? 'rgba(210,172,52,.1)' : 'transparent';
+    b.style.borderColor = isActive ? 'rgba(210,172,52,.5)' : 'rgba(210,172,52,.25)';
+    b.style.color = isActive ? 'var(--gold)' : 'var(--muted)';
+  });
+  el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-family:\'Lora\',serif;font-style:italic;">Loading oeuvre data…</div>';
+  try {
+    const res = await fetch(`${TRACK_WORKER_URL}/oeuvre?artist=${encodeURIComponent(artist)}`);
+    const d = await res.json();
+    if (!d.found) { el.innerHTML = `<div style="padding:16px;color:var(--muted);">Not found</div>`; return; }
+
+    const styleRes = await fetch(`${TRACK_WORKER_URL}/style-database?artist=${encodeURIComponent(artist.charAt(0).toUpperCase()+artist.slice(1))}`);
+    const style = styleRes.ok ? await styleRes.json() : null;
+
+    const pct = n => d.total_documented ? Math.round(n/d.total_documented*100) : 0;
+    el.innerHTML = `
+      <div style="margin-bottom:16px;">
+        <div style="font-family:'Montserrat',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">${esc(d.artist)}</div>
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.8rem;color:var(--muted);">${esc(d.dates)}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:16px;">
+        ${[['total_documented','Total'],['located_museum','Museum'],['located_private','Private'],['unlocated','Unlocated']].map(([k,lbl])=>`
+          <div style="background:rgba(5,10,28,.5);border:1px solid rgba(210,172,52,.13);padding:12px 8px;text-align:center;">
+            <div style="font-family:'Courier Prime',monospace;font-size:1.3rem;font-weight:700;color:${k==='unlocated'?'#c0392b':'var(--gold)'};display:block;">${d[k]||0}</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:.38rem;font-weight:600;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;">${lbl}</div>
+          </div>`).join('')}
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Top Museums</div>
+        ${(d.top_museums||[]).map(m=>`<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(210,172,52,.08);">
+          <span style="font-family:'Lora',serif;font-size:0.8rem;color:var(--pdim);flex:1;">${esc(m.name)}</span>
+          <span style="font-family:'Lora',serif;font-size:0.72rem;color:var(--muted);">${esc(m.city)}</span>
+          <span style="font-family:'Courier Prime',monospace;font-size:.8rem;color:var(--gold);">${m.count}</span>
+        </div>`).join('')}
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.18em;color:#c0392b;text-transform:uppercase;margin-bottom:8px;">⚡ ${d.unlocated||0} Unlocated Works — Active Search</div>
+        ${(d.missing_works||[]).map(w=>`<div style="background:rgba(192,57,43,.05);border:1px solid rgba(192,57,43,.18);padding:10px 14px;margin-bottom:4px;">
+          <div style="font-family:'Lora',serif;font-size:0.8rem;color:var(--parchment);margin-bottom:3px;">${esc(w.title)}</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:.42rem;color:var(--muted);letter-spacing:.08em;">${esc(w.medium)} · ${esc(w.dimensions?.w||'?')}×${esc(w.dimensions?.h||'?')} cm · ${esc(w.period)}</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:.42rem;color:rgba(192,57,43,.7);margin-top:3px;">Last seen: ${esc(w.last_seen?.location||'—')} (${esc(w.last_seen?.date||'—')})</div>
+        </div>`).join('')}
+      </div>
+
+      ${style?.found && style.periods ? `<div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.18em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px;">Style Reference</div>
+        ${Object.entries(style.periods).map(([pk,pv])=>`<div style="background:rgba(210,172,52,.04);border:1px solid rgba(210,172,52,.1);padding:10px 14px;margin-bottom:4px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <span style="font-family:'Montserrat',sans-serif;font-size:.46rem;font-weight:700;letter-spacing:.12em;color:var(--gold);text-transform:uppercase;">${esc(pv.label||pk)}</span>
+            <span style="font-family:'Montserrat',sans-serif;font-size:.42rem;color:var(--muted);">${esc(pv.period||'')}</span>
+          </div>
+          <ul style="padding-left:14px;">${(pv.characteristics||[]).map(c=>`<li style="font-family:'Lora',serif;font-size:0.72rem;color:var(--pdim);line-height:1.7;">${esc(c)}</li>`).join('')}</ul>
+        </div>`).join('')}
+      </div>` : ''}`;
+  } catch(e) {
+    el.innerHTML = `<div style="padding:16px;color:#c0392b;font-family:'Montserrat',sans-serif;font-size:.5rem;">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+// Initialize watchlist count on load
+updateWatchlistCount();
+updateSavesCount();
+</script>
+
+<!-- SETUP OVERLAY -->
+<div id="setupOverlay" style="
+  display:none;
+  position:fixed;inset:0;z-index:1000;
+  background:#080E26;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 28px;text-align:center;
+  overflow-y:auto;
+">
+  <div style="font-family:'Montserrat',sans-serif;font-size:.5rem;letter-spacing:.28em;color:#A88A30;text-transform:uppercase;margin-bottom:20px;">
+    TRACK · Picturia Intelligence
+  </div>
+  <div style="font-family:'Lora',serif;font-size:1.73rem;font-weight:400;color:#FFFFFF;letter-spacing:.2em;margin-bottom:6px;">
+    AI Connection
+  </div>
+  <div style="width:120px;height:1px;background:linear-gradient(90deg,transparent,#E8C14A,transparent);margin:0 auto 28px;"></div>
+
+  <!-- GEMINI — PRIMARY, FREE -->
+  <div style="width:100%;max-width:420px;margin-bottom:28px;">
+    <div style="font-family:'Montserrat',sans-serif;font-size:.55rem;font-weight:600;letter-spacing:.2em;color:#27ae60;text-transform:uppercase;margin-bottom:8px;text-align:left;">
+      ⬡ Gemini · Free · Recommended
+    </div>
+    <div style="font-family:'Lora',serif;font-style:normal;font-size:0.735rem;color:#c0bcb4;margin-bottom:12px;text-align:left;line-height:1.6;">
+      aistudio.google.com/app/apikey → Create API key → copy key
+    </div>
+    <input id="geminiKey" type="text"
+      placeholder="AIzaSy… or AQ.…"
+      style="
+        width:100%;background:rgba(5,10,28,0.8);
+        border:1px solid rgba(39,174,96,0.4);
+        padding:14px 16px;color:#FFFFFF;
+        font-family:'Montserrat',sans-serif;font-size:.8rem;
+        outline:none;margin-bottom:10px;
+        text-align:center;letter-spacing:.03em;
+      "
+    />
+    <button onclick="saveGeminiKey()" style="
+      width:100%;background:transparent;
+      border:1px solid #27ae60;padding:14px;
+      color:#27ae60;font-family:'Montserrat',sans-serif;
+      font-size:.65rem;font-weight:600;
+      letter-spacing:.2em;text-transform:uppercase;
+      cursor:pointer;
+    ">⬡ &nbsp; Test &amp; Save Gemini Key</button>
+  </div>
+
+  <div style="font-family:'Montserrat',sans-serif;font-size:.5rem;letter-spacing:.2em;color:#8a8aaa;text-transform:uppercase;margin-bottom:24px;">
+    — or —
+  </div>
+
+  <!-- OPENROUTER — FALLBACK, PAID -->
+  <div style="width:100%;max-width:420px;margin-bottom:24px;">
+    <div style="font-family:'Montserrat',sans-serif;font-size:.55rem;font-weight:600;letter-spacing:.2em;color:#A88A30;text-transform:uppercase;margin-bottom:8px;text-align:left;">
+      ⬡ OpenRouter · Backup · Paid
+    </div>
+    <div style="font-family:'Lora',serif;font-style:normal;font-size:0.735rem;color:#c0bcb4;margin-bottom:12px;text-align:left;line-height:1.6;">
+      openrouter.ai/keys → $5 credit → copy key
+    </div>
+    <input id="orKey" type="text"
+      placeholder="sk-or-v1-…"
+      style="
+        width:100%;background:rgba(5,10,28,0.8);
+        border:1px solid rgba(210,172,52,0.4);
+        padding:14px 16px;color:#FFFFFF;
+        font-family:'Montserrat',sans-serif;font-size:.8rem;
+        outline:none;margin-bottom:10px;
+        text-align:center;letter-spacing:.03em;
+      "
+    />
+    <button onclick="saveOpenRouterKey()" style="
+      width:100%;background:transparent;
+      border:1px solid #E8C14A;padding:14px;
+      color:#E8C14A;font-family:'Montserrat',sans-serif;
+      font-size:.65rem;font-weight:600;
+      letter-spacing:.2em;text-transform:uppercase;
+      cursor:pointer;
+    ">⬡ &nbsp; Test &amp; Save OpenRouter Key</button>
+  </div>
+
+  <div id="keyStatus" style="
+    font-family:'Montserrat',sans-serif;
+    font-size:.55rem;letter-spacing:.1em;
+    color:#9a9ab0;text-transform:uppercase;
+    margin-top:8px;min-height:20px;max-width:420px;
+  "></div>
+
+  <button onclick="document.getElementById('setupOverlay').style.display='none'" style="
+    margin-top:24px;background:none;border:none;
+    color:#A88A30;font-family:'Montserrat',sans-serif;
+    font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;
+    cursor:pointer;text-decoration:underline;
+    border-bottom:1px solid transparent;
+  ">Skip — set up later</button>
+</div>
+
+<script>
+// Show setup overlay if no working key saved
+window.addEventListener('load', () => {
+  const gk = localStorage.getItem('geminiKey');
+  const ok = localStorage.getItem('openrouterKey');
+  if(gk) document.getElementById('geminiKey').value = gk;
+  if(ok) document.getElementById('orKey').value = ok;
+  if(gk || ok) {
+    document.getElementById('setupOverlay').style.display = 'none';
+  } else {
+    document.getElementById('setupOverlay').style.display = 'flex';
+  }
+  if(localStorage.getItem('trackHasScanned')) {
+    const hint = document.getElementById('onboardingHint');
+    if(hint) hint.style.display = 'none';
+  }
+});
+
+async function saveGeminiKey() {
+  const key = document.getElementById('geminiKey').value.trim();
+  const status = document.getElementById('keyStatus');
+  if(!key) { status.textContent = 'No key entered'; status.style.color = '#c0392b'; return; }
+  status.textContent = 'Testing Gemini…';
+  status.style.color = '#E8C14A';
+  try {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', {
+      method:'POST',
+      headers:{ 'x-goog-api-key': key, 'Content-Type':'application/json' },
+      body:JSON.stringify({ contents:[{parts:[{text:'Reply OK'}]}] })
+    });
+    if(!res.ok) {
+      const e = await res.text();
+      throw new Error(`${res.status}`);
+    }
+    localStorage.setItem('geminiKey', key);
+    localStorage.setItem('primaryProvider', 'gemini');
+    status.textContent = '✓ Gemini connected — opening TRACK…';
+    status.style.color = '#27ae60';
+    setTimeout(() => { document.getElementById('setupOverlay').style.display = 'none'; }, 1000);
+  } catch(e) {
+    status.textContent = 'Gemini error: ' + e.message + ' — try OpenRouter';
+    status.style.color = '#c0392b';
+  }
+}
+
+async function saveOpenRouterKey() {
+  const key = document.getElementById('orKey').value.trim();
+  const status = document.getElementById('keyStatus');
+  if(!key.startsWith('sk-or')) {
+    status.textContent = 'Invalid key — must start with sk-or-…';
+    status.style.color = '#c0392b';
+    return;
+  }
+  status.textContent = 'Testing OpenRouter…';
+  status.style.color = '#E8C14A';
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${key}`,
+        'HTTP-Referer':'https://picturia.art',
+        'X-Title':'TRACK'
+      },
+      body:JSON.stringify({
+        model:'deepseek/deepseek-v3.2',
+        max_tokens:5,
+        messages:[{role:'user',content:'Reply OK'}]
+      })
+    });
+    if(!res.ok) throw new Error(res.status);
+    localStorage.setItem('openrouterKey', key);
+    if(!localStorage.getItem('primaryProvider')) localStorage.setItem('primaryProvider', 'openrouter');
+    status.textContent = '✓ OpenRouter connected — opening TRACK…';
+    status.style.color = '#27ae60';
+    setTimeout(() => { document.getElementById('setupOverlay').style.display = 'none'; }, 1000);
+  } catch(e) {
+    status.textContent = 'OpenRouter error: ' + e.message;
+    status.style.color = '#c0392b';
+  }
+}
+</script>
+</body>
+</html>

@@ -291,7 +291,7 @@ function updateChatSuggestions(sugs) {
 
     var btn = document.createElement('button');
     btn.id = 'trace-chat-btn';
-    btn.style.cssText = 'width:100%;background:var(--surface2);border:1px solid var(--border-mid);border-top:1px solid var(--border);color:var(--gold);padding:14px;font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;';
+    btn.style.cssText = 'width:100%;background:var(--surface2);border:1px solid var(--border-mid);border-top:1px solid var(--border);color:var(--gold);padding:14px;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;';
     btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Ask Follow-up Questions';
     btn.addEventListener('click', function() { window.openChat(); });
     btn.addEventListener('mouseenter', function() { btn.style.borderColor = 'var(--gold)'; });

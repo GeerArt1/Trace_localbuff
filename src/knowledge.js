@@ -161,10 +161,10 @@
 
       // Color palette by node type
       var typeColors = {
-        artwork: '#D4AE52',
+        artwork: '#E8C14A',
         artist: '#8AADEA',
         owner: '#5AAA78',
-        creation: '#D4AE52',
+        creation: '#E8C14A',
         exhibition: '#8B5CF6',
         auction: '#EF4444',
         event: '#C0B090'
@@ -224,7 +224,7 @@
         .attr('orient', 'auto')
         .append('path')
         .attr('d', 'M0,0 L8,4 L0,8 Z')
-        .attr('fill', 'rgba(212, 174, 82, 0.3)');
+        .attr('fill', 'rgba(232, 193, 74, 0.3)');
 
       // Tooltip
       var tooltip = d3.select(container)
@@ -232,7 +232,7 @@
         .attr('class', 'kg-tooltip')
         .style('position', 'absolute')
         .style('background', 'rgba(20, 18, 9, 0.95)')
-        .style('border', '1px solid rgba(212, 174, 82, 0.3)')
+        .style('border', '1px solid rgba(232, 193, 74, 0.3)')
         .style('color', '#F5EDD8')
         .style('padding', '8px 12px')
         .style('border-radius', '4px')
@@ -243,7 +243,7 @@
         .style('z-index', 100)
         .style('max-width', '200px')
         .style('box-shadow', '0 4px 16px rgba(0,0,0,0.5)')
-        .style('font-family', 'Montserrat, sans-serif');
+        .style('font-family', 'var(--font-ui)');
 
       this.tooltip = tooltip;
 
@@ -311,7 +311,7 @@
         .selectAll('line')
         .data(linkData)
         .join('line')
-        .attr('stroke', 'rgba(212, 174, 82, 0.15)')
+        .attr('stroke', 'rgba(232, 193, 74, 0.15)')
         .attr('stroke-width', 1.2)
         .attr('stroke-dasharray', function(d) {
           return d.label === 'gap' ? '4,3' : null;
@@ -326,7 +326,7 @@
         .join('text')
         .attr('font-size', '7px')
         .attr('fill', 'rgba(192, 176, 144, 0.5)')
-        .attr('font-family', 'Montserrat, sans-serif')
+        .attr('font-family', 'var(--font-ui)')
         .attr('text-anchor', 'middle')
         .attr('dy', '-4')
         .text(function(d) { return d.label; });
@@ -392,7 +392,7 @@
           return d.type === 'artwork' ? '9px' : '8px';
         })
         .attr('fill', '#F5EDD8')
-        .attr('font-family', 'Montserrat, sans-serif')
+        .attr('font-family', 'var(--font-ui)')
         .attr('font-weight', function(d) {
           return d.type === 'artwork' ? '600' : '400';
         })
@@ -406,7 +406,7 @@
         })
         .attr('font-size', '7px')
         .attr('fill', '#8A7A60')
-        .attr('font-family', 'Courier Prime, monospace')
+        .attr('font-family', 'var(--font-mono)')
         .text(function(d) { return d.year || ''; });
 
       // Hover interactions
@@ -428,7 +428,7 @@
           // Highlight connected edges
           link.attr('stroke', function(l) {
             return l.source.id === d.id || l.target.id === d.id ?
-              'rgba(212, 174, 82, 0.5)' : 'rgba(212, 174, 82, 0.08)';
+              'rgba(232, 193, 74, 0.5)' : 'rgba(232, 193, 74, 0.08)';
           });
           link.attr('stroke-width', function(l) {
             return l.source.id === d.id || l.target.id === d.id ? 2 : 0.8;
@@ -442,7 +442,7 @@
         })
         .on('mouseleave', function(event, d) {
           tooltip.transition().duration(300).style('opacity', 0);
-          link.attr('stroke', 'rgba(212, 174, 82, 0.15)');
+          link.attr('stroke', 'rgba(232, 193, 74, 0.15)');
           link.attr('stroke-width', 1.2);
         });
 
@@ -512,7 +512,7 @@
 
       // Legend
       var legendData = [
-        { label: 'Artwork', color: '#D4AE52' },
+        { label: 'Artwork', color: '#E8C14A' },
         { label: 'Artist', color: '#8AADEA' },
         { label: 'Owner', color: '#5AAA78' },
         { label: 'Exhibition', color: '#8B5CF6' },
@@ -530,7 +530,7 @@
         .attr('y', 0)
         .attr('font-size', '7px')
         .attr('fill', 'rgba(192, 176, 144, 0.5)')
-        .attr('font-family', 'Montserrat, sans-serif')
+        .attr('font-family', 'var(--font-ui)')
         .text(function(d) { return '\u25CF ' + d.label; });
 
       legend.selectAll('circle')

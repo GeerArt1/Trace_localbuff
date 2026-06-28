@@ -66,18 +66,18 @@ window.showUpgradeCard = window.showUpgradeCard || function showUpgradeCard(key)
   var box = document.createElement('div');
   box.style.cssText = 'background:var(--surface);border:1px solid var(--border-strong);padding:28px 24px;max-width:360px;width:100%;text-align:center;';
   box.innerHTML = '<div style="font-size:36px;color:var(--gold);margin-bottom:12px;">\u25C8</div>' +
-    '<div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:400;color:var(--text);margin-bottom:10px;">' + window.esc(card.title) + '</div>' +
+    '<div style="font-family:var(--font-display);font-size:22px;font-weight:400;color:var(--text);margin-bottom:10px;">' + window.esc(card.title) + '</div>' +
     '<div style="font-size:12px;line-height:1.7;color:var(--text-mid);margin-bottom:20px;">' + window.esc(card.body) + '</div>';
   var upBtn = document.createElement('button');
   upBtn.textContent = 'UPGRADE NOW';
-  upBtn.style.cssText = 'width:100%;background:var(--gold);color:#060402;border:none;padding:14px;font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;';
+  upBtn.style.cssText = 'width:100%;background:var(--gold);color:#060402;border:none;padding:14px;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;';
   upBtn.addEventListener('click', function() {
     overlay.remove();
     if (typeof TRACE_SUB !== 'undefined') TRACE_SUB.showUpgradeFlow(card.tier);
   });
   var laterBtn = document.createElement('button');
   laterBtn.textContent = 'Maybe later';
-  laterBtn.style.cssText = 'background:none;border:none;color:var(--text-dim);padding:10px;font-family:Montserrat,sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;';
+  laterBtn.style.cssText = 'background:none;border:none;color:var(--text-dim);padding:10px;font-family:var(--font-ui);font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;';
   laterBtn.addEventListener('click', function() { overlay.remove(); });
   box.appendChild(upBtn);
   box.appendChild(laterBtn);

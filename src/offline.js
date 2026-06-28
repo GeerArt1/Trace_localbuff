@@ -208,7 +208,7 @@
       dom('button', {
         id: 'pwa-install-btn',
         style: 'background:var(--gold);color:#060402;border:none;padding:8px 14px;' +
-          'font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;' +
+          'font-family:var(--font-ui);font-size:8px;font-weight:700;' +
           'letter-spacing:.15em;text-transform:uppercase;cursor:pointer;white-space:nowrap;'
       }).text('INSTALL'),
       dom('button', {

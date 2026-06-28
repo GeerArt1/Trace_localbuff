@@ -1,0 +1,90 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "track-ebay-proxy",
+  "main": "src/index.js",
+  "compatibility_date": "2026-06-21",
+  "compatibility_flags": ["nodejs_compat"],
+
+
+  "kv_namespaces": [
+    {
+      "binding": "TOKEN_CACHE",
+      "id": "c9dac4e64c1941e18a00b942d8c55843",
+      "preview_id": "1e1b2022f42f4baba1fe269490576ff5"
+    },
+    {
+      "binding": "TRACK_WATCHLIST",
+      "id": "e67aabea74c64615b72f34150597f5ea",
+      "preview_id": "90131368fa054a82b2a67bba057aea74"
+    },
+    {
+      "binding": "TRACK_SEEN_IDS",
+      "id": "679f66eb407f497e9aa4ff91c42ccd44",
+      "preview_id": "6a616e3ac2bf42698a4ce98d3606ea98"
+    },
+    {
+      "binding": "TRACK_ALERT_HISTORY",
+      "id": "c47f93a02c7647d09512d5b89ca448a0",
+      "preview_id": "b60cd535427443cca8e3546bc2cdc202"
+    },
+    {
+      "binding": "TRACK_REFERENCE_CACHE",
+      "id": "3980b848c30b45d99a2183b6120a189d",
+      "preview_id": "55f82e3ff66541a898dc46f49d9cc869"
+    },
+    {
+      "binding": "TRACK_SAVED_FINDS",
+      "id": "986c7c8d5f8042b5b87784370d1d1c2b",
+      "preview_id": "c92d00e3880c4339a41f4070639b9c81"
+    },
+    {
+      "binding": "TRACK_VISUAL_CACHE",
+      "id": "3b7c484303e54cfb9b8100ac1d44fd3d",
+      "preview_id": "af2efc8ca635401389cb3e8bb8d7da44"
+    },
+    {
+      "binding": "TRACK_OEUVRE_CACHE",
+      "id": "6a485da196d64a7ea41acddc76b94f95"
+    }
+  ],
+
+  // Cron schedule — smart seasonal scanning
+  // Daily base at 8am UTC. High season gets extra runs.
+  "triggers": {
+    "crons": [
+      "0 8 * * *",
+      "0 7 * 1,2 *",
+      "0 7,14 * 3,4 *",
+      "0 7 * 6 *",
+      "0 7,14 * 10,11 *"
+    ]
+  },
+
+  "observability": {
+    "traces": {
+      "enabled": true,
+      "destinations": ["sentry-traces"]
+    },
+    "logs": {
+      "enabled": true,
+      "destinations": ["sentry-logs"]
+    }
+  },
+
+  "vars": {
+    "EBAY_MARKETPLACE": "EBAY_NL",
+    "EBAY_API_BASE": "https://api.ebay.com"
+  }
+
+  // Secrets — set via: npx wrangler secret put <NAME>
+  // EBAY_CLIENT_ID
+  // EBAY_CLIENT_SECRET
+  // ALLOWED_ORIGIN  (e.g. "*" for dev, or "https://yourdomain.com")
+  // TELEGRAM_BOT_TOKEN  (get from @BotFather)
+  //
+  // Create new KV namespaces:
+  //   npx wrangler kv namespace create TRACK_WATCHLIST
+  //   npx wrangler kv namespace create TRACK_SEEN_IDS
+  //   npx wrangler kv namespace create TRACK_ALERT_HISTORY
+  //   npx wrangler kv namespace create TRACK_REFERENCE_CACHE
+}

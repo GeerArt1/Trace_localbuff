@@ -78,7 +78,7 @@ window.zoomPreview = function zoomPreview() {
 };
 
 /**
- * Display analysis results
+ * Display analysis results with professional Amazon-inspired layout
  * @param {Object} r - Result object from AI analysis
  */
 window.showResult = function showResult(r) {
@@ -91,59 +91,215 @@ window.showResult = function showResult(r) {
   if (rid) rid.textContent = id;
 
   var subjectLabels = {
-    artwork: '\u25C8 Art Analysis Complete', painting: '\u25C8 Painting Identified',
-    sculpture: '\u25C8 Sculpture Identified', photograph: '\u25C8 Photo Analysed',
-    person: '\u25C8 Person Identified', animal: '\u25C8 Species Identified',
-    landmark: '\u25C8 Landmark Identified', architecture: '\u25C8 Architecture Analysed',
-    place: '\u25C8 Location Identified', nature: '\u25C8 Nature Identified',
-    object: '\u25C8 Object Identified', food: '\u25C8 Dish Identified',
-    vehicle: '\u25C8 Vehicle Identified', fashion: '\u25C8 Style Identified',
-    unknown: '\u25C8 Analysis Complete'
+    artwork: 'Art Analysis Complete', painting: 'Painting Identified',
+    sculpture: 'Sculpture Identified', photograph: 'Photo Analysed',
+    person: 'Person Identified', animal: 'Species Identified',
+    landmark: 'Landmark Identified', architecture: 'Architecture Analysed',
+    place: 'Location Identified', nature: 'Nature Identified',
+    object: 'Object Identified', food: 'Dish Identified',
+    vehicle: 'Vehicle Identified', fashion: 'Style Identified',
+    unknown: 'Analysis Complete'
   };
   var rpl = document.getElementById('rp-label');
-  if (rpl) rpl.textContent = subjectLabels[r.subject_type] || '\u25C8 Analysis Complete';
+  if (rpl) rpl.textContent = subjectLabels[r.subject_type] || 'Analysis Complete';
 
   var conf = r.provenance_confidence || 55;
   var tags = (r.keywords || []).map(function(k) {
-    return '<span class="rtag">' + window.esc(k) + '</span>';
+    return '<span class="track-pill track-keyword">' + window.esc(k) + '</span>';
   }).join('');
 
-  var bodyHTML = '<div class="r-title">' + window.esc(r.title || 'Unknown Subject') + '</div>' +
-    '<div class="r-attr">' + window.esc(r.artist || '') +
-    (r.period ? ', ' + window.esc(r.period) : '') +
-    (r.medium ? ' \u00B7 ' + window.esc(r.medium) : '') + '</div>' +
-    '<div class="rdiv"></div>';
+  var medium = r.medium || r.movement || '';
+  var period = r.period || '';
+  var movement = r.movement || r.medium || '';
 
-  if (window.TIER === 'discover') {
-    bodyHTML +=
-      '<div class="rsec">The Story</div><div class="rtext">' + window.esc(r.the_story || r.style_analysis || r.professional_assessment || '') + '</div>' +
-      '<div class="rdiv"></div>' +
-      '<div class="rsec">\u2726 Fascinating Fact</div><div class="rtext" style="color:var(--text)">' + window.esc(r.fascinating_fact || '') + '</div>' +
-      '<div class="rdiv"></div>' +
-      '<div class="rsec">What to Look For</div><div class="rtext">' + window.esc(r.what_to_look_for || '') + '</div>';
+  // Determine alert level from confidence (track_final-style)
+  var alertLevel = 'CLEAR';
+  if (conf < 30) alertLevel = 'CRITICAL';
+  else if (conf < 50) alertLevel = 'PRIORITY';
+  else if (conf < 70) alertLevel = 'WATCH';
+
+  // ── Build the enhanced result layout ──
+  var bodyHTML = '';
+
+  // ── 0. Stats bar (track_final-inspired) ──
+  bodyHTML += '<div class="track-stats" style="margin-bottom:3px;">' +
+    '<div class="track-stat"><span class="track-snum">1</span><span class="track-slbl">Scanned</span></div>' +
+    '<div class="track-stat"><span class="track-snum">' + (conf < 70 ? 1 : 0) + '</span><span class="track-slbl">Alerts</span></div>' +
+    '<div class="track-stat"><span class="track-snum">' + (conf < 50 ? 1 : 0) + '</span><span class="track-slbl">Priority</span></div>' +
+    '<div class="track-stat"><span class="track-snum">1</span><span class="track-slbl">Sources</span></div>' +
+    '</div>';
+
+  // ── 0b. Alert banner (track_final-inspired) ──
+  bodyHTML += '<div class="track-rblock" style="margin-bottom:3px;">';
+  bodyHTML += '<div class="track-rbanner track-' + alertLevel + '">' +
+    '<span class="track-rlevel track-' + alertLevel + '">' + alertLevel + '</span>' +
+    '<span class="track-rtitle">' + window.esc(r.title || 'Untitled scan') + '</span>' +
+    '</div>';
+  // Two-column field layout
+  bodyHTML += '<div class="track-rbody">';
+  // Keywords as pills (full width)
+  if (tags) {
+    bodyHTML += '<div class="track-rfield track-full"><span class="track-rflbl">Keywords</span><div class="track-pills">' + tags + '</div></div>';
+  }
+  bodyHTML += '<div class="track-rfield"><span class="track-rflbl">Confidence</span><span class="track-rfval">' + conf + '%' +
+    ' <span style="color:' + (conf < 30 ? 'var(--red-lt)' : conf < 50 ? '#e67e22' : conf < 70 ? '#E8A020' : 'var(--green-lt)') + ';">' +
+    (conf < 30 ? '— Critical investigation needed' : conf < 50 ? '— Priority review' : conf < 70 ? '— Monitor for signals' : '— Good confidence') +
+    '</span></span></div>';
+  bodyHTML += '<div class="track-rfield"><span class="track-rflbl">Provenance</span><span class="track-rfval">' + window.esc(r.provenance_chain || r.professional_assessment || 'See analysis below') + '</span></div>';
+  if (r.style_analysis) {
+    bodyHTML += '<div class="track-rfield"><span class="track-rflbl">Style</span><span class="track-rfval">' + window.esc(r.style_analysis.substring(0, 120) + (r.style_analysis.length > 120 ? '...' : '')) + '</span></div>';
+  }
+  if (r.risk_assessment) {
+    bodyHTML += '<div class="track-rfield"><span class="track-rflbl">Risk</span><span class="track-rfval">' + window.esc(r.risk_assessment.substring(0, 120)) + '</span></div>';
+  }
+  if (r.recommended_actions) {
+    bodyHTML += '<div class="track-rfield"><span class="track-rflbl">Action</span><span class="track-rfval">' + window.esc(r.recommended_actions.substring(0, 120)) + '</span></div>';
+  }
+  bodyHTML += '<div class="track-rfield"><span class="track-rflbl">Type</span><span class="track-rfval">' + (r.subject_type || 'artwork') + ' · ' + (period || '—') + ' · ' + (medium || '—') + '</span></div>';
+  bodyHTML += '<div class="track-rfield"><span class="track-rflbl">ID</span><span class="track-rfval" style="font-family:var(--font-mono);font-size:9px;">' + window.esc(id) + '</span></div>';
+  bodyHTML += '</div></div>';
+
+  // ── Photo comparison (track_final-inspired) ──
+  bodyHTML += '<div class="track-photo-compare">';
+  var imgSrc = '';
+  var previewImg = document.getElementById('main-preview');
+  if (previewImg && previewImg.src && previewImg.style.display !== 'none') {
+    imgSrc = previewImg.src;
+  }
+  // Listing photo column
+  bodyHTML += '<div class="track-photo-col track-photo-col-listing">';
+  if (imgSrc) {
+    bodyHTML += '<div class="track-pimg"><img src="' + window.escAttr(imgSrc) + '" alt="Scan"/></div>';
   } else {
-    bodyHTML +=
-      '<div class="rsec">Stylistic Analysis</div><div class="rtext">' + window.esc(r.style_analysis || 'Analysis pending.') + '</div>' +
-      '<div class="rdiv"></div>' +
-      '<div class="rsec">Historical Context</div><div class="rtext">' + window.esc(r.historical_context || 'Context pending.') + '</div>' +
-      '<div class="rdiv"></div>' +
-      '<div class="rsec">Investigation Notes</div><div class="rtext">' + window.esc(r.investigation_notes || 'No specific flags.') + '</div>' +
-      '<div class="rdiv"></div>' +
-      '<div class="rsec">Professional Assessment</div><div class="rtext">' + window.esc(r.professional_assessment || '') + '</div>' +
-      '<div class="rdiv"></div>' +
-      '<div class="rsec">Provenance Chain</div><div class="rtext">' + window.esc(r.provenance_chain || '') + '</div>' +
-      '<div class="rdiv"></div>' +
-      '<div class="rsec">Risk Assessment</div><div class="rtext" style="color:' + (conf < 50 ? 'var(--red-lt)' : 'var(--text-mid)') + '">' + window.esc(r.risk_assessment || '') + '</div>' +
-      '<div class="rdiv"></div>' +
-      '<div class="rsec">Recommended Actions</div><div class="rtext">' + window.esc(r.recommended_actions || '') + '</div>';
+    bodyHTML += '<div class="track-pimg" style="display:flex;align-items:center;justify-content:center;background:rgba(192,57,43,.06);border-color:rgba(192,57,43,.3);"><span style="font-size:14px;color:rgba(192,57,43,.6);">\u25C8</span></div>';
+  }
+  bodyHTML += '<div><span class="track-plbl">Uploaded Scan</span>';
+  bodyHTML += '<div class="track-ptitle" style="font-size:.78rem;">' + window.esc(r.title || 'Unknown artwork') + '</div>';
+  bodyHTML += '<div class="track-ploc">' + (r.artist ? window.esc(r.artist) : 'Unknown artist') + '</div>';
+  bodyHTML += '</div></div>';
+  // Reference column (placeholder)
+  bodyHTML += '<div class="track-photo-col">';
+  bodyHTML += '<div class="track-pimg" style="display:flex;align-items:center;justify-content:center;background:var(--bg2);"><span style="font-size:16px;color:var(--gold-dim);">\u25C8</span></div>';
+  bodyHTML += '<div><span class="track-plbl">Analysis Reference</span>';
+  bodyHTML += '<div class="track-ptitle">' + (subjectLabels[r.subject_type] || 'Analysis Complete') + '</div>';
+  bodyHTML += '<div class="track-ploc">' + alertLevel + ' · ' + conf + '% confidence</div>';
+  bodyHTML += '</div></div></div>';
+
+  // ── Now inject the full detail layout below the track_final summary ──
+  // Artwork Hero Image
+  bodyHTML += '<div class="art-detail-hero">';
+  if (imgSrc) {
+    bodyHTML += '<img src="' + window.escAttr(imgSrc) + '" alt="' + window.esc(r.title || 'Artwork') + '" id="art-hero-img" />';
+  } else {
+    bodyHTML += '<div style="height:260px;display:flex;align-items:center;justify-content:center;color:var(--gold-dim);font-size:48px;">\u25C8</div>';
+  }
+  bodyHTML += '<div class="art-detail-hero-badges">' +
+    '<span class="art-hero-badge">' + window.esc(subjectLabels[r.subject_type] || 'Analysis') + '</span>' +
+    (conf >= 70 ? '<span class="art-hero-badge" style="color:var(--green-lt);">\u2713 High</span>' : conf >= 40 ? '<span class="art-hero-badge" style="color:#E8A020;">\u26a0 Medium</span>' : '<span class="art-hero-badge" style="color:var(--red-lt);">\u26a1 Low</span>') +
+    '</div>';
+  bodyHTML += '<button class="art-detail-hero-zoom-btn" id="art-zoom-btn" data-art-action="zoom">\u26B2</button>';
+  bodyHTML += '</div>';
+
+  // Metadata Panel
+  bodyHTML += '<div class="art-meta-panel">';
+  bodyHTML += '<div class="art-meta-breadcrumb">' +
+    '<span class="crumb-link" data-art-action="nav-home">TRACE</span>' +
+    (period ? '<span class="crumb-link">' + window.esc(period) + '</span>' : '') +
+    (r.artist ? '<span class="crumb-link">' + window.esc(r.artist) + '</span>' : '') +
+    '<span>' + window.esc(r.title || 'Unknown') + '</span>' +
+    '</div>';
+  bodyHTML += '<div class="art-meta-title">' + window.esc(r.title || 'Unknown Subject') + '</div>';
+  bodyHTML += '<div class="art-meta-artist">' +
+    '<a data-art-action="toast" data-art-msg="Artist profile">' + window.esc(r.artist || 'Unknown artist') + '</a>' +
+    '<span class="artist-follow" data-art-action="toast" data-art-msg="Following artist">+ Follow</span>' +
+    '</div>';
+  bodyHTML += '<div class="art-meta-tags">';
+  if (period) bodyHTML += '<span class="art-meta-tag gold-tag">' + window.esc(period) + '</span>';
+  if (medium) bodyHTML += '<span class="art-meta-tag">' + window.esc(medium) + '</span>';
+  if (movement && movement !== medium) bodyHTML += '<span class="art-meta-tag">' + window.esc(movement) + '</span>';
+  if (r.subject_type) bodyHTML += '<span class="art-meta-tag gold-tag">' + window.esc(r.subject_type) + '</span>';
+  bodyHTML += '</div>';
+  bodyHTML += '<div class="art-meta-confidence">' +
+    '<span class="art-conf-label">' + (window.TIER === 'discover' ? 'Story Confidence' : 'Provenance Confidence') + '</span>' +
+    '<div class="art-conf-bar"><div class="art-conf-fill" style="width:' + conf + '%"></div></div>' +
+    '<span class="art-conf-value">' + conf + '%</span>' +
+    '</div></div>';
+
+  // Action Buttons
+  bodyHTML += '<div class="art-actions-row">' +
+    '<button class="art-action-btn" data-art-action="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button>' +
+    '<button class="art-action-btn" data-art-action="bookmark" id="bookmark-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> Save</button>' +
+    '<button class="art-action-btn" data-art-action="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>' +
+    '<button class="art-action-btn" data-art-action="zoom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg> Zoom</button>' +
+    '</div>';
+
+  // Detail Attributes Grid
+  bodyHTML += '<div class="art-detail-grid">';
+  bodyHTML += '<div class="art-detail-grid-title">Artwork Details</div>';
+  bodyHTML += '<div class="art-detail-grid-table">';
+  bodyHTML += detailGridCell('Period', period || '—');
+  bodyHTML += detailGridCell('Medium', medium || '—');
+  bodyHTML += detailGridCell('Movement', movement || '—');
+  bodyHTML += detailGridCell('Type', (r.subject_type || 'artwork').toUpperCase());
+  bodyHTML += detailGridCell('Tier', (window.TIER || 'collector').toUpperCase());
+  bodyHTML += detailGridCell('ID', id);
+  bodyHTML += '</div></div>';
+
+  // Analysis Sections
+  if (window.TIER === 'discover') {
+    bodyHTML += sectionCard('\u25C8', 'The Story', window.esc(r.the_story || r.style_analysis || r.professional_assessment || 'Analysis pending.'));
+    bodyHTML += sectionCard('\u2726', 'Fascinating Fact', window.esc(r.fascinating_fact || 'No fascinating fact recorded.'), 'var(--text)');
+    bodyHTML += sectionCard('\u25C8', 'What to Look For', window.esc(r.what_to_look_for || ''));
+  } else {
+    bodyHTML += sectionCard('\u25C8', 'Stylistic Analysis', window.esc(r.style_analysis || 'Analysis pending.'));
+    bodyHTML += sectionCard('\u25C8', 'Historical Context', window.esc(r.historical_context || 'Context pending.'));
+    bodyHTML += sectionCard('\u25C8', 'Investigation Notes', window.esc(r.investigation_notes || 'No specific flags.'));
+    bodyHTML += sectionCard('\u25C8', 'Professional Assessment', window.esc(r.professional_assessment || ''));
+    bodyHTML += sectionCard('\u25C8', 'Provenance Chain', window.esc(r.provenance_chain || ''));
+    bodyHTML += sectionCard('\u25C8', 'Risk Assessment', window.esc(r.risk_assessment || ''), conf < 50 ? 'var(--red-lt)' : 'var(--text-mid)');
+    bodyHTML += sectionCard('\u25C8', 'Recommended Actions', window.esc(r.recommended_actions || ''));
   }
 
-  bodyHTML +=
-    '<div class="rdiv"></div>' +
-    '<div class="conf-mrow"><span class="conf-ml">' + (window.TIER === 'discover' ? 'Story Confidence' : 'Provenance Confidence') + '</span><span class="conf-mv">' + conf + '%</span></div>' +
-    '<div class="cbar2"><div class="cfill2" style="width:' + conf + '%"></div></div>' +
-    '<div class="rsec">Keywords</div><div class="rtags">' + tags + '</div>';
+  // Keywords Cloud (legacy style - only for Discover tier outside track banner)
+  // Keywords already appear in the track banner pills above for all tiers.
 
+  // Artist Card
+  if (r.artist) {
+    bodyHTML += '<div class="art-artist-card">';
+    bodyHTML += '<div class="art-artist-card-header">';
+    bodyHTML += '<div class="art-artist-avatar">\u25C8</div>';
+    bodyHTML += '<div class="art-artist-info">';
+    bodyHTML += '<div class="art-artist-name">' + window.esc(r.artist) + '</div>';
+    bodyHTML += '<div class="art-artist-period">' + (r.period ? window.esc(r.period) : 'Artist') + '</div>';
+    bodyHTML += '</div>';
+    bodyHTML += '<button class="art-artist-follow-btn" data-art-action="toast" data-art-msg="Following artist">+ Follow</button>';
+    bodyHTML += '</div>';
+    bodyHTML += '<div class="art-artist-bio">';
+    bodyHTML += window.esc(r.artist_bio || r.artist + ' is associated with this work. Further research into their body of work and provenance records is recommended.') + ' <a data-art-action="toast" data-art-msg="Read more about artist">Read more \u2192</a>';
+    bodyHTML += '</div>';
+    bodyHTML += '</div>';
+  }
+
+  // Related Artworks section
+  bodyHTML += '<div class="art-related-section">';
+  bodyHTML += '<div class="art-related-header">';
+  bodyHTML += '<div class="art-related-title">Related Works You Might Investigate</div>';
+  bodyHTML += '<span style="font-size:8px;color:var(--text-ghost);cursor:pointer;" data-art-action="toast" data-art-msg="View all related">See all \u2192</span>';
+  bodyHTML += '</div>';
+  bodyHTML += '<div class="art-related-scroll" id="art-related-scroll">';
+  var relatedItems = generateRelatedItems(r);
+  relatedItems.forEach(function(item) {
+    bodyHTML += '<div class="art-related-item" data-art-action="toast" data-art-msg="' + window.escAttr(item.label || 'Related work') + '">';
+    bodyHTML += '<div class="art-related-item-img">';
+    bodyHTML += item.img || '<span style="font-size:20px;opacity:0.4;">\u25C8</span>';
+    bodyHTML += '</div>';
+    bodyHTML += '<div class="art-related-item-title">' + window.esc(item.label) + '</div>';
+    bodyHTML += '<div class="art-related-item-sub">' + window.esc(item.sub) + '</div>';
+    bodyHTML += '</div>';
+  });
+  bodyHTML += '</div></div>';
+
+  // Inject the enhanced layout
   var rb = document.getElementById('result-body');
   if (rb) rb.innerHTML = bodyHTML;
 
@@ -174,7 +330,7 @@ window.showResult = function showResult(r) {
         var dot = document.createElement('div');
         dot.style.cssText = 'width:9px;height:9px;border-radius:50%;background:var(--bg);border:1.5px solid ' + (isGap ? '#E8A020' : 'var(--gold-dim)') + ';' + (isGap ? 'box-shadow:0 0 5px rgba(232,160,32,0.5);' : '') + '';
         var yr = document.createElement('div');
-        yr.style.cssText = 'font-family:\'Courier Prime\',monospace;font-size:9px;color:' + (isGap ? '#E8A020' : 'var(--gold)') + ';';
+        yr.style.cssText = 'font-family:var(--font-mono);font-size:9px;color:' + (isGap ? '#E8A020' : 'var(--gold)') + ';';
         yr.textContent = t.year;
         var ev = document.createElement('div');
         ev.style.cssText = 'font-size:8px;color:' + (isGap ? '#E8A020' : 'var(--text-dim)') + ';text-align:center;white-space:normal;max-width:80px;line-height:1.3;';
@@ -224,15 +380,14 @@ window.showResult = function showResult(r) {
     if (typeof window.syncTimelineToServer === 'function') window.syncTimelineToServer(_storeTitle);
   }, 500);
 
-  // Show quick actions
-  // Show/hide compare button
+  // Show quick actions — hide old quick-actions div, use new art-actions-row
   var cmpBtn = document.getElementById('compare-btn');
   if (cmpBtn) {
     cmpBtn.style.display = window._lastScanImageData && window._scanImageData ? 'flex' : 'none';
   }
 
-  var qa = document.getElementById('quick-actions');
-  if (qa) qa.style.display = 'flex';
+  var oldQa = document.getElementById('quick-actions-old');
+  if (oldQa) oldQa.style.display = 'none';
 
   // Check bookmark status
   try {
@@ -258,6 +413,57 @@ window.showResult = function showResult(r) {
     TRACE_REGISTRY.emit('result:render', { result: r, id: id });
   }
 };
+/**
+ * Helper: detail grid cell
+ */
+function detailGridCell(label, value) {
+  return '<div class="art-detail-grid-cell"><div class="art-detail-label">' + window.esc(label) + '</div><div class="art-detail-value">' + window.esc(value) + '</div></div>';
+}
+
+/**
+ * Helper: section card with icon
+ */
+function sectionCard(icon, label, content, colorOverride) {
+  var colorStyle = colorOverride ? ' style="color:' + colorOverride + '"' : '';
+  return '<div class="art-section-card">' +
+    '<div class="art-section-label"><span class="section-icon">' + icon + '</span>' + window.esc(label) + '</div>' +
+    '<div class="art-section-body"' + colorStyle + '>' + content + '</div>' +
+    '</div>';
+}
+
+/**
+ * Helper: generate related artworks based on keywords
+ */
+function generateRelatedItems(r) {
+  var items = [];
+  var keywords = r.keywords || [];
+  var period = r.period || '';
+  var artist = r.artist || '';
+
+  // Build contextual related works
+  var suggestions = [];
+  if (artist) {
+    suggestions.push({ label: 'More by ' + artist, sub: period || 'Same artist', img: '' });
+  }
+  if (period && period.indexOf('c.') === -1) {
+    suggestions.push({ label: period + ' Works', sub: 'Contemporary pieces', img: '' });
+  }
+  for (var i = 0; i < Math.min(2, keywords.length); i++) {
+    suggestions.push({ label: keywords[i] + ' Works', sub: period || 'Related style', img: '' });
+  }
+  // Fill remaining with general suggestions
+  var fallbacks = [
+    { label: 'Similar Provenance', sub: 'Comparable history', img: '' },
+    { label: 'Same Collection', sub: 'Institutional holding', img: '' },
+    { label: 'Period Masterwork', sub: period || 'Era highlight', img: '' },
+    { label: 'Attributed Works', sub: artist || 'Circle of', img: '' }
+  ];
+  while (suggestions.length < 4 && fallbacks.length > 0) {
+    suggestions.push(fallbacks.shift());
+  }
+  return suggestions.slice(0, 5);
+}
+
 
 /**
  * Open comparison view between current and previous scan

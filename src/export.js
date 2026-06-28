@@ -14,7 +14,7 @@ window.exportPDF = function exportPDF() {
 
   var conf = r.provenance_confidence || 55;
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TRACE Report \u2014 ' + (r.title || 'Analysis') + '</title>';
-  html += '<style>@page{margin:1in;size:A4;}body{font-family:Georgia,serif;color:#1a1a1a;line-height:1.7;font-size:11pt;}' +
+  html += '<style>@page{margin:1in;size:A4;}body{font-family:'Cormorant Garamond',Georgia,serif;color:#1a1a1a;line-height:1.7;font-size:11pt;}' +
     '.header{border-bottom:2px solid #D4AE52;padding-bottom:16px;margin-bottom:24px;}' +
     '.logo{font-size:28px;color:#D4AE52;letter-spacing:0.15em;font-weight:300;}' +
     '.title{font-size:22px;margin:16px 0 4px;font-weight:400;}' +
@@ -27,7 +27,7 @@ window.exportPDF = function exportPDF() {
     '.conf-val{font-size:14pt;font-weight:700;color:#D4AE52;}' +
     '.timeline-table{width:100%;border-collapse:collapse;margin-top:8px;}' +
     '.timeline-table td{padding:6px 8px;border-bottom:1px solid #f0e8d0;font-size:10pt;vertical-align:top;}' +
-    '.timeline-table td:first-child{font-family:monospace;color:#8A6F2E;width:70px;white-space:nowrap;}' +
+    '.timeline-table td:first-child{font-family:'Courier Prime','Courier New',monospace;color:#8A6F2E;width:70px;white-space:nowrap;}' +
     '.timeline-table .cat{font-size:8pt;text-transform:uppercase;letter-spacing:0.1em;color:#8A6F2E;}' +
     '.gap-row{background:#FFF8E8;}' +
     '.footer{margin-top:32px;padding-top:16px;border-top:1px solid #e0d8c0;font-size:9pt;color:#8A6F2E;text-align:center;}' +
@@ -173,3 +173,99 @@ if (typeof TRACE_REGISTRY !== 'undefined' && typeof TRACE_REGISTRY.register === 
 }
 
 console.log('[TRACE Export] Loaded');
+
+
+// ── Museum-Grade Documentation Export ──
+// Generates comprehensive CIDOC-CRM compliant museum documentation package
+window.exportMuseumDoc = function(data) {
+  if (!data) data = window._lastResult;
+  if (!data) { alert('No analysis data available'); return; }
+  
+  var html = '<!DOCTYPE html><html><head><meta charset="utf-8">';
+  html += '<title>Museum Documentation - ' + (data.title || 'Artwork') + '</title>';
+  html += '<style>@page{margin:1in;size:A4;}body{';
+  html += 'font-family: Georgia, serif; color: #1a1a1a; line-height: 1.7; font-size: 11pt; max-width: 7in; margin: auto; padding: 1in;}';
+  html += 'h1{font-size:18pt;color:#8A6F2E;border-bottom:2px solid #D4AE52;padding-bottom:6pt;}';
+  html += 'h2{font-size:14pt;color:#8A6F2E;margin-top:24pt;}';
+  html += 'table{width:100%;border-collapse:collapse;margin:12pt 0;}';
+  html += 'td,th{border:1px solid #ccc;padding:6pt 10pt;text-align:left;font-size:10pt;}';
+  html += 'th{background:#f5f0e8;color:#555;}';
+  html += '.section{margin:16pt 0;padding:0;}';
+  html += '.badge{display:inline-block;background:#D4AE52;color:#fff;padding:2pt 8pt;border-radius:3pt;font-size:9pt;}';
+  html += '.critical{border-left:4px solid #c0392b;padding-left:12pt;}';
+  html += '.footer{margin-top:36pt;padding-top:12pt;border-top:1px solid #ccc;font-size:9pt;color:#999;}';
+  html += '@media print{body{padding:0;max-width:none;}}</style></head><body>';
+  
+  // Header
+  html += '<h1>Museum Documentation Report</h1>';
+  html += '<p style="font-size:10pt;color:#666;">Generated: ' + new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }) + '</p>';
+  
+  // 1. Object Identification
+  html += '<h2>1. Object Identification</h2>';
+  html += '<table><tr><th>Field</th><th>Value</th></tr>';
+  html += '<tr><td>Title</td><td>' + (data.title || 'Unknown') + '</td></tr>';
+  html += '<tr><td>Artist</td><td>' + (data.artist || 'Unknown') + '</td></tr>';
+  html += '<tr><td>Date/Period</td><td>' + (data.period_estimate || data.period || 'Unknown') + '</td></tr>';
+  html += '<tr><td>Media</td><td>' + (data.media_type || 'Unknown') + '</td></tr>';
+  html += '<tr><td>Dimensions</td><td>' + (data.dimensions || 'Not recorded') + '</td></tr>';
+  html += '<tr><td>Current Location</td><td>' + (data.current_location || 'Unknown') + '</td></tr>';
+  html += '</table>';
+  
+  // 2. Provenance
+  html += '<h2>2. Provenance Chain</h2>';
+  if (data.provenance_timeline && data.provenance_timeline.length) {
+    html += '<table><tr><th>Year</th><th>Event</th><th>Actor</th><th>Location</th></tr>';
+    data.provenance_timeline.forEach(function(e) {
+      html += '<tr><td>' + (e.year || '') + '</td><td>' + (e.type || '') + '</td><td>' + (e.actor || '') + '</td><td>' + (e.location || '') + '</td></tr>';
+    });
+    html += '</table>';
+  } else {
+    html += '<p class="critical">No provenance chain recorded. Further research required.</p>';
+  }
+  
+  // 3. Risk Assessment
+  html += '<h2>3. Risk Assessment</h2>';
+  html += '<table><tr><th>Factor</th><th>Assessment</th></tr>';
+  html += '<tr><td>Alert Level</td><td>' + (data.alert && data.alert.level ? '<span class="badge">' + data.alert.level + '</span>' : 'Normal') + '</td></tr>';
+  html += '<tr><td>Attribution</td><td>' + (data.attribution_suggestion || 'Not assessed') + '</td></tr>';
+  html += '<tr><td>Market Value</td><td>' + (data.market_value ? '€' + (data.market_value?.atelier_low || 0).toLocaleString() + ' - €' + (data.market_value?.atelier_high || 0).toLocaleString() : 'Not estimated') + '</td></tr>';
+  html += '</table>';
+  
+  // 4. AI Analysis
+  if (data.analysis_text) {
+    html += '<h2>4. Forensic Analysis</h2>';
+    html += '<div class="section"><p>' + data.analysis_text + '</p></div>';
+  }
+  
+  // 5. Recommendations
+  html += '<h2>5. Recommendations</h2>';
+  html += '<ul>';
+  var recs = data.next_steps || [];
+  if (recs.length) {
+    recs.forEach(function(r) { html += '<li>' + r + '</li>'; });
+  } else {
+    html += '<li>Complete provenance research with RKD database cross-reference</li>';
+    html += '<li>Consult INTERPOL Stolen Works Database</li>';
+    html += '<li>Schedule physical examination by conservation specialist</li>';
+  }
+  html += '</ul>';
+  
+  // Footer
+  html += '<div class="footer">';
+  html += '<p>This report was generated by TRACE Art Intelligence System using AI-assisted analysis.</p>';
+  html += '<p>All conclusions are preliminary and require expert verification.</p>';
+  html += '<p>TRACE v2.0 — ' + new Date().toISOString() + '</p>';
+  html += '</div>';
+  
+  html += '</body></html>';
+  
+  // Open in new window for printing
+  var w = window.open('', '_blank');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+  } else {
+    alert('Please allow pop-ups to generate the documentation report.');
+  }
+};

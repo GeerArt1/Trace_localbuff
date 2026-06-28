@@ -11,8 +11,19 @@ const path = require('path');
 const crypto = require('crypto');
 const tls = require('tls');
 require('dotenv').config({ override: true });
+
+const Sentry = require('@sentry/node');
 const { exec } = require('child_process');
 const db = require('./trace_db');
+
+// Sentry error tracking
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.SENTRY_ENVIRONMENT || 'production',
+    tracesSampleRate: parseFloat(process.env.SENTRY_SAMPLE_RATE) || 0.1,
+  });
+}
 
 const {
   sendJSON, collectBody, setSecurityHeaders, maybeGzip,
@@ -1142,7 +1153,8 @@ const evRoutes = require('./routes/events')(routeCtx);
 const opsRoutes = require('./routes/ops')(routeCtx);
 const provRoutes = require('./routes/provenance')(routeCtx);
 const agentRoutes = require('./routes/agent')(routeCtx);
-const authRoutes = require('./routes/auth')(routeCtx);
+const authRoutes = require('./routes/auth')(routeCtx)
+var dbRoutes = require('./routes/databases')(routeCtx);
 
 // Re-export verifyToken for rate limit tier detection
 const { verifyToken } = subRoutes;
@@ -2102,7 +2114,12 @@ function handleRequest(req, res) {
   }
 
   if (method === 'POST' && urlPath === '/api/auth/verify') {
-    return collectBody(req, res, 2048, (body) => authRoutes.handleVerify(req, res, body));
+    return collectBody(req, res, 2048, (body) => authRoutes.handleVerify(req, res, body));  }
+
+  // ── External Database Integration ──
+  if (method === 'GET' && urlPath === '/api/databases') {
+    return dbRoutes.handleDatabaseLookup(req, res);
+
   }
 
   // ── Event Routes ──
@@ -2450,6 +2467,12 @@ function gracefulShutdown(signal) {
 
 process.on('SIGTERM', function() { gracefulShutdown('SIGTERM'); });
 process.on('SIGINT', function() { gracefulShutdown('SIGINT'); });
+// Respond to cluster master health pings immediately
+process.on("message", function(msg) {
+  if (msg \&\& msg.type === "health_ping") {
+    reportHealthToMaster();
+  }
+});
 
 server.on('error', function(err) {
   if (err.code === 'EADDRINUSE') {
@@ -2575,6 +2598,7 @@ function startServer(done) {
       if (isClusterWorker) {
         try {
           process.send({ type: 'cluster_ready', workerId: process.env.WORKER_ID || 'unknown', pid: process.pid });
+          reportHealthToMaster(); // Send immediate health report, don't wait for interval
           healthPingInterval = setInterval(reportHealthToMaster, 10000);
           if (healthPingInterval && healthPingInterval.unref) healthPingInterval.unref();
         } catch(e) { /* cluster master may not be available in standalone mode */ }

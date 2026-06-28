@@ -20,7 +20,8 @@ var suites = [
   { name: 'Server Core', file: 'tests/test_server_core.js', env: {} },
   { name: 'Database',    file: 'tests/test_db.js',           env: { TRACE_DB_PATH: path.resolve(__dirname, '..', 'trace_db_test.sqlite') } },
   { name: 'Client i18n + CSV', file: 'tests/test_client.js', env: {} },
-  { name: 'Integration',      file: 'tests/test_integration.js', env: {} }
+  { name: 'Integration',      file: 'tests/test_integration.js', env: {} },
+  { name: 'Provenance Timeline', file: 'tests/test_provenance_timeline.js', env: {} }
 ];
 
 var passed = 0;

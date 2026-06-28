@@ -172,7 +172,7 @@ window.openTimeline = function openTimeline(title, sub, type, eventsArg) {
       var dot = document.createElement('div');
       dot.style.cssText = 'width:8px;height:8px;border-radius:50%;border:1.5px solid ' + (isGap ? '#E8A020' : 'var(--gold-dim)') + ';background:var(--bg);transition:all .25s;' + (isGap ? 'box-shadow:0 0 5px rgba(232,160,32,0.5);' : '');
       var yr = document.createElement('div');
-      yr.style.cssText = 'font-family:\'Courier Prime\',monospace;font-size:8px;color:' + (isGap ? '#E8A020' : 'var(--text-dim)') + ';text-align:center;white-space:nowrap;';
+      yr.style.cssText = 'font-family:var(--font-mono);font-size:8px;color:' + (isGap ? '#E8A020' : 'var(--text-dim)') + ';text-align:center;white-space:nowrap;';
       yr.textContent = ev.year;
       wrap.appendChild(dot);
       wrap.appendChild(yr);
@@ -196,7 +196,7 @@ window.openTimeline = function openTimeline(title, sub, type, eventsArg) {
     var sDot = document.createElement('div');
     sDot.style.cssText = 'width:9px;height:9px;border-radius:50%;border:1.5px solid ' + (isGap ? '#E8A020' : 'var(--gold-dim)') + ';background:var(--bg);position:relative;z-index:1;transition:all .25s;flex-shrink:0;' + (isGap ? 'box-shadow:0 0 5px rgba(232,160,32,0.5);' : '');
     var sYr = document.createElement('div');
-    sYr.style.cssText = 'font-family:\'Courier Prime\',monospace;font-size:9px;color:' + (isGap ? '#E8A020' : 'var(--text-dim)') + ';margin-top:5px;text-align:center;line-height:1.2;transition:color .25s;word-break:break-all;max-width:60px;';
+    sYr.style.cssText = 'font-family:var(--font-mono);font-size:9px;color:' + (isGap ? '#E8A020' : 'var(--text-dim)') + ';margin-top:5px;text-align:center;line-height:1.2;transition:color .25s;word-break:break-all;max-width:60px;';
     sYr.textContent = ev.year;
     sc.appendChild(sDot);
     sc.appendChild(sYr);
