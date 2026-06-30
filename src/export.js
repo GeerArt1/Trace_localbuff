@@ -8,13 +8,13 @@
  */
 window.exportPDF = function exportPDF() {
   var r = window._lastResult;
-  if (!r) { window.toast('No analysis to export'); return; }
+  if (!r) { window.showToastError && window.showToastError('No analysis to export'); return; }
 
-  window.toast('Generating PDF report\u2026');
+  window.showToastInfo && window.showToastInfo('Generating PDF report\u2026');
 
   var conf = r.provenance_confidence || 55;
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TRACE Report \u2014 ' + (r.title || 'Analysis') + '</title>';
-  html += '<style>@page{margin:1in;size:A4;}body{font-family:'Cormorant Garamond',Georgia,serif;color:#1a1a1a;line-height:1.7;font-size:11pt;}' +
+  html += '<style>@page{margin:1in;size:A4;}body{font-family:"Cormorant Garamond",Georgia,serif;color:#1a1a1a;line-height:1.7;font-size:11pt;}' +
     '.header{border-bottom:2px solid #D4AE52;padding-bottom:16px;margin-bottom:24px;}' +
     '.logo{font-size:28px;color:#D4AE52;letter-spacing:0.15em;font-weight:300;}' +
     '.title{font-size:22px;margin:16px 0 4px;font-weight:400;}' +
@@ -27,7 +27,7 @@ window.exportPDF = function exportPDF() {
     '.conf-val{font-size:14pt;font-weight:700;color:#D4AE52;}' +
     '.timeline-table{width:100%;border-collapse:collapse;margin-top:8px;}' +
     '.timeline-table td{padding:6px 8px;border-bottom:1px solid #f0e8d0;font-size:10pt;vertical-align:top;}' +
-    '.timeline-table td:first-child{font-family:'Courier Prime','Courier New',monospace;color:#8A6F2E;width:70px;white-space:nowrap;}' +
+    '.timeline-table td:first-child{font-family:"Courier Prime","Courier New",monospace;color:#8A6F2E;width:70px;white-space:nowrap;}' +
     '.timeline-table .cat{font-size:8pt;text-transform:uppercase;letter-spacing:0.1em;color:#8A6F2E;}' +
     '.gap-row{background:#FFF8E8;}' +
     '.footer{margin-top:32px;padding-top:16px;border-top:1px solid #e0d8c0;font-size:9pt;color:#8A6F2E;text-align:center;}' +
@@ -78,6 +78,7 @@ window.exportPDF = function exportPDF() {
   var win = window.open('', '_blank');
   if (win) {
     win.document.write(html);
+  window.showToastSuccess && window.showToastSuccess('PDF report generated');
     win.document.close();
     setTimeout(function() { win.print(); }, 500);
   } else {
@@ -97,7 +98,7 @@ window.exportPDF = function exportPDF() {
  */
 window.exportCIDOC = function exportCIDOC() {
   var r = window._lastResult;
-  if (!r) { window.toast('No analysis to export'); return; }
+  if (!r) { window.showToastError && window.showToastError('No analysis to export'); return; }
 
   var cidoc = {
     '@context': 'https://www.cidoc-crm.org/contexts/cidoc-crm-v7.1.1.jsonld',
@@ -151,7 +152,7 @@ window.exportCIDOC = function exportCIDOC() {
  */
 window.exportCaseJSON = function exportCaseJSON() {
   var r = window._lastResult;
-  if (!r) { window.toast('No analysis to export'); return; }
+  if (!r) { window.showToastError && window.showToastError('No analysis to export'); return; }
 
   var data = JSON.stringify(r, null, 2);
   var blob = new Blob([data], { type: 'application/json' });

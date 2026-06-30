@@ -170,7 +170,7 @@
             <div class="scan-hint-title" id="scan-zone-hint">Upload or Photograph</div>
             <div class="scan-sub-label">Select a source below</div>
           </div>
-          <img id="main-preview" alt="">
+          <img id="main-preview" alt="Artwork preview" loading="lazy">
       </div>
       <input type="file" id="main-file"         accept="image/*"            class="d-none">
       <input type="file" id="main-file-cam"    accept="image/*" capture="environment" class="d-none">
@@ -385,7 +385,7 @@
         <div class="page-title">Ask TRACE</div>
       </div>
       <div class="chat-context d-none" id="chat-context">
-        <img class="chat-ctx-img" id="chat-ctx-img" src="" alt="">
+        <img class="chat-ctx-img" id="chat-ctx-img" src="" alt="Context artwork thumbnail" loading="lazy">
         <div class="chat-ctx-text">
           <div class="chat-ctx-title" id="chat-ctx-title"></div>
           <div class="chat-ctx-sub" id="chat-ctx-sub"></div>
@@ -940,12 +940,13 @@
 <script src="src/investigation.js"></script>
   <script src="src/cidoc-crm.js"></script>
   <script src="src/forensic.js"></script>
-  <script src="src/fingerprint.js"
-  <script src="src/blockchain.js"
+  <script src="src/fingerprint.js"></script>
+  <script src="src/blockchain.js"></script>
   <script src="src/proxy.js"></script>
   <script src="src/expert.js"></script>
 
   <script src="src/app.js"></script>
+  <script src="src/ui.js"></script>
 <!-- ── Event Binding Init — replaces 68 inline onclick handlers ── -->
 <script>
 (function() {

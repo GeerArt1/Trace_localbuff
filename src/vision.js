@@ -270,12 +270,41 @@ window.DatabaseQuery = {
 
   _abortController: null,
 
-  async search(title, artist, period) {
+    async search(title, artist, period) {
     // Abort any previous DB query
     if (this._abortController) this._abortController.abort();
     this._abortController = new AbortController();
 
     var apiBase = window.TRACE_API_PROXY || '';
+    
+    // Use real server SPARQL endpoint when available (Getty ULAN + GPI)
+    if (apiBase) {
+      try {
+        var res = await fetch(apiBase + '/api/provenance/cross-reference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: this._abortController.signal,
+          body: JSON.stringify({
+            artworkTitle: title || '',
+            artist: artist || '',
+            period: period || '',
+            timeline: [],
+            tier: window.TIER || 'collector'
+          })
+        });
+        if (res.ok) {
+          var data = await res.json();
+          this.results = data;
+          this.renderServerResult(data);
+          return data;
+        }
+      } catch(e) {
+        // Fallback to AI simulation below
+        console.warn('[TRACE] Server SPARQL failed, falling back to AI:', e.message);
+      }
+    }
+
+    // Fallback: AI simulation (no server or server error)
     var apiUrl = apiBase ? apiBase + '/analyse' : 'https://api.anthropic.com/v1/messages';
     var headers = { 'Content-Type': 'application/json' };
     if (!apiBase) headers['anthropic-version'] = '2023-06-01';
@@ -297,13 +326,108 @@ window.DatabaseQuery = {
     var data = await res.json();
     var raw = data.content ? data.content.map(function(b) { return b.text || ''; }).join('') : '{}';
     var result = {};
-    try { result = JSON.parse(raw.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim()); } catch (e) {
+    try { result = JSON.parse(raw.replace(RegExp("```[a-z]*\\n?", "g"), '').replace(RegExp("```", "g"), '').trim()); } catch (e) {
       try { var s = raw.indexOf('{'), end = raw.lastIndexOf('}'); if (s >= 0 && end > s) result = JSON.parse(raw.slice(s, end + 1)); } catch(e2) { TRACE_WATCHDOG?.warn('Vision', e2); }
     }
 
     this.results = result;
     this.render(result);
     return result;
+  },
+
+  // Render server-side SPARQL results (real data from Getty + Rijksmuseum)
+  renderServerResult(data) {
+    var wrap = document.getElementById('db-query-results');
+    if (!wrap) return;
+    
+    if (!data || !data.databases) {
+      wrap.innerHTML = '<div class="text-dim-11" style="padding:14px;">No provenance data returned.</div>';
+      wrap.style.display = 'block';
+      return;
+    }
+
+    var dbs = data.databases;
+    var apis = data.apis || {};
+    var summary = data.summary || {};
+
+    // Badge helper
+    function badge(key, label) {
+      var info = apis[key] || {};
+      var isReal = info.real;
+      var color = isReal ? 'var(--green-lt)' : 'var(--gold-dim)';
+      var text = isReal ? 'LIVE' : 'SIMULATED';
+      return '<span class="live-badge" style="border-color:' + color + ';color:' + color + '">' +
+        '<span class="status-dot" style="background:' + color + '"></span>' +
+        window.esc(label) + ' ' + text + '</span>';
+    }
+
+    var riskLevel = summary.alerts && summary.alerts > 0 ? 'critical' : 'low';
+    var riskColors = { low: 'var(--green-lt)', moderate: '#E8A020', high: 'var(--red-lt)', critical: '#C44848' };
+
+    var html = '';
+    html += '<div class="flex-gap-wrap-bg" style="padding:8px 14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface2);">' +
+      badge('gettyUlan', 'Getty ULAN') + badge('gettyProvenance', 'GPI') + 
+      badge('rijksmuseum', 'Rijksmuseum') + 
+      badge('interpol', 'INTERPOL') + badge('alr', 'ALR') + badge('aamd', 'AAMD') + badge('unesco', 'UNESCO') +
+      '</div>';
+
+    html += '<div class="db-risk-header" style="border-left:3px solid ' + (riskColors[riskLevel] || 'var(--gold)') + ';padding:10px 14px;background:var(--surface);">' +
+      '<div style="font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);">Risk Assessment</div>' +
+      '<div style="font-family:var(--font-mono);font-size:16px;color:' + (riskColors[riskLevel] || 'var(--gold)') + ';font-weight:700;margin-top:4px;">' + (riskLevel).toUpperCase() + '</div>' +
+      '<div style="font-size:11px;color:var(--text-mid);margin-top:4px;">' + (summary.alerts > 0 ? summary.alerts + ' alert(s) found across ' + summary.totalChecks + ' databases' : 'All databases clear') + '</div></div>';
+
+    // Getty artist results
+    if (dbs.getty && dbs.getty.artist && dbs.getty.artist.length) {
+      html += '<div class="px-14 py-10"><div class="gold-label">Getty ULAN Artist Matches</div>';
+      dbs.getty.artist.slice(0, 5).forEach(function(a) {
+        html += '<div class="gpi-match-item">' +
+          '<div style="font-family:var(--font-display);font-size:13px;color:var(--text);">' + window.esc(a.name || '') + '</div>' +
+          '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + (a.nationality || '') + (a.birth ? ', ' + a.birth + '-' + (a.death || '') : '') + '</div>' +
+          '<div style="font-size:8px;color:var(--text-ghost);margin-top:3px;">Source: ' + window.esc(a.source || 'Getty ULAN') + ' · ' + (a.isMock ? 'SIMULATED' : 'LIVE') + ' · ' + window.esc(a.role || '') + '</div></div>';
+      });
+      html += '</div>';
+    }
+
+    // Rijksmuseum results
+    if (dbs.rijksmuseum && dbs.rijksmuseum.length) {
+      html += '<div class="px-14 py-10"><div class="gold-label" style="color:var(--green-lt);">Rijksmuseum Collection Matches</div>';
+      dbs.rijksmuseum.slice(0, 5).forEach(function(w) {
+        html += '<div class="gpi-match-item">' +
+          '<div style="font-family:var(--font-display);font-size:13px;color:var(--text);">' + window.esc(w.title || '') + '</div>' +
+          '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + window.esc(w.artist || '') + (w.year ? ', ' + w.year : '') + '</div>' +
+          '<div style="font-size:8px;color:var(--text-ghost);margin-top:3px;">' + (w.medium ? window.esc(w.medium) + ' · ' : '') + 'Rijksmuseum, Amsterdam' + '</div></div>';
+      });
+      html += '</div>';
+    }
+
+    // Getty provenance results
+    if (dbs.getty && dbs.getty.provenance && dbs.getty.provenance.length) {
+      html += '<div class="px-14 py-10"><div class="gold-label">Getty Provenance Index Matches</div>';
+      dbs.getty.provenance.slice(0, 5).forEach(function(w) {
+        html += '<div class="gpi-match-item">' +
+          '<div style="font-family:var(--font-display);font-size:13px;color:var(--text);">' + window.esc(w.title || '') + '</div>' +
+          '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + window.esc(w.artist || '') + (w.year ? ', ' + w.year : '') + '</div>' +
+          '<div style="font-size:8px;color:var(--text-ghost);margin-top:3px;">' + (w.currentLocation ? window.esc(w.currentLocation) + ' · ' : '') + (w.isMock ? 'SIMULATED' : 'LIVE') + '</div></div>';
+      });
+      html += '</div>';
+    }
+
+    // INTERPOL + ALR results
+    function dbRow(database, result) {
+      if (!result) return '';
+      var matched = result.matched;
+      var color = matched ? 'var(--red-lt)' : 'var(--green-lt)';
+      return '<div style="padding:8px 14px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border);">' +
+        '<div class="db-dot" style="background:' + color + '"></div>' +
+        '<span class="text-mid text-sm">' + window.esc(database) + ': <strong style="color:' + color + '">' + (matched ? 'MATCH FOUND' : 'CLEAR') + '</strong></span>' +
+        (result.detail ? '<span class="text-dim-11">' + window.esc(result.detail) + '</span>' : '') + '</div>';
+    }
+    html += dbRow('INTERPOL Stolen Works', dbs.interpol);
+    html += dbRow('Art Loss Register', dbs.alr);
+    html += dbRow('AAMD Nazi-Era Check', dbs.aamd);
+
+    wrap.innerHTML = html;
+    wrap.style.display = 'block';
   },
 
   render(result) {
@@ -367,7 +491,7 @@ window.DatabaseQuery = {
 // ── RUN DB QUERY Button Handler ──────────────
 window.runDBQuery = function() {
   var r = window._lastResult;
-  if (!r) { window.toast('No analysis to cross-reference'); return; }
+  if (!r) { window.showToastError && window.showToastError('No analysis to cross-reference'); return; }
   var wrap = document.getElementById('db-query-results');
   if (wrap) {
     wrap.style.display = 'block';
@@ -381,9 +505,11 @@ window.runDBQuery = function() {
   window.DatabaseQuery.search(r.title, r.artist, r.period).then(function() {
     if (spinner) spinner.style.display = 'none';
     if (btn) btn.style.opacity = '1';
+    window.showToastSuccess && window.showToastSuccess('Database query complete');
   }).catch(function() {
     if (spinner) spinner.style.display = 'none';
     if (btn) btn.style.opacity = '1';
+    window.showToastError && window.showToastError('Database query failed');
   });
 };
 
@@ -640,7 +766,7 @@ window.ProvenanceCheck = {
 
 window.runProvenanceCheck = function() {
   var r = window._lastResult;
-  if (!r) { window.toast('No analysis to cross-reference'); return; }
+  if (!r) { window.showToastError && window.showToastError('No analysis to cross-reference'); return; }
   var btn = document.getElementById('provenance-btn');
   if (btn) btn.style.opacity = '0.5';
   var spinner = document.getElementById('provenance-btn-spinner');
@@ -648,9 +774,11 @@ window.runProvenanceCheck = function() {
   window.ProvenanceCheck.search(r.title, r.artist, r.timeline, window.TIER).then(function() {
     if (btn) btn.style.opacity = '1';
     if (spinner) spinner.style.display = 'none';
+    window.showToastSuccess && window.showToastSuccess('Cross-reference complete');
   }).catch(function() {
     if (btn) btn.style.opacity = '1';
     if (spinner) spinner.style.display = 'none';
+    window.showToastError && window.showToastError('Cross-reference failed');
   });
 };
 
@@ -662,7 +790,7 @@ window.MSSpectral = {
   open() {
     window.nav('scan');
     window.buildTabs(['Visible', 'UV Fluorescence', 'IR Reflectography', 'X-Ray', 'Compare']);
-    window.toast('Multi-spectral mode \u2014 import images for each band');
+    window.showToastInfo && window.showToastInfo('Multi-spectral mode \u2014 import images for each band');
   },
 
   importBand(bandName) {
@@ -681,7 +809,7 @@ window.MSSpectral = {
         } else {
           window.MSSpectral.bands.push(entry);
         }
-        window.toast(bandName + ' imported');
+        window.showToastSuccess && window.showToastSuccess(bandName + ' imported');
         window.MSSpectral.renderLayers();
       };
       reader.readAsDataURL(file);

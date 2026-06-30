@@ -43,15 +43,17 @@
  *   POST /report                 { id }
  *   POST /send-digest
  *
+ *   POST /tts                    { text, voice_id?, language? }
+ *
  * Secrets: EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, ALLOWED_ORIGIN,
  *          TELEGRAM_BOT_TOKEN, ANTHROPIC_API_KEY, OPENROUTER_API_KEY,
- *          GEMINI_API_KEY, RESEND_API_KEY
+ *          GEMINI_API_KEY, RESEND_API_KEY, ELEVENLABS_API_KEY
  * KV:      TOKEN_CACHE, TRACK_WATCHLIST, TRACK_SEEN_IDS,
  *          TRACK_ALERT_HISTORY, TRACK_REFERENCE_CACHE,
  *          TRACK_SAVED_FINDS, TRACK_VISUAL_CACHE, TRACK_OEUVRE_CACHE
  */
 
-import { jsonResponse, corsPreflightResponse, addCorsHeaders, hashString } from './utils.js';
+import { jsonResponse, corsPreflightResponse, addCorsHeaders, corsHeaders, hashString } from './utils.js';
 import { withSentry } from './sentry.js';
 import { buildVisionContent, callAI, getTierForTask } from './ai.js';
 import { classifyMedia, scoreAlert } from './alerts.js';
@@ -600,6 +602,8 @@ const router = {
         response = await timed('oeuvre', () => handleGetOeuvre(url.searchParams, env));
       } else if (path === '/report' && method === 'POST') {
         response = await timed('report', () => handleReport(request, env));
+      } else if (path === '/tts' && method === 'POST') {
+        response = await timed('tts', () => handleTTS(request, env));
       } else if (path === '/send-digest' && method === 'POST') {
         const body = await request.json().catch(() => ({}));
         const finds = body.finds || [];
@@ -618,5 +622,55 @@ const router = {
     ctx.waitUntil(runBackgroundScan(env, ctx));
   },
 };
+
+// ── ElevenLabs TTS with KV caching ───────────────────────────────────────────
+
+async function handleTTS(request, env) {
+  if (!env.ELEVENLABS_API_KEY) {
+    return jsonResponse({ error: 'ElevenLabs not configured' }, 503);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Invalid JSON body' }, 400);
+  }
+
+  const { text, voice_id = 'onwK4e9ZLuTAKqWW03F9', language = 'nl' } = body;
+  if (!text || typeof text !== 'string') return jsonResponse({ error: 'text required' }, 400);
+
+  const truncated = text.slice(0, 2500);
+  const cacheKey = `tts_${voice_id}_${language}_${hashString(truncated)}`;
+
+  const cached = await env.TOKEN_CACHE.get(cacheKey, { type: 'arrayBuffer' });
+  if (cached) {
+    return new Response(cached, {
+      headers: { 'Content-Type': 'audio/mpeg', 'X-Cache': 'HIT', ...corsHeaders(env) },
+    });
+  }
+
+  const elRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice_id}`, {
+    method: 'POST',
+    headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      text: truncated,
+      model_id: 'eleven_multilingual_v2',
+      voice_settings: { stability: 0.72, similarity_boost: 0.85, style: 0.12 },
+    }),
+  });
+
+  if (!elRes.ok) {
+    const err = await elRes.text().catch(() => elRes.status);
+    return jsonResponse({ error: 'ElevenLabs error', detail: err }, elRes.status);
+  }
+
+  const audio = await elRes.arrayBuffer();
+  await env.TOKEN_CACHE.put(cacheKey, audio, { expirationTtl: 86400 * 30 });
+
+  return new Response(audio, {
+    headers: { 'Content-Type': 'audio/mpeg', 'X-Cache': 'MISS', ...corsHeaders(env) },
+  });
+}
 
 export default withSentry(router);

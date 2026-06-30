@@ -342,9 +342,9 @@
           inp.multiple = true;
           inp.onchange = function(e) {
             if (e.target.files) handleDrop(e.target.files);
-          });
+          };
           inp.click();
-        };
+        });
         sourcePicker.appendChild(batchBtn);
       }
 

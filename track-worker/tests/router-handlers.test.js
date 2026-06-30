@@ -716,7 +716,7 @@ describe('POST /test-notify', () => {
     const body = await resp.json();
 
     expect(body.test).toBe(true);
-    expect(mockSendResendEmail).toHaveBeenCalledWith('digest', expect.any(Array), expect.any(Object));
+    expect(mockSendResendEmail).toHaveBeenCalledWith('digest', expect.any(Array), expect.any(Object), 'test@example.com');
   });
 
   it('should handle both Telegram and email', async () => {

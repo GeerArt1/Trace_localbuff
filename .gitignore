@@ -13,3 +13,10 @@ trace_optimize.log
 lib/
 .DS_Store
 *.log
+
+# Backup files
+*.bak
+
+# Build output
+dist/
+build.js

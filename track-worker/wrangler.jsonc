@@ -81,6 +81,7 @@
   // EBAY_CLIENT_SECRET
   // ALLOWED_ORIGIN  (e.g. "*" for dev, or "https://yourdomain.com")
   // TELEGRAM_BOT_TOKEN  (get from @BotFather)
+  // ELEVENLABS_API_KEY  (Companion TTS — POST /tts)
   //
   // Create new KV namespaces:
   //   npx wrangler kv namespace create TRACK_WATCHLIST

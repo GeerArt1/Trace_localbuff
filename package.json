@@ -4,7 +4,7 @@
   "description": "TRACE Art Intelligence API Proxy — SQLite backend",
   "main": "trace_server.js",
   "scripts": {
-    "start": "node trace_cluster.js",
+    "start": "node trace_server.js",
     "start:standalone": "node trace_server.js",
     "start:watch": "node trace_cluster.js --watch",
     "start:graceful": "node trace_cluster.js --graceful",
@@ -12,7 +12,9 @@
     "test": "node tests/test_all.js",
     "test:db": "TRACE_DB_PATH=trace_db_test.sqlite node tests/test_db.js",
     "test:server": "node tests/test_server_core.js",
-    "test:watch": "node -e \"setInterval(function(){require('child_process').spawn('node',['tests/test_all.js'],{stdio:'inherit',env:process.env})},10000).unref();console.log('Watching — tests re-run every 10s')\""
+    "test:watch": "node -e \"setInterval(function(){require('child_process').spawn('node',['tests/test_all.js'],{stdio:'inherit',env:process.env})},10000).unref();console.log('Watching — tests re-run every 10s')\"",
+    "build": "node build.js",
+    "build:prod": "esbuild dist/trace-bundle.js --minify --outfile=dist/trace-bundle.min.js --target=es2017"
   },
   "dependencies": {
     "@sentry/node": "^10.61.0",
@@ -25,6 +27,8 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.60.0"
+    "@playwright/test": "^1.60.0",
+    "esbuild": "^0.28.1",
+    "uglify-js": "^3.19.3"
   }
 }

@@ -119,7 +119,18 @@ module.exports = function(ctx) {
     } catch(e) {
       return null;
     }
+   
+  // ── Set httpOnly session cookie ──
+  function setSessionCookie(res, token) {
+    var secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+    res.setHeader("Set-Cookie", "trace_token=" + token + "; HttpOnly; Path=/; Max-Age=" + (TOKEN_EXPIRY_MS / 1000) + "; SameSite=Strict" + secure);
   }
+
+  // ── Clear session cookie (logout) ──
+  function clearSessionCookie(res) {
+    res.setHeader("Set-Cookie", "trace_token=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict");
+  }
+}
 
   // ── Route handlers ──
 
@@ -174,6 +185,8 @@ module.exports = function(ctx) {
       var csrfToken = generateCsrfToken(token);
       res.setHeader('x-csrf-token', csrfToken);
 
+      setSessionCookie(res, token);
+
       sendJSON(res, 201, {
         ok: true,
         token: token,
@@ -220,6 +233,8 @@ module.exports = function(ctx) {
       var csrfToken = generateCsrfToken(token);
       res.setHeader('x-csrf-token', csrfToken);
 
+      setSessionCookie(res, token);
+
       sendJSON(res, 200, {
         ok: true,
         token: token,
@@ -235,6 +250,11 @@ module.exports = function(ctx) {
     try {
       var data = JSON.parse(body);
       var token = data.token || '';
+      // Fallback: read httpOnly cookie if no token in body
+      if (!token && req.headers && req.headers.cookie) {
+        var cookieMatch = req.headers.cookie.match(/trace_token=([^;]+)/);
+        if (cookieMatch) token = cookieMatch[1];
+      }
 
       if (!token) {
         return sendJSON(res, 200, { ok: false, authenticated: false });

@@ -1938,6 +1938,12 @@ function handleRequest(req, res) {
   }
 
   // GET /api/subscription-status
+  // ── Logout: clear session cookie ──
+  if (method === 'POST' && urlPath === '/api/auth/logout') {
+    authRoutes.clearSessionCookie(res);
+    return sendJSON(res, 200, { ok: true });
+  }
+
   if (method === 'GET' && urlPath === '/api/subscription-status') {
     return subRoutes.handleSubscriptionStatus(req, res);
   }
@@ -2469,7 +2475,7 @@ process.on('SIGTERM', function() { gracefulShutdown('SIGTERM'); });
 process.on('SIGINT', function() { gracefulShutdown('SIGINT'); });
 // Respond to cluster master health pings immediately
 process.on("message", function(msg) {
-  if (msg \&\& msg.type === "health_ping") {
+  if (msg && msg.type === "health_ping") {
     reportHealthToMaster();
   }
 });
@@ -2511,6 +2517,13 @@ function startServer(done) {
     server.listen(PORT, function() {
       log('INFO', '═══════════════════════════════════════');
       log('INFO', '  TRACE API Proxy v3.1 — Self-Healing');
+
+      // ── Warmup: prime Getty SPARQL caches on startup ──
+      setTimeout(function() {
+        if (provRoutes && provRoutes.warmupGetty) {
+          provRoutes.warmupGetty().catch(function(){});
+        }
+      }, 3000);
       log('INFO', '  ' + (USE_HTTPS ? 'HTTPS' : 'HTTP') + ' — Port: ' + PORT);
       log('INFO', '  CORS: ' + ALLOWED_ORIGIN);
       log('INFO', '  Rate limits: ' + RATE_LIMITS.discover + '/' + RATE_LIMITS.collector + '/' + RATE_LIMITS.professional + ' req/min');

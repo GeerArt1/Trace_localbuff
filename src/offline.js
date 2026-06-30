@@ -229,7 +229,7 @@
       }
       prompt.remove();
       try { localStorage.setItem(INSTALL_PROMPT_KEY, 'true'); } catch(e) { TRACE_WATCHDOG?.warn('Offline', e); }
-    };
+    });
 
     document.getElementById('pwa-dismiss-btn').addEventListener('click', function() {
       prompt.remove();
