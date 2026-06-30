@@ -2451,6 +2451,28 @@ body.tier-discover .mtab.active::after{background:var(--accent);}
   border-radius: 2px;
 }
 
+.tour-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.tour-bottom > .tour-arrow {
+  top: -6px;
+  left: 50%;
+  margin-left: -6px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--surface3);
+}
+.tour-top > .tour-arrow {
+  bottom: -6px;
+  left: 50%;
+  margin-left: -6px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--surface3);
+}
+
 /* ── LOADING OVERLAY ── */
 #trace-loading {
   position: fixed;
