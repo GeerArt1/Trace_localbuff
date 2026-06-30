@@ -37,3 +37,30 @@
 - Telegram + Resend email notifications
 - Seasonal cron scheduling
 - Oeuvre matching engine
+
+## v2.3 (June 2026)
+
+### ✨ New Features
+- Museum API integrations: Smithsonian, Europeana, Rijksmuseum provenance cross-references
+- httpOnly/SameSite=Strict session cookies with /api/auth/logout route
+- Real server SPARQL endpoint integration in vision.js with live/simulated badges
+- New ui.js module: toast system, loading overlay, keyboard shortcuts, onboarding tour
+- Tour popup with animated arrow pointer and smooth button hover/active transitions
+
+### 🐛 Bug Fixes
+- Watchdog: deduplicated refreshDashboardWatchdog, replaced innerHTML with DOM manipulation
+- Syntax fixes in offline.js and upload.js (mismatched parentheses)
+- Fixed broken script closing tags in trace.html
+
+### ♿ Accessibility
+- ARIA labels/roles on lock screen, sidebar, main content, buttons
+- lazy loading + alt text on all preview images
+- Google Fonts integration (Cormorant Garamond, Montserrat, Lora, Courier Prime)
+
+### 🧪 Testing
+- 300 tests passing across 16 test files (100% pass rate)
+- Added Provenance Routes test suite
+
+### 📋 DevOps
+- Worker deployed: track-ebay-proxy (506 KiB / 115 KiB gzip, 7ms startup)
+
